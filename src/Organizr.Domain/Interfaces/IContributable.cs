@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Organizr.Domain.Entities;
+using Organizr.Domain.AggregateModel;
 
 namespace Organizr.Domain.Interfaces
 {
     public interface IContributable
     {
-        ICollection<Contributor> Contributors { get; }
+        IReadOnlyCollection<Contributor> Contributors { get; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Organizr.Domain.Interfaces
 {
-    public interface IAggregate
+    public interface IAggregateRoot
     {
         
     }

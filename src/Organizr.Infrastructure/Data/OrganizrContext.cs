@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Organizr.Domain.Entities.TodoListAggregate;
+using Organizr.Domain.AggregateModel.ListAggregate;
 
 namespace Organizr.Infrastructure.Data
 {
@@ -15,6 +15,5 @@ namespace Organizr.Infrastructure.Data
 
         public DbSet<TodoList> TodoLists { get; set; }
         public DbSet<TodoItem> TodoItems { get; set; }
-        public DbSet<TodoListGroup> TodoListGroups { get; set; }
     }
 }
