@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Organizr.Domain.AggregateModel.ListAggregate;
+using Organizr.Domain.Lists.Entities.TodoListAggregate;
 
 namespace Organizr.Infrastructure.Data
 {

@@ -5,15 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="TodoLists\Commands\DeleteTodoList\" />
-    <Folder Include="TodoLists\Commands\DeleteTodoItem\" />
-    <Folder Include="TodoLists\Commands\DeleteTodoListGroup\" />
-    <Folder Include="TodoLists\Commands\AddContributor\" />
-    <Folder Include="TodoLists\Commands\RemoveContributor\" />
-    <Folder Include="TodoLists\Commands\UpsertTodoListGroup\" />
-    <Folder Include="TodoLists\Commands\UpsertTodoItem\" />
-    <Folder Include="TodoLists\Commands\UpsertTodoList\" />
-    <Folder Include="TodoLists\Commands\ReorderTodoList\" />
+    <Folder Include="TodoLists\Commands\" />
     <Folder Include="TodoLists\Queries\" />
   </ItemGroup>
 

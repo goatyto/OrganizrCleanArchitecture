@@ -1,4 +1,4 @@
-﻿namespace Organizr.Domain.Interfaces
+﻿namespace Organizr.Domain.SharedKernel
 {
     public interface IAggregateRoot
     {
