@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using FluentAssertions;
 using Organizr.Domain.Lists.Entities.TodoListAggregate;
@@ -11,34 +12,22 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
     public class TodoSubListTests
     {
         [Fact]
-        public void AddSubList_TodoSubListInfo_SubListItemAdded()
+        public void AddSubList_ValidData_SubListItemAdded()
         {
-            var list = new TodoList(Guid.NewGuid(), "User1", "TodoList1");
-            var originalItemCount = list.SubLists.Count;
+            var fixture = new TodoListFixture();
 
-            var subListId = Guid.NewGuid();
-            var subListTitle = "TodoSubList1";
-            var subListDescription = "TodoSubListDescription1";
-            list.AddSubList(subListId, subListTitle, subListDescription);
+            var title = "Todo Sub List";
+            var description = "Todo Sub List Description";
 
-            list.SubLists.Count.Should().Be(originalItemCount + 1);
+            fixture.TodoList.AddSubList(title, description);
 
-            var insertedSubList = list.SubLists.Last();
-            insertedSubList.Id.Should().Be(subListId);
-            insertedSubList.Title.Should().Be(subListTitle);
-            insertedSubList.Description.Should().Be(subListDescription);
+            var insertedSubList = fixture.TodoList.SubLists.Last();
+
+            insertedSubList.Id.Should().Be(default(int));
+            insertedSubList.Title.Should().Be(title);
+            insertedSubList.Ordinal.Should().Be(fixture.TodoList.SubLists.Count);
+            insertedSubList.Description.Should().Be(description);
             insertedSubList.IsDeleted.Should().Be(false);
-        }
-
-        [Fact]
-        public void AddSubList_DuplicateSubListId_ThrowsTodoSubListAlreadyExistsException()
-        {
-            var list = new TodoList(Guid.NewGuid(), "User1", "TodoList1");
-            var duplicatedSubListId = Guid.NewGuid();
-
-            list.AddSubList(duplicatedSubListId, "TodoSubList1");
-            list.Invoking(l => l.AddSubList(duplicatedSubListId, "TodoSubList2")).Should().Throw<TodoSubListAlreadyExistsException>()
-                .And.SubListId.Should().Be(duplicatedSubListId);
         }
 
         [Theory]
@@ -47,39 +36,60 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         [InlineData(" ")]
         public void AddSubList_NullOrWhiteSpaceTitle_ThrowsArgumentException(string title)
         {
-            var list = new TodoList(Guid.NewGuid(), "User1", "TodoList1");
-            list.Invoking(l => l.AddSubList(Guid.NewGuid(), title)).Should().Throw<ArgumentException>().And.ParamName
-                .Should().Be(nameof(TodoList.Title));
+            var fixture = new TodoListFixture();
+
+            var description = "Todo Sub List Description";
+
+            fixture.TodoList.Invoking(l => l.AddSubList(title, description)).Should().Throw<ArgumentException>().And
+                .ParamName.Should().Be(nameof(TodoSubList.Title));
         }
 
         [Fact]
-        public void EditSubList_NewSubListInfo_SubListInfoChanges()
+        public void EditSubList_NewSubListData_SubListInfoChanges()
         {
-            var list = new TodoList(Guid.NewGuid(), "User1", "TodoList1");
-            var subListId = Guid.NewGuid();
-            list.AddSubList(subListId, "SubListTitle", "SubListDescription");
-            var newSubListTitle = "NewSubListTitle";
-            var newSubListDescription = "NewSubListDescription";
+            var fixture = new TodoListFixture();
 
-            list.EditSubList(subListId, newSubListTitle, newSubListDescription);
+            var subListId = 1;
+            var editedSubList = fixture.TodoList.SubLists.Single(sl=>sl.Id == subListId);
+            var currentOrdinal = editedSubList.Ordinal;
 
-            var editedSubList = list.SubLists.Last();
+            var newTitle = "Todo Sub List";
+            var newDescription = "Todo Sub List Description";
+
+            fixture.TodoList.EditSubList(subListId, newTitle, newDescription);
+
 
             editedSubList.Id.Should().Be(subListId);
-            editedSubList.Title.Should().Be(newSubListTitle);
-            editedSubList.Description.Should().Be(newSubListDescription);
+            editedSubList.Title.Should().Be(newTitle);
+            editedSubList.Ordinal.Should().Be(currentOrdinal);
+            editedSubList.Description.Should().Be(newDescription);
             editedSubList.IsDeleted.Should().Be(false);
         }
 
         [Fact]
-        public void EditSubList_InvalidSubListId_ThrowsTodoSubListDoesNotExistException()
+        public void EditSubList_NonExistingSubListId_ThrowsTodoSubListDoesNotExistException()
         {
-            var list = new TodoList(Guid.NewGuid(), "User1", "TodoList1");
-            var insertedSubListId = Guid.NewGuid();
-            var invalidSubListId = Guid.NewGuid();
-            list.AddSubList(insertedSubListId, "SubList1");
-            list.Invoking(l => l.EditSubList(invalidSubListId, "NewSubList1")).Should()
-                .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(invalidSubListId);
+            var fixture = new TodoListFixture();
+
+            var nonExistingSubListId = 3;
+            var newTitle = "Todo Sub List";
+            var newDescription = "Todo Sub List Description";
+
+            fixture.TodoList.Invoking(l => l.EditSubList(nonExistingSubListId, newTitle, newDescription)).Should()
+                .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistingSubListId);
+        }
+
+        [Fact]
+        public void EditSubList_DeletedSubListId_ThrowsTodoSubListDeletedException()
+        {
+            var fixture = new TodoListFixture();
+
+            var deletedSubListId = 2;
+            var newTitle = "Todo Sub List";
+            var newDescription = "Todo Sub List Description";
+
+            fixture.TodoList.Invoking(l => l.EditSubList(deletedSubListId, newTitle, newDescription)).Should()
+                .Throw<TodoSubListDeletedException>().And.SubListId.Should().Be(deletedSubListId);
         }
 
         [Theory]
@@ -88,41 +98,38 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         [InlineData(" ")]
         public void EditSubList_NullOrWhiteSpaceTitle_ThrowsArgumentException(string newTitle)
         {
-            var list = new TodoList(Guid.NewGuid(), "User1", "TodoList1");
-            var subListId = Guid.NewGuid();
-            list.AddSubList(subListId, "TodoSubList1");
-            list.Invoking(l => l.EditSubList(subListId, newTitle)).Should().Throw<ArgumentException>().And.ParamName
-                .Should().Be(nameof(TodoSubList.Title));
+            var fixture = new TodoListFixture();
+
+            var subListId = 1;
+            var newDescription = "Todo Sub List Description";
+
+            fixture.TodoList.Invoking(l => l.EditSubList(subListId, newTitle, newDescription)).Should().Throw<ArgumentException>()
+                .And.ParamName.Should().Be(nameof(TodoSubList.Title));
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        public void DeleteSubList_SubListId_MarksSubListAsDeleted(int subListId)
+        {
+            var fixture = new TodoListFixture();
+
+            var subListToBeDeleted = fixture.TodoList.SubLists.Single(sl => sl.Id == subListId);
+
+            fixture.TodoList.DeleteSubList(subListId);
+
+            subListToBeDeleted.IsDeleted.Should().Be(true);
         }
 
         [Fact]
-        public void DeleteSubList_SubListId_MarksSubListAsDeleted()
+        public void DeleteSubList_NonExistingSubListId_ThrowsSubListDoesNotExistException()
         {
-            var list = new TodoList(Guid.NewGuid(), "User1", "TodoList1");
-            var subListId = Guid.NewGuid();
+            var fixture = new TodoListFixture();
 
-            list.AddSubList(subListId, "TodoSubList1");
+            var nonExistingSubListId = 3;
 
-            list.DeleteSubList(subListId);
-
-            list.SubLists.Count.Should().Be(1);
-
-            var insertedSubList = list.SubLists.Last();
-
-            insertedSubList.IsDeleted.Should().Be(true);
-        }
-
-        [Fact]
-        public void DeleteSubList_InvalidSubListId_ThrowsSubListDoesNotExistException()
-        {
-            var list = new TodoList(Guid.NewGuid(), "User1", "TodoList1");
-            var subListId = Guid.NewGuid();
-            var invalidListId = Guid.NewGuid();
-
-            list.AddSubList(subListId, "TodoSubList1");
-
-            list.Invoking(l => l.DeleteSubList(invalidListId)).Should().Throw<TodoSubListDoesNotExistException>().And
-                .SubListId.Should().Be(invalidListId);
+            fixture.TodoList.Invoking(l => l.DeleteSubList(nonExistingSubListId)).Should()
+                .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistingSubListId);
         }
     }
 }

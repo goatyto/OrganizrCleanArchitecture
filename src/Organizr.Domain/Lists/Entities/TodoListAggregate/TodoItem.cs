@@ -4,29 +4,16 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 {
-    public class TodoItem : Entity<Guid>
+    public class TodoItem : Entity
     {
         private Guid _mainListId;
         public Guid MainListId
         {
             get => _mainListId;
-            private set
+            protected internal set
             {
                 Guard.Against.Default(value, nameof(MainListId));
                 _mainListId = value;
-            }
-        }
-
-        private Guid? _subListId;
-        public Guid? SubListId
-        {
-            get => _subListId;
-            private set
-            {
-                if(value.HasValue)
-                    Guard.Against.Default(value.Value, nameof(SubListId));
-
-                _subListId = value;
             }
         }
 
@@ -34,27 +21,31 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
         public string Title
         {
             get => _title;
-            private set
+            protected internal set
             {
                 Guard.Against.NullOrWhiteSpace(value, nameof(Title));
                 _title = value;
             }
         }
 
-        public string Description { get; private set; }
-        public int Ordinal { get; private set; }
-        public bool IsCompleted { get; private set; }
-        public bool IsDeleted { get; private set; }
-        public DateTime? DueDate { get; private set; }
+        public string Description { get; protected internal set; }
+        public TodoItemPosition Position { get; protected internal set; }
+        public bool IsCompleted { get; protected internal set; }
+        public bool IsDeleted { get; protected internal set; }
+        public DateTime? DueDate { get; protected internal set; }
 
-        public TodoItem(Guid id, Guid mainListId, string title, int ordinal, string description = null, DateTime? dueDate = null, Guid? subListId = null) : base(id)
+        private TodoItem()
+        {
+            
+        }
+
+        protected internal TodoItem(Guid mainListId, string title, TodoItemPosition position, string description = null, DateTime? dueDate = null)
         {
             MainListId = mainListId;
             Title = title;
-            Ordinal = ordinal;
+            Position = position;
             Description = description;
             DueDate = dueDate;
-            SubListId = subListId;
         }
 
         internal void Edit(string title, string description = null, DateTime? dueDate = null)
@@ -64,10 +55,9 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             DueDate = dueDate;
         }
 
-        internal void ChangeSubList(Guid? subListId, int ordinal)
+        internal void ChangePosition(TodoItemPosition position)
         {
-            SubListId = subListId;
-            Ordinal = ordinal;
+            Position = position;
         }
 
         internal void SetCompleted(bool isCompleted = true)

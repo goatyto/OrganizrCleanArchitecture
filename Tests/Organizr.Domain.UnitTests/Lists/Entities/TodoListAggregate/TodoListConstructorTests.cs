@@ -10,16 +10,14 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
     public class TodoListConstructorTests
     {
         [Fact]
-        public void TodoListConstructor_TodoListParameters_ObjectInitializedProperly()
+        public void TodoListConstructor_ValidData_ObjectInitializedProperly()
         {
-            var id = Guid.NewGuid();
             var ownerId = "User1";
             var title = "ListTitle1";
             var description = "ListDescription1";
 
-            var list = new TodoList(id, ownerId, title, description);
+            var list = new TodoList(ownerId, title, description);
 
-            list.Id.Should().Be(id);
             list.OwnerId.Should().Be(ownerId);
             list.Title.Should().Be(title);
             list.Description.Should().Be(description);
@@ -33,7 +31,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         [InlineData(" ")]
         public void TodoListConstructor_NullOrWhiteSpaceTitle_ThrowsArgumentException(string title)
         {
-            Func<TodoList> construct = () => new TodoList(Guid.NewGuid(), "User1", title);
+            Func<TodoList> construct = () => new TodoList( "User1", title);
 
             construct.Should().Throw<ArgumentException>().And.ParamName.Should().Be(nameof(TodoList.Title));
         }

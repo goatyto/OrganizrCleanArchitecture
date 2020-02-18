@@ -5,31 +5,32 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 {
-    public class TodoSubList: Entity<Guid>
+    public class TodoSubList: Entity
     {
         private string _title;
         public string Title
         {
             get => _title;
-            private set
+            protected internal set
             {
                 Guard.Against.NullOrWhiteSpace(value, nameof(Title));
                 _title = value;
             }
         }
 
-        public string Description { get; private set; }
-        public bool IsDeleted { get; private set; }
+        public string Description { get; protected internal set; }
+        public int Ordinal { get; protected internal set; }
+        public bool IsDeleted { get; protected internal set; }
 
         private TodoSubList() : base()
         {
 
         }
 
-        public TodoSubList(Guid id, string title, string description = null): base(id)
+        protected internal TodoSubList(string title, int ordinal, string description = null)
         {
-            Id = id;
             Title = title;
+            Ordinal = ordinal;
             Description = description;
         }
 
@@ -37,6 +38,11 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
         {
             Title = title;
             Description = description;
+        }
+
+        internal void ChangeOrdinal(int newOrdinal)
+        {
+            Ordinal = newOrdinal;
         }
 
         internal void Delete()

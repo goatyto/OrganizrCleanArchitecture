@@ -15,16 +15,15 @@ namespace Organizr.Domain.UnitTests.SharedKernel
         [InlineData(" ")]
         public void Constructor_InvalidParameters_ThrowArgumentException(string ownerId)
         {
-            Func<ResourceMock> construct = () => new ResourceMock(Guid.NewGuid(), ownerId);
+            Func<ResourceMock> construct = () => new ResourceMock(ownerId);
 
             construct.Should().Throw<ArgumentException>().And.ParamName.Should().Be(nameof(ResourceMock.OwnerId));
         }
 
         private class ResourceMock : ResourceEntity
         {
-            public ResourceMock(Guid id, string ownerId)
+            public ResourceMock(string ownerId)
             {
-                Id = id;
                 OwnerId = ownerId;
             }
         }

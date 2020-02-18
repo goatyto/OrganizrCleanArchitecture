@@ -19,18 +19,11 @@ namespace Organizr.Domain.SharedKernel
             }
         }
 
-        protected List<string> _contributorIds;
+        protected readonly List<string> _contributorIds;
         public IReadOnlyCollection<string> ContributorIds => _contributorIds.AsReadOnly();
 
-        protected ResourceEntity() : base()
+        protected ResourceEntity()
         {
-
-        }
-
-        protected ResourceEntity(Guid id, string ownerId) : base(id)
-        {
-            OwnerId = ownerId;
-
             _contributorIds = new List<string>();
         }
 

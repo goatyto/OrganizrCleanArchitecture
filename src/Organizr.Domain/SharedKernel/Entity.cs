@@ -7,28 +7,8 @@ namespace Organizr.Domain.SharedKernel
     {
         int? _requestedHashCode;
 
-        private TKey _id;
-
-        public virtual TKey Id
-        {
-            get => _id;
-            protected set
-            {
-                Guard.Against.Default(value, nameof(Id));
-                _id = value;
-            }
-        }
-
-        protected Entity()
-        {
-
-        }
-
-        protected Entity(TKey id): this()
-        {
-            Id = id;
-        }
-
+        public virtual TKey Id { get; protected set; }
+        
         public bool IsTransient()
         {
             return Id.Equals(default(TKey));
@@ -82,8 +62,6 @@ namespace Organizr.Domain.SharedKernel
 
     public abstract class Entity : Entity<int>
     {
-        protected Entity(int id) : base(id)
-        {
-        }
+
     }
 }
