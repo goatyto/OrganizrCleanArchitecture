@@ -23,6 +23,8 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             list.Description.Should().Be(description);
             list.Items.Should().NotBeNull();
             list.SubLists.Should().NotBeNull();
+            list.OwnerId.Should().NotBeNullOrWhiteSpace();
+            list.ContributorIds.Should().NotBeNull();
         }
 
         [Theory]

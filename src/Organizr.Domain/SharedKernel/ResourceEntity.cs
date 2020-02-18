@@ -19,7 +19,7 @@ namespace Organizr.Domain.SharedKernel
             }
         }
 
-        protected readonly List<string> _contributorIds;
+        protected internal readonly List<string> _contributorIds;
         public IReadOnlyCollection<string> ContributorIds => _contributorIds.AsReadOnly();
 
         protected ResourceEntity()
@@ -30,7 +30,7 @@ namespace Organizr.Domain.SharedKernel
         public void AddContributor(string contributorId)
         {
             if (OwnerId == contributorId)
-                throw new OwnerSetAsContributorException();
+                throw new ContributorAlreadyOwnerException(Id, contributorId);
 
             if (ContributorIds.Any(id => id == contributorId))
                 throw new ContributorAlreadyExistsException(Id, contributorId);
