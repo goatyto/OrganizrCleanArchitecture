@@ -31,11 +31,22 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
+        public void TodoListConstructor_NullOrWhiteSpaceOwnerId_ThrowsArgumentException(string ownerId)
+        {
+            Func<TodoList> construct = () => new TodoList(ownerId, "TodoList");
+
+            construct.Should().Throw<ArgumentException>().And.ParamName.Should().Be("ownerId");
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
         public void TodoListConstructor_NullOrWhiteSpaceTitle_ThrowsArgumentException(string title)
         {
             Func<TodoList> construct = () => new TodoList( "User1", title);
 
-            construct.Should().Throw<ArgumentException>().And.ParamName.Should().Be(nameof(TodoList.Title));
+            construct.Should().Throw<ArgumentException>().And.ParamName.Should().Be("title");
         }
     }
 }

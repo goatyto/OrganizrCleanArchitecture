@@ -11,26 +11,6 @@ namespace Organizr.Domain.UnitTests.SharedKernel
     public class ResourceEntityTests
     {
         [Fact]
-        public void Constructor_ValidData_ResourceInitialized()
-        {
-            var ownerId = "User1";
-            var resource = new ResourceEntityStub(ownerId);
-
-            resource.OwnerId.Should().Be(ownerId);
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData(" ")]
-        public void Constructor_NullOrWhiteSpaceOwnerId_ThrowArgumentException(string ownerId)
-        {
-            Func<ResourceEntityStub> construct = () => new ResourceEntityStub(ownerId);
-
-            construct.Should().Throw<ArgumentException>().And.ParamName.Should().Be(nameof(ResourceEntityStub.OwnerId));
-        }
-
-        [Fact]
         public void AddContributor_ValidContributorId_ContributorAdded()
         {
             var fixture = new ResourceEntityFixture();
@@ -65,6 +45,18 @@ namespace Organizr.Domain.UnitTests.SharedKernel
                 .Throw<ContributorAlreadyOwnerException>().And.ContributorId.Should().Be(ownerId);
         }
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void AddContributor_NullOrWhiteSpaceContributorId_ThrowsArgumentException(string contributorId)
+        {
+            var fixture = new ResourceEntityFixture();
+
+            fixture.ResourceEntity.Invoking(re => re.AddContributor(contributorId)).Should()
+                .Throw<ArgumentException>().And.ParamName.Should().Be("contributorId");
+        }
+
         [Fact]
         public void RemoveContributor_ExistingContributorId_ContributorRemoved()
         {
@@ -86,6 +78,18 @@ namespace Organizr.Domain.UnitTests.SharedKernel
 
             fixture.ResourceEntity.Invoking(re => re.RemoveContributor(nonExistentContributorId)).Should()
                 .Throw<ContributorDoesNotExistException>().And.ContributorId.Should().Be(nonExistentContributorId);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void RemoveContributor_NullOrWhiteSpaceContributorId_ThrowsArgumentException(string contributorId)
+        {
+            var fixture = new ResourceEntityFixture();
+
+            fixture.ResourceEntity.Invoking(re => re.RemoveContributor(contributorId)).Should()
+                .Throw<ArgumentException>().And.ParamName.Should().Be("contributorId");
         }
 
         private class ResourceEntityStub : ResourceEntity

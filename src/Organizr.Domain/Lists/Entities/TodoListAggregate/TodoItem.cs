@@ -6,33 +6,13 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 {
     public class TodoItem : Entity
     {
-        private Guid _mainListId;
-        public Guid MainListId
-        {
-            get => _mainListId;
-            protected internal set
-            {
-                Guard.Against.Default(value, nameof(MainListId));
-                _mainListId = value;
-            }
-        }
-
-        private string _title;
-        public string Title
-        {
-            get => _title;
-            protected internal set
-            {
-                Guard.Against.NullOrWhiteSpace(value, nameof(Title));
-                _title = value;
-            }
-        }
-
-        public string Description { get; protected internal set; }
-        public TodoItemPosition Position { get; protected internal set; }
-        public bool IsCompleted { get; protected internal set; }
-        public bool IsDeleted { get; protected internal set; }
-        public DateTime? DueDate { get; protected internal set; }
+        public Guid MainListId { get; protected set;}
+        public string Title { get; protected set; }
+        public string Description { get; protected set; }
+        public TodoItemPosition Position { get; protected set; }
+        public bool IsCompleted { get; protected set; }
+        public bool IsDeleted { get; protected set; }
+        public DateTime? DueDate { get; protected set; }
 
         private TodoItem()
         {
@@ -41,6 +21,9 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         protected internal TodoItem(Guid mainListId, string title, TodoItemPosition position, string description = null, DateTime? dueDate = null)
         {
+            Guard.Against.Default(mainListId, nameof(mainListId));
+            Guard.Against.NullOrWhiteSpace(title, nameof(title));
+
             MainListId = mainListId;
             Title = title;
             Position = position;
@@ -50,12 +33,14 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         internal void Edit(string title, string description = null, DateTime? dueDate = null)
         {
+            Guard.Against.NullOrWhiteSpace(title, nameof(title));
+
             Title = title;
             Description = description;
             DueDate = dueDate;
         }
 
-        internal void ChangePosition(TodoItemPosition position)
+        internal void SetPosition(TodoItemPosition position)
         {
             Position = position;
         }

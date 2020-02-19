@@ -41,7 +41,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var description = "Todo Sub List Description";
 
             fixture.TodoList.Invoking(l => l.AddSubList(title, description)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be(nameof(TodoSubList.Title));
+                .ParamName.Should().Be("title");
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
             var subListId = 1;
             var editedSubList = fixture.TodoList.SubLists.Single(sl=>sl.Id == subListId);
-            var currentOrdinal = editedSubList.Ordinal;
+            var originalOrdinal = editedSubList.Ordinal;
 
             var newTitle = "Todo Sub List";
             var newDescription = "Todo Sub List Description";
@@ -61,7 +61,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
             editedSubList.Id.Should().Be(subListId);
             editedSubList.Title.Should().Be(newTitle);
-            editedSubList.Ordinal.Should().Be(currentOrdinal);
+            editedSubList.Ordinal.Should().Be(originalOrdinal);
             editedSubList.Description.Should().Be(newDescription);
             editedSubList.IsDeleted.Should().Be(false);
         }
@@ -71,7 +71,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         {
             var fixture = new TodoListFixture();
 
-            var nonExistingSubListId = 3;
+            var nonExistingSubListId = 99;
             var newTitle = "Todo Sub List";
             var newDescription = "Todo Sub List Description";
 
@@ -104,7 +104,79 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var newDescription = "Todo Sub List Description";
 
             fixture.TodoList.Invoking(l => l.EditSubList(subListId, newTitle, newDescription)).Should().Throw<ArgumentException>()
-                .And.ParamName.Should().Be(nameof(TodoSubList.Title));
+                .And.ParamName.Should().Be("title");
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        public void EditSubList_InvalidSubListId_ThrowsArgumentException(int invalidSubListId)
+        {
+            var fixture = new TodoListFixture();
+
+            var newTitle = "Todo Sub List";
+            var newDescription = "Todo Sub List Description";
+
+            fixture.TodoList.Invoking(l => l.EditSubList(invalidSubListId, newTitle, newDescription)).Should()
+                .Throw<ArgumentException>().And.ParamName.Should().Be("subListId");
+        }
+
+        [Theory]
+        [InlineData(1, 4)]
+        [InlineData(3, 3)]
+        [InlineData(5, 2)]
+        [InlineData(3, 1)]
+        [InlineData(4, 3)]
+        public void MoveSubList_ValidPosition_SubListOrdinalChanges(int subListId, int targetOrdinal)
+        {
+            var fixture = new TodoListFixture();
+
+            var subListToBeMoved = fixture.TodoList.SubLists.Single(sl => sl.Id == subListId);
+
+            fixture.TodoList.MoveSubList(subListId, targetOrdinal);
+
+            subListToBeMoved.Ordinal.Should().Be(targetOrdinal);
+
+            var resultSubListOrdinals =
+                fixture.TodoList.SubLists.Where(sl => !sl.IsDeleted).OrderBy(sl => sl.Ordinal).ToList();
+
+            for(int i = 0; i < resultSubListOrdinals.Count; i++)
+            {
+                resultSubListOrdinals[i].Ordinal.Should().Be(i + 1);
+            }
+        }
+
+        [Fact]
+        public void MoveSubList_DeletedSubList_ThrowsTodoSubListDeletedException()
+        {
+            var fixture = new TodoListFixture();
+            var deletedSubListId = 2;
+            
+            fixture.TodoList.Invoking(l => l.MoveSubList(deletedSubListId, 4)).Should().Throw<TodoSubListDeletedException>().And
+                .SubListId.Should().Be(deletedSubListId);
+        }
+
+        [Theory]
+        [InlineData(-99)]
+        [InlineData(0)]
+        [InlineData(99)]
+        public void MoveSubList_OutOfRangeOrdinal_ThrowsArgumentException(int invalidOrdinal)
+        {
+            var fixture=new TodoListFixture();
+
+            fixture.TodoList.Invoking(l => l.MoveSubList(3, invalidOrdinal)).Should().Throw<ArgumentException>().And
+                .ParamName.Should().Be("newOrdinal");
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        public void MoveSubList_InvalidSubListId_ThrowsArgumentException(int invalidSubListId)
+        {
+            var fixture = new TodoListFixture();
+
+            fixture.TodoList.Invoking(l => l.MoveSubList(invalidSubListId, 4)).Should().Throw<ArgumentException>().And
+                .ParamName.Should().Be("subListId");
         }
 
         [Theory]
@@ -126,10 +198,21 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         {
             var fixture = new TodoListFixture();
 
-            var nonExistingSubListId = 3;
+            var nonExistingSubListId = 99;
 
             fixture.TodoList.Invoking(l => l.DeleteSubList(nonExistingSubListId)).Should()
                 .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistingSubListId);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        public void DeleteSubList_InvalidSubListId_ThrowsArgumentException(int invalidSubListId)
+        {
+            var fixture = new TodoListFixture();
+
+            fixture.TodoList.Invoking(l => l.DeleteSubList(invalidSubListId)).Should().Throw<ArgumentException>().And
+                .ParamName.Should().Be("subListId");
         }
     }
 }

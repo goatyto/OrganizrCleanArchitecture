@@ -7,20 +7,10 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 {
     public class TodoSubList: Entity
     {
-        private string _title;
-        public string Title
-        {
-            get => _title;
-            protected internal set
-            {
-                Guard.Against.NullOrWhiteSpace(value, nameof(Title));
-                _title = value;
-            }
-        }
-
-        public string Description { get; protected internal set; }
-        public int Ordinal { get; protected internal set; }
-        public bool IsDeleted { get; protected internal set; }
+        public string Title { get; protected set; }
+        public string Description { get; protected set; }
+        public int Ordinal { get; protected set; }
+        public bool IsDeleted { get; protected set; }
 
         private TodoSubList() : base()
         {
@@ -29,6 +19,9 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         protected internal TodoSubList(string title, int ordinal, string description = null)
         {
+            Guard.Against.NullOrWhiteSpace(title, nameof(title));
+            Guard.Against.NegativeOrZero(ordinal, nameof(ordinal));
+
             Title = title;
             Ordinal = ordinal;
             Description = description;
@@ -36,12 +29,16 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         internal void Edit(string title, string description = null)
         {
+            Guard.Against.NullOrWhiteSpace(title, nameof(title));
+
             Title = title;
             Description = description;
         }
 
-        internal void ChangeOrdinal(int newOrdinal)
+        internal void SetOrdinal(int newOrdinal)
         {
+            Guard.Against.NegativeOrZero(newOrdinal, nameof(newOrdinal));
+
             Ordinal = newOrdinal;
         }
 

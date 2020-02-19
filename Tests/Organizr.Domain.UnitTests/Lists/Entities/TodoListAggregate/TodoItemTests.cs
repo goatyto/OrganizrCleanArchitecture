@@ -19,8 +19,8 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         {
             var fixture = new TodoListFixture();
 
-            var title = "Todo List";
-            var description = "Todo List Description";
+            var title = "Todo";
+            var description = "Todo Description";
             var dueDate = DateTime.Today.AddDays(1);
 
             fixture.TodoList.AddTodo(title, description, dueDate, subListId);
@@ -42,10 +42,10 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         {
             var fixture = new TodoListFixture();
 
-            var title = "Todo List";
-            var description = "Todo List Description";
+            var title = "Todo";
+            var description = "Todo Description";
             var dueDate = DateTime.Today.AddDays(1);
-            var nonExistantSubListId = 3;
+            var nonExistantSubListId = 99;
 
             fixture.TodoList.Invoking(l => l.AddTodo(title, description, dueDate, nonExistantSubListId)).Should()
                 .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistantSubListId);
@@ -56,8 +56,8 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         {
             var fixture = new TodoListFixture();
 
-            var title = "Todo List";
-            var description = "Todo List Description";
+            var title = "Todo";
+            var description = "Todo Description";
             var dueDate = DateTime.Today.AddDays(1);
             var deletedSubListId = 2;
 
@@ -73,11 +73,26 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         {
             var fixture = new TodoListFixture();
 
-            var description = "Todo List Description";
+            var description = "Todo Description";
             var dueDate = DateTime.Today.AddDays(1);
 
             fixture.TodoList.Invoking(l => l.AddTodo(title, description, dueDate)).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be(nameof(TodoItem.Title));
+                .Throw<ArgumentException>().And.ParamName.Should().Be("title");
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        public void AddTodo_InvalidSubListId_ThrowsArgumentException(int invalidSubListId)
+        {
+            var fixture = new TodoListFixture();
+
+            var title = "Todo";
+            var description = "Todo Description";
+            var dueDate = DateTime.Today.AddDays(1);
+
+            fixture.TodoList.Invoking(l => l.AddTodo(title, description, dueDate, invalidSubListId)).Should()
+                .Throw<ArgumentException>().And.ParamName.Should().Be("subListId");
         }
 
         [Theory]
@@ -88,12 +103,12 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var fixture = new TodoListFixture();
 
             var todoToBeEdited = fixture.TodoList.Items.Single(item => item.Id == todoId);
-            var currentPosition = todoToBeEdited.Position;
-            var currentIsCompleted = todoToBeEdited.IsCompleted;
-            var currentIsDeleted = todoToBeEdited.IsDeleted;
+            var originalPosition = todoToBeEdited.Position;
+            var originalIsCompleted = todoToBeEdited.IsCompleted;
+            var originalIsDeleted = todoToBeEdited.IsDeleted;
 
-            var newTitle = "Todo List";
-            var newDescription = "Todo List Description";
+            var newTitle = "Todo";
+            var newDescription = "Todo Description";
             var newDueDate = DateTime.Today.AddDays(5);
 
             fixture.TodoList.EditTodo(todoId, newTitle, newDescription, newDueDate);
@@ -104,9 +119,9 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             todoToBeEdited.Title.Should().Be(newTitle);
             todoToBeEdited.Description.Should().Be(newDescription);
             todoToBeEdited.DueDate.Should().Be(newDueDate);
-            todoToBeEdited.Position.Should().Be(currentPosition);
-            todoToBeEdited.IsCompleted.Should().Be(currentIsCompleted);
-            todoToBeEdited.IsDeleted.Should().Be(currentIsDeleted);
+            todoToBeEdited.Position.Should().Be(originalPosition);
+            todoToBeEdited.IsCompleted.Should().Be(originalIsCompleted);
+            todoToBeEdited.IsDeleted.Should().Be(originalIsDeleted);
         }
 
         [Fact]
@@ -114,10 +129,10 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         {
             var fixture = new TodoListFixture();
 
-            var newTitle = "Todo List";
-            var newDescription = "Todo List Description";
+            var newTitle = "Todo";
+            var newDescription = "Todo Description";
             var newDueDate = DateTime.Today.AddDays(5);
-            var nonExistantTodoId = 10;
+            var nonExistantTodoId = 99;
 
             fixture.TodoList.Invoking(l => l.EditTodo(nonExistantTodoId, newTitle, newDescription, newDueDate)).Should()
                 .Throw<TodoItemDoesNotExistException>().And.TodoId.Should().Be(nonExistantTodoId);
@@ -125,13 +140,13 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
         [Theory]
         [InlineData(2)]
-        [InlineData(5)]
+        [InlineData(7)]
         public void EditTodo_CompletedTodoId_ThrowsTodoItemCompletedException(int todoId)
         {
             var fixture = new TodoListFixture();
 
-            var newTitle = "Todo List";
-            var newDescription = "Todo List Description";
+            var newTitle = "Todo";
+            var newDescription = "Todo Description";
             var newDueDate = DateTime.Today.AddDays(5);
 
             fixture.TodoList.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate)).Should()
@@ -140,13 +155,13 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
         [Theory]
         [InlineData(3)]
-        [InlineData(6)]
+        [InlineData(8)]
         public void EditTodo_DeletedTodoId_ThrowsTodoItemDeletedException(int todoId)
         {
             var fixture = new TodoListFixture();
 
-            var newTitle = "Todo List";
-            var newDescription = "Todo List Description";
+            var newTitle = "Todo";
+            var newDescription = "Todo Description";
             var newDueDate = DateTime.Today.AddDays(5);
 
             fixture.TodoList.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate)).Should()
@@ -154,15 +169,15 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         }
 
         [Theory]
-        [InlineData(7)]
-        [InlineData(8)]
-        [InlineData(9)]
+        [InlineData(11)]
+        [InlineData(12)]
+        [InlineData(13)]
         public void EditTodo_DeletedSubListTodoId_ThrowsTodoSubListDeletedException(int deletedSubListTodoId)
         {
             var fixture = new TodoListFixture();
 
-            var newTitle = "Todo List";
-            var newDescription = "Todo List Description";
+            var newTitle = "Todo";
+            var newDescription = "Todo Description";
             var newDueDate = DateTime.Today.AddDays(5);
             var deletedSubListId = 2;
 
@@ -179,11 +194,26 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var fixture = new TodoListFixture();
 
             var todoId = 1;
-            var newDescription = "Todo List Description";
+            var newDescription = "Todo Description";
             var newDueDate = DateTime.Today.AddDays(5);
 
             fixture.TodoList.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate)).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be(nameof(TodoItem.Title));
+                .Throw<ArgumentException>().And.ParamName.Should().Be("title");
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        public void EditTodo_InvalidTodoId_ThrowsArgumentException(int invalidTodoId)
+        {
+            var fixture = new TodoListFixture();
+
+            var newTitle = "Todo";
+            var newDescription = "Todo Description";
+            var newDueDate = DateTime.Today.AddDays(5);
+
+            fixture.TodoList.Invoking(l => l.EditTodo(invalidTodoId, newTitle, newDescription, newDueDate)).Should()
+                .Throw<ArgumentException>().And.ParamName.Should().Be("todoId");
         }
 
         [Theory]
@@ -208,9 +238,9 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
         [Theory]
         [InlineData(3, true)]
-        [InlineData(6, true)]
+        [InlineData(8, true)]
         [InlineData(3, false)]
-        [InlineData(6, false)]
+        [InlineData(8, false)]
         public void SetCompletedTodo_DeletedTodoId_ThrowsTodoItemDeletedException(int todoId, bool isCompleted)
         {
             var fixture = new TodoListFixture();
@@ -220,12 +250,12 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         }
 
         [Theory]
-        [InlineData(7, true)]
-        [InlineData(8, true)]
-        [InlineData(9, true)]
-        [InlineData(7, false)]
-        [InlineData(8, false)]
-        [InlineData(9, false)]
+        [InlineData(11, true)]
+        [InlineData(12, true)]
+        [InlineData(13, true)]
+        [InlineData(11, false)]
+        [InlineData(12, false)]
+        [InlineData(13, false)]
         public void SetCompletedTodo_DeletedSubListTodoId_ThrowsTodoSubListDeletedException(int todoId, bool isCompleted)
         {
             var fixture = new TodoListFixture();
@@ -234,6 +264,17 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
             fixture.TodoList.Invoking(l => l.SetCompletedTodo(todoId, isCompleted)).Should()
                 .Throw<TodoSubListDeletedException>().And.SubListId.Should().Be(deletedSubListId);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        public void SetCompletedTodo_InvalidTodoId_ThrowsArgumentException(int invalidTodoId)
+        {
+            var fixture = new TodoListFixture();
+
+            fixture.TodoList.Invoking(l => l.SetCompletedTodo(invalidTodoId)).Should().Throw<ArgumentException>().And
+                .ParamName.Should().Be("todoId");
         }
 
         [Theory]
@@ -259,16 +300,16 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         {
             var fixture = new TodoListFixture();
 
-            var nonExistantTodoId = 10;
+            var nonExistantTodoId = 99;
 
             fixture.TodoList.Invoking(l => l.DeleteTodo(nonExistantTodoId)).Should().Throw<TodoItemDoesNotExistException>().And
                 .TodoId.Should().Be(nonExistantTodoId);
         }
 
         [Theory]
-        [InlineData(7)]
-        [InlineData(8)]
-        [InlineData(9)]
+        [InlineData(11)]
+        [InlineData(12)]
+        [InlineData(13)]
         public void DeleteTodo_DeletedSubListTodoId_ThrowsTodoSubListDeletedException(int todoId)
         {
             var fixture = new TodoListFixture();
@@ -277,6 +318,17 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
             fixture.TodoList.Invoking(l => l.DeleteTodo(todoId)).Should().Throw<TodoSubListDeletedException>().And
                 .SubListId.Should().Be(deletedSubListId);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        public void DeleteTodo_InvalidTodoId_ThrowsArgumentException(int invalidTodoId)
+        {
+            var fixture = new TodoListFixture();
+
+            fixture.TodoList.Invoking(l => l.DeleteTodo(invalidTodoId)).Should().Throw<ArgumentException>().And
+                .ParamName.Should().Be("todoId");
         }
     }
 }

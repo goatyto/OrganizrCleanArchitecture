@@ -6,35 +6,18 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 {
-    public class TodoItemPosition:ValueObject
+    public class TodoItemPosition : ValueObject
     {
-        private int _ordinal;
-        public int Ordinal
-        {
-            get => _ordinal;
-            protected internal set
-            {
-                Guard.Against.Default(value, nameof(Ordinal));
+        public int Ordinal { get; }
+        public int? SubListId { get; }
 
-                _ordinal = value;
-            }
-        }
-        
-        private int? _subListId;
-        public int? SubListId
+        public TodoItemPosition(int ordinal, int? subListId)
         {
-            get => _subListId;
-            protected internal set
-            {
-                if (value.HasValue)
-                    Guard.Against.Default(value.Value, nameof(SubListId));
+            Guard.Against.NegativeOrZero(ordinal, nameof(ordinal));
 
-                _subListId = value;
-            }
-        }
+            if (subListId.HasValue)
+                Guard.Against.NegativeOrZero(subListId.Value, nameof(subListId));
 
-        public TodoItemPosition(int ordinal, int? subListId = null)
-        {
             Ordinal = ordinal;
             SubListId = subListId;
         }

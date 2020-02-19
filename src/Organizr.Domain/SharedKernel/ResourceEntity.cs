@@ -7,19 +7,9 @@ namespace Organizr.Domain.SharedKernel
 {
     public abstract class ResourceEntity : Entity<Guid>
     {
-        private string _ownerId;
+        public virtual string OwnerId { get; protected set; }
 
-        public virtual string OwnerId
-        {
-            get => _ownerId;
-            protected set
-            {
-                Guard.Against.NullOrWhiteSpace(value, nameof(OwnerId));
-                _ownerId = value;
-            }
-        }
-
-        protected internal readonly List<string> _contributorIds;
+        protected readonly List<string> _contributorIds;
         public IReadOnlyCollection<string> ContributorIds => _contributorIds.AsReadOnly();
 
         protected ResourceEntity()
@@ -29,6 +19,8 @@ namespace Organizr.Domain.SharedKernel
 
         public void AddContributor(string contributorId)
         {
+            Guard.Against.NullOrWhiteSpace(contributorId, nameof(contributorId));
+
             if (OwnerId == contributorId)
                 throw new ContributorAlreadyOwnerException(Id, contributorId);
 
@@ -40,6 +32,8 @@ namespace Organizr.Domain.SharedKernel
 
         public void RemoveContributor(string contributorId)
         {
+            Guard.Against.NullOrWhiteSpace(contributorId, nameof(contributorId));
+
             if (ContributorIds.All(id => id != contributorId))
                 throw new ContributorDoesNotExistException(Id, contributorId);
 
