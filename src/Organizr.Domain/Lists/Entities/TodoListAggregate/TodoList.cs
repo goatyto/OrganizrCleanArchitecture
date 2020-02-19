@@ -41,6 +41,14 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             _subLists = new List<TodoSubList>();
         }
 
+        public void Edit(string title, string description = null)
+        {
+            Guard.Against.NullOrWhiteSpace(title, nameof(title));
+
+            Title = title;
+            Description = description;
+        }
+
         public void AddSubList(string title, string description = null)
         {
             Guard.Against.NullOrWhiteSpace(title, nameof(title));

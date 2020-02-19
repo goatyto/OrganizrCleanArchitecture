@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 {
-    public class TodoListConstructorTests
+    public class TodoListTests
     {
         [Fact]
         public void TodoListConstructor_ValidData_ObjectInitializedProperly()
@@ -44,9 +44,37 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         [InlineData(" ")]
         public void TodoListConstructor_NullOrWhiteSpaceTitle_ThrowsArgumentException(string title)
         {
-            Func<TodoList> construct = () => new TodoList( "User1", title);
+            Func<TodoList> construct = () => new TodoList("User1", title);
 
             construct.Should().Throw<ArgumentException>().And.ParamName.Should().Be("title");
+        }
+
+        [Fact]
+        public void Edit_ValidData_StateChanges()
+        {
+            var list = new TodoList("User1", "Todo List 1 Title", "Todo List 1 Description");
+
+            var newTitle = "New Todo List 1";
+            var newDescription = "New Todo List 1 Description";
+
+            list.Edit(newTitle, newDescription);
+
+            list.Title.Should().Be(newTitle);
+            list.Description.Should().Be(newDescription);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void Edit_NullOrWhiteSpaceTitle_ThrowsArgumentException(string title)
+        {
+            var list = new TodoList("User1", "Todo List 1 Title", "Todo List 1 Description");
+
+            var newDescription = "New Todo List 1 Description";
+
+            list.Invoking(l => l.Edit(title, newDescription)).Should().Throw<ArgumentException>().And.ParamName.Should()
+                .Be("title");
         }
     }
 }
