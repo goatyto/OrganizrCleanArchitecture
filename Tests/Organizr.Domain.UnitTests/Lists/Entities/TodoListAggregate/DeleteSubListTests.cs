@@ -25,14 +25,14 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         }
 
         [Fact]
-        public void DeleteSubList_NonExistingSubListId_ThrowsSubListDoesNotExistException()
+        public void DeleteSubList_NonExistentSubListId_ThrowsSubListDoesNotExistException()
         {
             var fixture = new TodoListFixture();
 
-            var nonExistingSubListId = 99;
+            var nonExistentSubListId = 99;
 
-            fixture.TodoList.Invoking(l => l.DeleteSubList(nonExistingSubListId)).Should()
-                .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistingSubListId);
+            fixture.TodoList.Invoking(l => l.DeleteSubList(nonExistentSubListId)).Should()
+                .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistentSubListId);
         }
 
         [Theory]

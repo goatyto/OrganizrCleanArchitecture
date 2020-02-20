@@ -19,7 +19,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             
         }
 
-        protected internal TodoItem(Guid mainListId, string title, TodoItemPosition position, string description = null, DateTime? dueDate = null)
+        protected internal TodoItem(Guid mainListId, string title, TodoItemPosition position, string description = null, DateTime? dueDate = null): this()
         {
             Guard.Against.Default(mainListId, nameof(mainListId));
             Guard.Against.NullOrWhiteSpace(title, nameof(title));

@@ -36,17 +36,17 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         }
 
         [Fact]
-        public void AddTodo_NonExistantSubListId_ThrowsTodoSubListDoesNotExistException()
+        public void AddTodo_NonExistentSubListId_ThrowsTodoSubListDoesNotExistException()
         {
             var fixture = new TodoListFixture();
 
             var title = "Todo";
             var description = "Todo Description";
             var dueDate = DateTime.Today.AddDays(1);
-            var nonExistantSubListId = 99;
+            var nonExistentSubListId = 99;
 
-            fixture.TodoList.Invoking(l => l.AddTodo(title, description, dueDate, nonExistantSubListId)).Should()
-                .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistantSubListId);
+            fixture.TodoList.Invoking(l => l.AddTodo(title, description, dueDate, nonExistentSubListId)).Should()
+                .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistentSubListId);
         }
 
         [Fact]

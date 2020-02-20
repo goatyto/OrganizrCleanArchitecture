@@ -68,5 +68,16 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             fixture.TodoList.Invoking(l => l.SetCompletedTodo(invalidTodoId)).Should().Throw<ArgumentException>().And
                 .ParamName.Should().Be("todoId");
         }
+
+        [Fact]
+        public void SetCompletedTodo_NonExistentTodoId_ThrowsTodoItemDoesNotExistException()
+        {
+            var fixture = new TodoListFixture();
+
+            var nonExistentTodoId = 99;
+
+            fixture.TodoList.Invoking(l => l.SetCompletedTodo(nonExistentTodoId)).Should()
+                .Throw<TodoItemDoesNotExistException>().And.TodoId.Should().Be(nonExistentTodoId);
+        }
     }
 }

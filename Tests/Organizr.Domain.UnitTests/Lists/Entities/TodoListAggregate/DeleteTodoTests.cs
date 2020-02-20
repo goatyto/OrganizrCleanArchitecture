@@ -27,14 +27,14 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
         }
 
         [Fact]
-        public void DeleteTodo_NonExistantTodoId_ThrowsTodoItemDoesNotExistException()
+        public void DeleteTodo_NonExistentTodoId_ThrowsTodoItemDoesNotExistException()
         {
             var fixture = new TodoListFixture();
 
-            var nonExistantTodoId = 99;
+            var nonExistentTodoId = 99;
 
-            fixture.TodoList.Invoking(l => l.DeleteTodo(nonExistantTodoId)).Should().Throw<TodoItemDoesNotExistException>().And
-                .TodoId.Should().Be(nonExistantTodoId);
+            fixture.TodoList.Invoking(l => l.DeleteTodo(nonExistentTodoId)).Should().Throw<TodoItemDoesNotExistException>().And
+                .TodoId.Should().Be(nonExistentTodoId);
         }
 
         [Theory]

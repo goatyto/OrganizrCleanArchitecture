@@ -28,7 +28,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         }
 
-        public TodoList(string ownerId, string title, string description = null)
+        public TodoList(string ownerId, string title, string description = null) : this()
         {
             Guard.Against.NullOrWhiteSpace(ownerId, nameof(ownerId));
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
@@ -204,7 +204,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
         public void MoveTodo(int todoId, TodoItemPosition newPosition)
         {
             Guard.Against.NegativeOrZero(todoId, nameof(todoId));
-            
+
             if (newPosition.SubListId.HasValue)
             {
                 var subList = SubLists.SingleOrDefault(sl => sl.Id == newPosition.SubListId.Value);
@@ -228,7 +228,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             {
                 var sourceSubList = SubLists.Single(sl => sl.Id == todoToBeMoved.Position.SubListId.Value);
 
-                if(sourceSubList.IsDeleted)
+                if (sourceSubList.IsDeleted)
                     throw new TodoSubListDeletedException(Id, todoToBeMoved.Position.SubListId.Value);
             }
 

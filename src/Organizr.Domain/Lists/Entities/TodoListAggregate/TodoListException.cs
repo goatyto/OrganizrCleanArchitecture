@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Ardalis.GuardClauses;
 
 namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 {
@@ -24,20 +25,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             SubListId = subListId;
         }
     }
-
-    public class TodoSubListAlreadyExistsException : TodoListException
-    {
-        public Guid ListId { get; }
-        public int SubListId { get; }
-
-        public TodoSubListAlreadyExistsException(Guid listId, int subListId, Exception innerException = null) : base(
-            $"Sublist with id \"{subListId}\" already exists in the context of list \"{listId}\"", innerException)
-        {
-            ListId = listId;
-            SubListId = subListId;
-        }
-    }
-
+    
     public class TodoSubListDeletedException : TodoListException
     {
         public Guid ListId { get; }

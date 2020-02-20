@@ -5,19 +5,19 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 {
-    public class TodoSubList: Entity
+    public class TodoSubList : Entity
     {
         public string Title { get; protected set; }
         public string Description { get; protected set; }
         public int Ordinal { get; protected set; }
         public bool IsDeleted { get; protected set; }
 
-        private TodoSubList() : base()
+        private TodoSubList()
         {
 
         }
 
-        protected internal TodoSubList(string title, int ordinal, string description = null)
+        protected internal TodoSubList(string title, int ordinal, string description = null) : this()
         {
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
             Guard.Against.NegativeOrZero(ordinal, nameof(ordinal));

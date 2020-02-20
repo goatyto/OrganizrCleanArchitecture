@@ -47,10 +47,10 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var newTitle = "Todo";
             var newDescription = "Todo Description";
             var newDueDate = DateTime.Today.AddDays(5);
-            var nonExistantTodoId = 99;
+            var nonExistentTodoId = 99;
 
-            fixture.TodoList.Invoking(l => l.EditTodo(nonExistantTodoId, newTitle, newDescription, newDueDate)).Should()
-                .Throw<TodoItemDoesNotExistException>().And.TodoId.Should().Be(nonExistantTodoId);
+            fixture.TodoList.Invoking(l => l.EditTodo(nonExistentTodoId, newTitle, newDescription, newDueDate)).Should()
+                .Throw<TodoItemDoesNotExistException>().And.TodoId.Should().Be(nonExistentTodoId);
         }
 
         [Theory]

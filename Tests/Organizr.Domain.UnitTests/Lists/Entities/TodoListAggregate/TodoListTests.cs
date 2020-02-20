@@ -76,5 +76,22 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             list.Invoking(l => l.Edit(title, newDescription)).Should().Throw<ArgumentException>().And.ParamName.Should()
                 .Be("title");
         }
+
+        [Fact]
+        public void DueDate_ReturnsMostDistantTodoDueDate()
+        {
+            var fixture = new TodoListFixture();
+
+            fixture.TodoList.DueDate.Should().Be(fixture.LastDueDate);
+        }
+
+        [Fact]
+        public void DueDate_TodoListWithNoDueDateSet_ReturnsNull()
+        {
+            var todoList = new TodoListStub(Guid.NewGuid(), "User1", "Todo List Title");
+            todoList.AddTodo("Todo Item Title");
+
+            todoList.DueDate.Should().Be(null);
+        }
     }
 }

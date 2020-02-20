@@ -4,15 +4,15 @@ using System.Text;
 
 namespace Organizr.Domain.SharedKernel
 {
-    public abstract class ResourceException : Exception
+    public abstract class ResourceEntityException : Exception
     {
-        public ResourceException(string message, Exception innerException = null) : base(message, innerException)
+        public ResourceEntityException(string message, Exception innerException = null) : base(message, innerException)
         {
 
         }
     }
 
-    public class ContributorAlreadyOwnerException : ResourceException
+    public class ContributorAlreadyOwnerException : ResourceEntityException
     {
         public Guid ResourceId { get; private set; }
         public string ContributorId { get; private set; }
@@ -26,7 +26,7 @@ namespace Organizr.Domain.SharedKernel
         }
     }
 
-    public class ContributorAlreadyExistsException : ResourceException
+    public class ContributorAlreadyExistsException : ResourceEntityException
     {
         public Guid ResourceId { get; private set; }
         public string ContributorId { get; private set; }
@@ -39,7 +39,7 @@ namespace Organizr.Domain.SharedKernel
         }
     }
 
-    public class ContributorDoesNotExistException : ResourceException
+    public class ContributorDoesNotExistException : ResourceEntityException
     {
         public Guid ResourceId { get; private set; }
         public string ContributorId { get; private set; }

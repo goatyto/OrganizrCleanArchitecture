@@ -32,7 +32,7 @@ namespace Organizr.Domain.SharedKernel
             ValueObject other = (ValueObject)obj;
             IEnumerator<object> thisValues = GetAtomicValues().GetEnumerator();
             IEnumerator<object> otherValues = other.GetAtomicValues().GetEnumerator();
-            while (thisValues.MoveNext() && otherValues.MoveNext())
+            while (thisValues.MoveNext() | otherValues.MoveNext())
             {
                 if (ReferenceEquals(thisValues.Current, null) ^ ReferenceEquals(otherValues.Current, null))
                 {
@@ -43,7 +43,7 @@ namespace Organizr.Domain.SharedKernel
                     return false;
                 }
             }
-            return !thisValues.MoveNext() && !otherValues.MoveNext();
+            return true;
         }
 
         public override int GetHashCode()

@@ -67,5 +67,15 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             fixture.TodoList.Invoking(l => l.MoveSubList(invalidSubListId, 4)).Should().Throw<ArgumentException>().And
                 .ParamName.Should().Be("subListId");
         }
+
+        [Fact]
+        public void MoveSubList_NonExistentSubListId_ThrowsTodoSubListDeletedException()
+        {
+            var fixture = new TodoListFixture();
+            var nonExistentSubListId = 99;
+
+            fixture.TodoList.Invoking(l => l.MoveSubList(nonExistentSubListId, 4)).Should()
+                .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistentSubListId);
+        }
     }
 }

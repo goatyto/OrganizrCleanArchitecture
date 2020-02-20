@@ -139,6 +139,42 @@ namespace Organizr.Domain.UnitTests.SharedKernel
             (entity2 == entity1).Should().Be(true);
         }
 
+        [Fact]
+        public void EqualityOperator_NullLeftOperand_ReturnsFalse()
+        {
+            EntityStub entity1 = null;
+            EntityStub entity2 = new EntityStub();
+
+            (entity1 == entity2).Should().Be(false);
+        }
+
+        [Fact]
+        public void EqualityOperator_NullOperands_ReturnsTrue()
+        {
+            EntityStub entity1 = null;
+            EntityStub entity2 = null;
+
+            (entity1 == entity2).Should().Be(true);
+        }
+
+        [Fact]
+        public void InequalityOperator_EntitiesWithSameIds_ReturnsFalse()
+        {
+            var entityId = Guid.NewGuid();
+            var entity1 = new EntityStub(entityId);
+            var entity2 = new EntityStub(entityId);
+
+            (entity1 != entity2).Should().Be(false);
+        }
+
+        [Fact]
+        public void InequalityOperator_EntitiesWithDifferentIds_ReturnsTrue()
+        {
+            var entity1 = new EntityStub(Guid.NewGuid());
+            var entity2 = new EntityStub(Guid.NewGuid());
+
+            (entity1 != entity2).Should().Be(true);
+        }
 
         public class EntityStub : Entity<Guid>
         {

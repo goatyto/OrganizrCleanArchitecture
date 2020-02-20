@@ -8,20 +8,22 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
     public class TodoListStub : TodoList
     {
         public TodoListStub(Guid id, string ownerId, string title, string description = null,
-            IEnumerable<TodoSubList> todoSubLists = null, IEnumerable < TodoItem> todoItems = null) : base(ownerId, title,
+            IEnumerable<TodoSubList> todoSubLists = null, IEnumerable<TodoItem> todoItems = null) : base(ownerId, title,
             description)
         {
             Id = id;
 
-            foreach (var todoItem in todoItems)
-            {
-                _items.Add(todoItem);
-            }
+            if (todoItems != null)
+                foreach (var todoItem in todoItems)
+                {
+                    _items.Add(todoItem);
+                }
 
-            foreach (var todoSubList in todoSubLists)
-            {
-                _subLists.Add(todoSubList);
-            }
+            if (todoSubLists != null)
+                foreach (var todoSubList in todoSubLists)
+                {
+                    _subLists.Add(todoSubList);
+                }
         }
     }
 

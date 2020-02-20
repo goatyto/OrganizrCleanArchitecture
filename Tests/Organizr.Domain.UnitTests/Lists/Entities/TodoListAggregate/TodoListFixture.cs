@@ -9,8 +9,8 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
     public class TodoListFixture : IDisposable
     {
         public TodoList TodoList { get; private set; }
-
         public readonly Guid TodoListId = Guid.NewGuid();
+        public readonly DateTime LastDueDate = DateTime.Today.AddDays(5);
 
         public TodoListFixture()
         {
@@ -35,7 +35,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
                     new TodoItemStub(4, TodoListId, "Todo Item 4 in Main list", new TodoItemPosition(3, null),
                         "Todo Item 4 in Sublist 1 Description", DateTime.Today.AddDays(4)),
                     new TodoItemStub(5, TodoListId, "Todo Item 5 in Main list", new TodoItemPosition(4, null),
-                        "Todo Item 5 in Sublist 1 Description", DateTime.Today.AddDays(5)),
+                        "Todo Item 5 in Sublist 1 Description", LastDueDate),
              
                     // sublist 1
                     new TodoItemStub(6, TodoListId, "Todo Item 1 in Sublist 1", new TodoItemPosition(1, 1),
@@ -47,7 +47,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
                     new TodoItemStub(9, TodoListId, "Todo Item 4 in Sublist 1", new TodoItemPosition(3, 1),
                         "Todo Item 4 in Sublist 1 Description", DateTime.Today.AddDays(4)),
                     new TodoItemStub(10, TodoListId, "Todo Item 5 in Sublist 1", new TodoItemPosition(4, 1),
-                        "Todo Item 5 in Sublist 1 Description", DateTime.Today.AddDays(5)),
+                        "Todo Item 5 in Sublist 1 Description", LastDueDate),
                 
                     // sublist 2
                     new TodoItemStub(11, TodoListId, "Todo Item 1 in Sublist 2", new TodoItemPosition(1, 2),
