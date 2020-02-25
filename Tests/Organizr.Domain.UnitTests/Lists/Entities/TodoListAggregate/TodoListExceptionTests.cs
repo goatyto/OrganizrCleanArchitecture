@@ -83,5 +83,20 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             exception.TodoId.Should().Be(todoId);
             exception.InnerException.Message.Should().Be(innerExceptionMessage);
         }
+
+        [Fact]
+        public void DueDateInThePastExceptionConstructor_ValidData_ObjectInitialized()
+        {
+            var listId = Guid.NewGuid();
+            var dueDate = DateTime.Today;
+            var innerExceptionMessage = "Inner Exception";
+            var innerException = new Exception(innerExceptionMessage);
+
+            var exception = new DueDateInThePastException(listId, dueDate, innerException);
+
+            exception.ListId.Should().Be(listId);
+            exception.DueDate.Should().Be(dueDate);
+            exception.InnerException.Message.Should().Be(innerExceptionMessage);
+        }
     }
 }

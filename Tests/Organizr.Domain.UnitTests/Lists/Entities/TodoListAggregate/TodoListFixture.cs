@@ -3,17 +3,24 @@ using System.Collections.Generic;
 using System.Text;
 using Moq;
 using Organizr.Domain.Lists.Entities.TodoListAggregate;
+using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 {
     public class TodoListFixture : IDisposable
     {
-        public TodoList TodoList { get; private set; }
+        public TodoList TodoList { get; }
         public readonly Guid TodoListId = Guid.NewGuid();
         public readonly DateTime LastDueDate = DateTime.Today.AddDays(5);
+        public IDateTime DateTimeProvider { get; }
 
         public TodoListFixture()
         {
+            var dateTimeMock = new Mock<IDateTime>();
+            dateTimeMock.Setup(dateTime => dateTime.Now).Returns(() => DateTime.Now);
+            dateTimeMock.Setup(dateTime => dateTime.Today).Returns(() => DateTime.Today);
+            DateTimeProvider = dateTimeMock.Object;
+
             TodoList = new TodoListStub(TodoListId, "User1", "Todo List 1", "Todo List 1 Description",
                 new List<TodoSubList>
                 {

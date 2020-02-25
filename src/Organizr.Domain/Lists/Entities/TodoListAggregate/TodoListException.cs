@@ -7,74 +7,79 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 {
     public abstract class TodoListException : Exception
     {
-        public TodoListException(string message, Exception innerException = null) : base(message, innerException)
-        {
+        public Guid ListId { get; set; }
 
+        public TodoListException(Guid listId, string message, Exception innerException = null) : base(message,
+            innerException)
+        {
+            ListId = listId;
         }
     }
 
     public class TodoSubListDoesNotExistException : TodoListException
     {
-        public Guid ListId { get; }
         public int SubListId { get; }
 
-        public TodoSubListDoesNotExistException(Guid listId, int subListId, Exception innerException = null): base(
-            $"Sublist with id \"{subListId}\" does not exist in the context of list \"{listId}\"", innerException)
+        public TodoSubListDoesNotExistException(Guid listId, int subListId, Exception innerException = null) : base(
+            listId, $"Sublist with id \"{subListId}\" does not exist in the context of list \"{listId}\"",
+            innerException)
         {
-            ListId = listId;
             SubListId = subListId;
         }
     }
     
     public class TodoSubListDeletedException : TodoListException
     {
-        public Guid ListId { get; }
         public int SubListId { get; }
 
-        public TodoSubListDeletedException(Guid listId, int subListId, Exception innerException = null) : base(
+        public TodoSubListDeletedException(Guid listId, int subListId, Exception innerException = null) : base(listId,
             $"Sublist with id \"{subListId}\" is marked as deleted", innerException)
         {
-            ListId = listId;
             SubListId = subListId;
         }
     }
 
     public class TodoItemDoesNotExistException : TodoListException
     {
-        public Guid ListId { get; }
         public int TodoId { get; }
 
-        public TodoItemDoesNotExistException(Guid listId, int todoId, Exception innerException = null) : base(
+        public TodoItemDoesNotExistException(Guid listId, int todoId, Exception innerException = null) : base(listId,
             $"Todo with id \"{todoId}\" does not exist in list \"{listId}\"", innerException)
         {
-            ListId = listId;
             TodoId = todoId;
         }
     }
 
     public class TodoItemCompletedException : TodoListException
     {
-        public Guid ListId { get; }
         public int TodoId { get; }
 
-        public TodoItemCompletedException(Guid listId, int todoId, Exception innerException = null) : base(
+        public TodoItemCompletedException(Guid listId, int todoId, Exception innerException = null) : base(listId,
             $"Todo with id \"{todoId}\" is marked as completed", innerException)
         {
-            ListId = listId;
             TodoId = todoId;
         }
     }
 
     public class TodoItemDeletedException : TodoListException
     {
-        public Guid ListId { get; }
         public int TodoId { get; }
 
-        public TodoItemDeletedException(Guid listId, int todoId, Exception innerException = null) : base(
+        public TodoItemDeletedException(Guid listId, int todoId, Exception innerException = null) : base(listId,
             $"Todo with id \"{todoId}\" is marked as deleted", innerException)
         {
-            ListId = listId;
             TodoId = todoId;
+        }
+    }
+
+    public class DueDateInThePastException : TodoListException
+    {
+        public DateTime DueDate { get; }
+
+        public DueDateInThePastException(Guid listId, DateTime dueDate, Exception innerException = null) : base(listId,
+            $"Todo item due date cannot be in the past: {dueDate}", innerException)
+        {
+            DueDate = dueDate;
         }
     }
 }

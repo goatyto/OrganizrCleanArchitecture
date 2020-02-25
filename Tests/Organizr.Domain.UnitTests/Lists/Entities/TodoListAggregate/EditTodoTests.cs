@@ -26,7 +26,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var newDescription = "Todo Description";
             var newDueDate = DateTime.Today.AddDays(5);
 
-            fixture.TodoList.EditTodo(todoId, newTitle, newDescription, newDueDate);
+            fixture.TodoList.EditTodo(todoId, newTitle, newDescription, newDueDate, fixture.DateTimeProvider);
 
 
             todoToBeEdited.Id.Should().Be(todoId);
@@ -64,7 +64,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var newDescription = "Todo Description";
             var newDueDate = DateTime.Today.AddDays(5);
 
-            fixture.TodoList.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate)).Should()
+            fixture.TodoList.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate, fixture.DateTimeProvider)).Should()
                 .Throw<TodoItemCompletedException>().And.TodoId.Should().Be(todoId);
         }
 
@@ -79,7 +79,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var newDescription = "Todo Description";
             var newDueDate = DateTime.Today.AddDays(5);
 
-            fixture.TodoList.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate)).Should()
+            fixture.TodoList.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate, fixture.DateTimeProvider)).Should()
                 .Throw<TodoItemDeletedException>().And.TodoId.Should().Be(todoId);
         }
 
@@ -96,7 +96,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var newDueDate = DateTime.Today.AddDays(5);
             var deletedSubListId = 2;
 
-            fixture.TodoList.Invoking(l => l.EditTodo(deletedSubListTodoId, newTitle, newDescription, newDueDate)).Should()
+            fixture.TodoList.Invoking(l => l.EditTodo(deletedSubListTodoId, newTitle, newDescription, newDueDate, fixture.DateTimeProvider)).Should()
                 .Throw<TodoSubListDeletedException>().And.SubListId.Should().Be(deletedSubListId);
         }
 
@@ -129,6 +129,34 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
             fixture.TodoList.Invoking(l => l.EditTodo(invalidTodoId, newTitle, newDescription, newDueDate)).Should()
                 .Throw<ArgumentException>().And.ParamName.Should().Be("todoId");
+        }
+
+        [Fact]
+        public void EditTodo_DueDateInThePast_ThrowsDueDateInThePastException()
+        {
+            var fixture = new TodoListFixture();
+
+            var todoId = 1;
+            var newTitle = "Todo";
+            var newDescription = "Todo Description";
+            var newDueDate = DateTime.Today.AddDays(-1);
+
+            fixture.TodoList.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate, fixture.DateTimeProvider)).Should()
+                .Throw<DueDateInThePastException>().And.DueDate.Should().Be(newDueDate);
+        }
+
+        [Fact]
+        public void EditTodo_NullDateTimeProvider_ThrowsArgumentException()
+        {
+            var fixture = new TodoListFixture();
+
+            var todoId = 1;
+            var newTitle = "Todo";
+            var newDescription = "Todo Description";
+            var newDueDate = DateTime.Today.AddDays(5);
+
+            fixture.TodoList.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate, null)).Should()
+                .Throw<ArgumentException>().And.ParamName.Should().Be("dateTimeProvider");
         }
     }
 }

@@ -127,9 +127,17 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             subList.Delete();
         }
 
-        public void AddTodo(string title, string description = null, DateTime? dueDate = null, int? subListId = null)
+        public void AddTodo(string title, string description = null, DateTime? dueDate = null, IDateTime dateTimeProvider = null, int? subListId = null)
         {
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
+
+            if (dueDate.HasValue)
+            {
+                Guard.Against.Null(dateTimeProvider, nameof(dateTimeProvider));
+
+                if (dueDate.Value < dateTimeProvider.Today)
+                    throw new DueDateInThePastException(Id, dueDate.Value);
+            }
 
             if (subListId.HasValue)
             {
@@ -148,7 +156,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             _items.Add(todo);
         }
 
-        public void EditTodo(int todoId, string title, string description = null, DateTime? dueDate = null)
+        public void EditTodo(int todoId, string title, string description = null, DateTime? dueDate = null, IDateTime dateTimeProvider = null)
         {
             Guard.Against.NegativeOrZero(todoId, nameof(todoId));
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
@@ -157,6 +165,14 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
             if (todo == null)
                 throw new TodoItemDoesNotExistException(Id, todoId);
+
+            if (dueDate.HasValue)
+            {
+                Guard.Against.Null(dateTimeProvider, nameof(dateTimeProvider));
+
+                if (dueDate.Value < dateTimeProvider.Today)
+                    throw new DueDateInThePastException(Id, dueDate.Value);
+            }
 
             var subListId = todo.Position.SubListId;
 
