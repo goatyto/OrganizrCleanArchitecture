@@ -10,21 +10,6 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
     public class TodoListExceptionTests
     {
         [Fact]
-        public void TodoSubListDoesNotExistExceptionConstructor_ValidData_ObjectInitialized()
-        {
-            var listId = Guid.NewGuid();
-            var subListId = 1;
-            var innerExceptionMessage = "Inner Exception";
-            var innerException = new Exception(innerExceptionMessage);
-
-            var exception = new TodoSubListDoesNotExistException(listId, subListId, innerException);
-
-            exception.ListId.Should().Be(listId);
-            exception.SubListId.Should().Be(subListId);
-            exception.InnerException.Message.Should().Be(innerExceptionMessage);
-        }
-
-        [Fact]
         public void TodoSubListDeletedExceptionConstructor_ValidData_ObjectInitialized()
         {
             var listId = Guid.NewGuid();
@@ -36,21 +21,6 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
             exception.ListId.Should().Be(listId);
             exception.SubListId.Should().Be(subListId);
-            exception.InnerException.Message.Should().Be(innerExceptionMessage);
-        }
-
-        [Fact]
-        public void TodoItemDoesNotExistExceptionConstructor_ValidData_ObjectInitialized()
-        {
-            var listId = Guid.NewGuid();
-            var todoId = 1;
-            var innerExceptionMessage = "Inner Exception";
-            var innerException = new Exception(innerExceptionMessage);
-
-            var exception = new TodoItemDoesNotExistException(listId, todoId, innerException);
-
-            exception.ListId.Should().Be(listId);
-            exception.TodoId.Should().Be(todoId);
             exception.InnerException.Message.Should().Be(innerExceptionMessage);
         }
 

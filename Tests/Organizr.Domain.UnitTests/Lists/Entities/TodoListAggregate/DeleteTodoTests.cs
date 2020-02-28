@@ -33,8 +33,8 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
             var nonExistentTodoId = 99;
 
-            fixture.TodoList.Invoking(l => l.DeleteTodo(nonExistentTodoId)).Should().Throw<TodoItemDoesNotExistException>().And
-                .TodoId.Should().Be(nonExistentTodoId);
+            fixture.TodoList.Invoking(l => l.DeleteTodo(nonExistentTodoId)).Should().Throw<ArgumentException>().And
+                .ParamName.Should().Be("todoId");
         }
 
         [Theory]

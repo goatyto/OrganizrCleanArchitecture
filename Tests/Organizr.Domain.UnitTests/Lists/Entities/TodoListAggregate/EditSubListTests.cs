@@ -42,7 +42,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var newDescription = "Todo Sub List Description";
 
             fixture.TodoList.Invoking(l => l.EditSubList(nonExistingSubListId, newTitle, newDescription)).Should()
-                .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistingSubListId);
+                .Throw<ArgumentException>().And.ParamName.Should().Be("subListId");
         }
 
         [Fact]

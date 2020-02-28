@@ -46,7 +46,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var nonExistentSubListId = 99;
 
             fixture.TodoList.Invoking(l => l.AddTodo(title, description, dueDate, fixture.DateTimeProvider, nonExistentSubListId)).Should()
-                .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistentSubListId);
+                .Throw<ArgumentException>().And.ParamName.Should().Be("subListId");
         }
 
         [Fact]

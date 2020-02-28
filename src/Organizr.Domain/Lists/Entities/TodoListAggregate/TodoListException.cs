@@ -16,18 +16,6 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
         }
     }
 
-    public class TodoSubListDoesNotExistException : TodoListException
-    {
-        public int SubListId { get; }
-
-        public TodoSubListDoesNotExistException(Guid listId, int subListId, Exception innerException = null) : base(
-            listId, $"Sublist with id \"{subListId}\" does not exist in the context of list \"{listId}\"",
-            innerException)
-        {
-            SubListId = subListId;
-        }
-    }
-    
     public class TodoSubListDeletedException : TodoListException
     {
         public int SubListId { get; }
@@ -36,17 +24,6 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             $"Sublist with id \"{subListId}\" is marked as deleted", innerException)
         {
             SubListId = subListId;
-        }
-    }
-
-    public class TodoItemDoesNotExistException : TodoListException
-    {
-        public int TodoId { get; }
-
-        public TodoItemDoesNotExistException(Guid listId, int todoId, Exception innerException = null) : base(listId,
-            $"Todo with id \"{todoId}\" does not exist in list \"{listId}\"", innerException)
-        {
-            TodoId = todoId;
         }
     }
 

@@ -77,7 +77,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var nonExistentTodoId = 99;
 
             fixture.TodoList.Invoking(l => l.SetCompletedTodo(nonExistentTodoId)).Should()
-                .Throw<TodoItemDoesNotExistException>().And.TodoId.Should().Be(nonExistentTodoId);
+                .Throw<ArgumentException>().And.ParamName.Should().Be("todoId");
         }
     }
 }

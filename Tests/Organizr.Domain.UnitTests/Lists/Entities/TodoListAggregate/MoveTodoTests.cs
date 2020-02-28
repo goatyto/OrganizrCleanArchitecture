@@ -120,7 +120,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var newPosition = new TodoItemPosition(1, nonExistentSubListId);
 
             fixture.TodoList.Invoking(l => l.MoveTodo(todoId, newPosition)).Should()
-                .Throw<TodoSubListDoesNotExistException>().And.SubListId.Should().Be(nonExistentSubListId);
+                .Throw<ArgumentException>().And.ParamName.Should().Be("SubListId");
         }
 
         [Fact]
@@ -132,7 +132,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var newPosition = new TodoItemPosition(1, 1);
 
             fixture.TodoList.Invoking(l => l.MoveTodo(nonExistentTodoId, newPosition)).Should()
-                .Throw<TodoItemDoesNotExistException>().And.TodoId.Should().Be(nonExistentTodoId);
+                .Throw<ArgumentException>().And.ParamName.Should().Be("todoId");
         }
     }
 }
