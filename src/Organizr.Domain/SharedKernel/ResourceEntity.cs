@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using Ardalis.GuardClauses;
+using Organizr.Domain.Guards;
 
 namespace Organizr.Domain.SharedKernel
 {
-    public abstract class ResourceEntity : Entity<Guid>
+    public abstract class ResourceEntity : Entity<Guid>, IAggregateRoot
     {
         public virtual string OwnerId { get; protected set; }
 
-        protected readonly List<string> _contributorIds;
-        public IReadOnlyCollection<string> ContributorIds => _contributorIds.AsReadOnly();
+        protected readonly List<ResourceContributor> _resourceContributors;
+        public IReadOnlyCollection<ResourceContributor> ResourceContributors => _resourceContributors.AsReadOnly();
 
         protected ResourceEntity()
         {
-            _contributorIds = new List<string>();
+            _resourceContributors = new List<ResourceContributor>();
         }
 
         public void AddContributor(string contributorId)
@@ -24,20 +25,23 @@ namespace Organizr.Domain.SharedKernel
             if (OwnerId == contributorId)
                 throw new ContributorAlreadyOwnerException(Id, contributorId);
 
-            if (ContributorIds.Any(id => id == contributorId))
+            var resourceContributor = new ResourceContributor(Id, contributorId);
+
+            if (ResourceContributors.Any(rc=>rc == resourceContributor))
                 throw new ContributorAlreadyExistsException(Id, contributorId);
 
-            _contributorIds.Add(contributorId);
+            _resourceContributors.Add(resourceContributor);
         }
 
         public void RemoveContributor(string contributorId)
         {
             Guard.Against.NullOrWhiteSpace(contributorId, nameof(contributorId));
 
-            if (ContributorIds.All(id => id != contributorId))
-                throw new ContributorDoesNotExistException(Id, contributorId);
+            var resourceContributor = ResourceContributors.SingleOrDefault(rc => rc.ContributorId == contributorId);
 
-            _contributorIds.Remove(contributorId);
+            Guard.Against.NullQueryResult(resourceContributor, nameof(contributorId));
+
+            _resourceContributors.Remove(resourceContributor);
         }
     }
 }

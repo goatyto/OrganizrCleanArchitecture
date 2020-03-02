@@ -65,7 +65,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
             var subList = SubLists.SingleOrDefault(sl => sl.Id == subListId);
 
-            Guard.Against.NullResult(subList, nameof(subListId));
+            Guard.Against.NullQueryResult(subList, nameof(subListId));
 
             if (subList.IsDeleted)
                 throw new TodoSubListDeletedException(Id, subListId);
@@ -80,7 +80,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
             var targetSubList = SubLists.SingleOrDefault(sl => sl.Id == subListId);
 
-            Guard.Against.NullResult(targetSubList, nameof(subListId));
+            Guard.Against.NullQueryResult(targetSubList, nameof(subListId));
 
             if (targetSubList.IsDeleted)
                 throw new TodoSubListDeletedException(Id, subListId);
@@ -117,7 +117,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
             var subList = SubLists.SingleOrDefault(sl => sl.Id == subListId);
 
-            Guard.Against.NullResult(subList, nameof(subListId));
+            Guard.Against.NullQueryResult(subList, nameof(subListId));
 
             if (subList.IsDeleted)
                 return;
@@ -143,7 +143,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
                 var subList = SubLists.SingleOrDefault(sl => sl.Id == subListId.Value);
 
-                Guard.Against.NullResult(subList, nameof(subListId));
+                Guard.Against.NullQueryResult(subList, nameof(subListId));
 
                 if (subList.IsDeleted)
                     throw new TodoSubListDeletedException(Id, subListId.Value);
@@ -159,7 +159,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
 
             var todo = Items.SingleOrDefault(item => item.Id == todoId);
-            Guard.Against.NullResult(todo, nameof(todoId));
+            Guard.Against.NullQueryResult(todo, nameof(todoId));
 
             if (dueDate.HasValue)
             {
@@ -191,7 +191,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             Guard.Against.NegativeOrZero(todoId, nameof(todoId));
 
             var todo = Items.SingleOrDefault(item => item.Id == todoId);
-            Guard.Against.NullResult(todo, nameof(todoId));
+            Guard.Against.NullQueryResult(todo, nameof(todoId));
 
             var subListId = todo.Position.SubListId;
 
@@ -218,7 +218,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             {
                 var subList = SubLists.SingleOrDefault(sl => sl.Id == newPosition.SubListId.Value);
 
-                Guard.Against.NullResult(subList, nameof(newPosition.SubListId));
+                Guard.Against.NullQueryResult(subList, nameof(newPosition.SubListId));
 
                 if (subList.IsDeleted)
                     throw new TodoSubListDeletedException(Id, newPosition.SubListId.Value);
@@ -228,7 +228,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
                 Items.Count(item => !item.IsDeleted && item.Position.SubListId == newPosition.SubListId));
 
             var todoToBeMoved = Items.SingleOrDefault(item => item.Id == todoId);
-            Guard.Against.NullResult(todoToBeMoved, nameof(todoId));
+            Guard.Against.NullQueryResult(todoToBeMoved, nameof(todoId));
 
             if (todoToBeMoved.Position.SubListId.HasValue)
             {
@@ -294,7 +294,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
             Guard.Against.NegativeOrZero(todoId, nameof(todoId));
 
             var todo = Items.SingleOrDefault(item => item.Id == todoId);
-            Guard.Against.NullResult(todo, nameof(todoId));
+            Guard.Against.NullQueryResult(todo, nameof(todoId));
 
             var subListId = todo.Position.SubListId;
 

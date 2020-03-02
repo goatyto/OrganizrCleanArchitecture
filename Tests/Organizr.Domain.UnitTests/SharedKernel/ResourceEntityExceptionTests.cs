@@ -38,20 +38,5 @@ namespace Organizr.Domain.UnitTests.SharedKernel
             exception.ContributorId.Should().Be(contributorId);
             exception.InnerException.Message.Should().Be(innerExceptionMessage);
         }
-
-        [Fact]
-        public void ContributorDoesNotExistExceptionConstructor_ValidData_ObjectInitialized()
-        {
-            var resourceId = Guid.NewGuid();
-            var contributorId = "User1";
-            var innerExceptionMessage = "Inner Exception";
-            var innerException = new Exception(innerExceptionMessage);
-
-            var exception = new ContributorDoesNotExistException(resourceId, contributorId, innerException);
-
-            exception.ResourceId.Should().Be(resourceId);
-            exception.ContributorId.Should().Be(contributorId);
-            exception.InnerException.Message.Should().Be(innerExceptionMessage);
-        }
     }
 }

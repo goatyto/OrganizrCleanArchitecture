@@ -14,7 +14,7 @@ namespace Organizr.Domain.Guards
         /// <param name="result">The result.</param>
         /// <param name="parameterName">Name of the parameter.</param>
         /// <exception cref="ArgumentException">Required input {parameterName} produced an empty result.</exception>
-        public static void NullResult<TElement>(this IGuardClause guardClause, TElement result, string parameterName)
+        public static void NullQueryResult<TElement>(this IGuardClause guardClause, TElement result, string parameterName)
         {
             if (result == null)
                 throw new ArgumentException($"Required input {parameterName} produced an empty result.", parameterName);

@@ -38,17 +38,4 @@ namespace Organizr.Domain.SharedKernel
             ContributorId = contributorId;
         }
     }
-
-    public class ContributorDoesNotExistException : ResourceEntityException
-    {
-        public Guid ResourceId { get; private set; }
-        public string ContributorId { get; private set; }
-
-        public ContributorDoesNotExistException(Guid resourceId, string contributorId, Exception innerException = null)
-            : base($"Contributor \"{contributorId}\" does not exist for resource \"{resourceId}\"", innerException)
-        {
-            ResourceId = resourceId;
-            ContributorId = contributorId;
-        }
-    }
 }

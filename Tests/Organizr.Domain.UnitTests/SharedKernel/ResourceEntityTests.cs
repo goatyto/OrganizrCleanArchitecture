@@ -18,9 +18,9 @@ namespace Organizr.Domain.UnitTests.SharedKernel
             var contributorId = "User";
             fixture.ResourceEntity.AddContributor(contributorId);
 
-            var addedContributor = fixture.ResourceEntity.ContributorIds.Last();
+            var addedContributor = fixture.ResourceEntity.ResourceContributors.Last();
 
-            addedContributor.Should().Be(contributorId);
+            addedContributor.ContributorId.Should().Be(contributorId);
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace Organizr.Domain.UnitTests.SharedKernel
 
             fixture.ResourceEntity.RemoveContributor(contributorId);
 
-            fixture.ResourceEntity.ContributorIds.Should().NotContain(contributorId);
+            fixture.ResourceEntity.ResourceContributors.Should().NotContain(contributorId);
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Organizr.Domain.UnitTests.SharedKernel
             var nonExistentContributorId = "User";
 
             fixture.ResourceEntity.Invoking(re => re.RemoveContributor(nonExistentContributorId)).Should()
-                .Throw<ContributorDoesNotExistException>().And.ContributorId.Should().Be(nonExistentContributorId);
+                .Throw<ArgumentException>().And.ParamName.Should().Be("contributorId");
         }
 
         [Theory]
@@ -94,16 +94,17 @@ namespace Organizr.Domain.UnitTests.SharedKernel
 
         private class ResourceEntityStub : ResourceEntity
         {
-            public ResourceEntityStub(string ownerId, IEnumerable<string> contributorIds = null)
+            public ResourceEntityStub(Guid id, string ownerId, IEnumerable<ResourceContributor> resourceContributors = null)
             {
+                Id = id;
                 OwnerId = ownerId;
 
-                if (contributorIds == null)
-                    contributorIds = new List<string>();
+                if (resourceContributors == null)
+                    resourceContributors = new List<ResourceContributor>();
 
-                foreach (var contributorId in contributorIds)
+                foreach (var contributor in resourceContributors)
                 {
-                    _contributorIds.Add(contributorId);
+                    _resourceContributors.Add(contributor);
                 }
             }
         }
@@ -114,7 +115,15 @@ namespace Organizr.Domain.UnitTests.SharedKernel
 
             public ResourceEntityFixture()
             {
-                ResourceEntity = new ResourceEntityStub("User1", new[] { "User2", "User3" });
+                var resourceEntityId = Guid.NewGuid();
+
+                ResourceEntity = new ResourceEntityStub(resourceEntityId,
+                    "User1",
+                    new ResourceContributor[]
+                    {
+                        new ResourceContributor(resourceEntityId, "User2"),
+                        new ResourceContributor(resourceEntityId, "User3")
+                    });
             }
 
             public void Dispose()

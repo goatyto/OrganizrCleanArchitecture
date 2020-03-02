@@ -24,7 +24,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             list.Items.Should().NotBeNull();
             list.SubLists.Should().NotBeNull();
             list.OwnerId.Should().NotBeNullOrWhiteSpace();
-            list.ContributorIds.Should().NotBeNull();
+            list.ResourceContributors.Should().NotBeNull();
         }
 
         [Theory]
