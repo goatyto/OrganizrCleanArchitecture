@@ -58,14 +58,14 @@ namespace Organizr.Domain.SharedKernel
             return this.MemberwiseClone() as ValueObject;
         }
 
-        //public static bool operator ==(ValueObject left, ValueObject right)
-        //{
-        //    return EqualOperator(left, right);
-        //}
+        public static bool operator ==(ValueObject left, ValueObject right)
+        {
+            return EqualOperator(left, right);
+        }
 
-        //public static bool operator !=(ValueObject left, ValueObject right)
-        //{
-        //    return NotEqualOperator(left, right);
-        //}
+        public static bool operator !=(ValueObject left, ValueObject right)
+        {
+            return NotEqualOperator(left, right);
+        }
     }
 }

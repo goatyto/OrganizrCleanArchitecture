@@ -60,7 +60,6 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         public void EditSubList(int subListId, string title, string description = null)
         {
-            Guard.Against.NegativeOrZero(subListId, nameof(subListId));
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
 
             var subList = SubLists.SingleOrDefault(sl => sl.Id == subListId);
@@ -75,7 +74,6 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         public void MoveSubList(int subListId, int newOrdinal)
         {
-            Guard.Against.NegativeOrZero(subListId, nameof(subListId));
             Guard.Against.OutOfRange(newOrdinal, nameof(newOrdinal), 1, SubLists.Count);
 
             var targetSubList = SubLists.SingleOrDefault(sl => sl.Id == subListId);
@@ -113,8 +111,6 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         public void DeleteSubList(int subListId)
         {
-            Guard.Against.NegativeOrZero(subListId, nameof(subListId));
-
             var subList = SubLists.SingleOrDefault(sl => sl.Id == subListId);
 
             Guard.Against.NullQueryResult(subList, nameof(subListId));
@@ -139,8 +135,6 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
             if (subListId.HasValue)
             {
-                Guard.Against.NegativeOrZero(subListId.Value, nameof(subListId));
-
                 var subList = SubLists.SingleOrDefault(sl => sl.Id == subListId.Value);
 
                 Guard.Against.NullQueryResult(subList, nameof(subListId));
@@ -155,7 +149,6 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         public void EditTodo(int todoId, string title, string description = null, DateTime? dueDate = null, IDateTime dateTimeProvider = null)
         {
-            Guard.Against.NegativeOrZero(todoId, nameof(todoId));
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
 
             var todo = Items.SingleOrDefault(item => item.Id == todoId);
@@ -188,8 +181,6 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         public void SetCompletedTodo(int todoId, bool isCompleted = true)
         {
-            Guard.Against.NegativeOrZero(todoId, nameof(todoId));
-
             var todo = Items.SingleOrDefault(item => item.Id == todoId);
             Guard.Against.NullQueryResult(todo, nameof(todoId));
 
@@ -212,8 +203,6 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         public void MoveTodo(int todoId, TodoItemPosition newPosition)
         {
-            Guard.Against.NegativeOrZero(todoId, nameof(todoId));
-
             if (newPosition.SubListId.HasValue)
             {
                 var subList = SubLists.SingleOrDefault(sl => sl.Id == newPosition.SubListId.Value);
@@ -291,8 +280,6 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         public void DeleteTodo(int todoId)
         {
-            Guard.Against.NegativeOrZero(todoId, nameof(todoId));
-
             var todo = Items.SingleOrDefault(item => item.Id == todoId);
             Guard.Against.NullQueryResult(todo, nameof(todoId));
 

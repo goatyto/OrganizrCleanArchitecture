@@ -31,16 +31,5 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
             construct.Should().Throw<ArgumentException>().And.ParamName.Should().Be("ordinal");
         }
-
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        public void Constructor_InvalidSubListId_ThrowsArgumentException(int invalidSubListId)
-        {
-            var ordinal = 1;
-            Func<TodoItemPosition> construct = () => new TodoItemPosition(ordinal, invalidSubListId);
-
-            construct.Should().Throw<ArgumentException>().And.ParamName.Should().Be("subListId");
-        }
     }
 }

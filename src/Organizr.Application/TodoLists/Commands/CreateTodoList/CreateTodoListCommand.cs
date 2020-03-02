@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Common.Interfaces;
 using Organizr.Domain.Lists.Entities.TodoListAggregate;
@@ -25,6 +26,9 @@ namespace Organizr.Application.TodoLists.Commands.CreateTodoList
 
         public CreateTodoListCommandHandler(ITodoListRepository todoListRepository, ICurrentUserService currentUserService)
         {
+            Guard.Against.Null(todoListRepository, nameof(todoListRepository));
+            Guard.Against.Null(currentUserService, nameof(currentUserService));
+
             _todoListRepository = todoListRepository;
             _currentUserService = currentUserService;
         }

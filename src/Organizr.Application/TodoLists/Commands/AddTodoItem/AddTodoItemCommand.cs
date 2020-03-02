@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Domain.Lists.Entities.TodoListAggregate;
 using Organizr.Domain.SharedKernel;
@@ -16,6 +17,15 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoItem
         public string Description { get; }
         public DateTime? DueDate { get; }
         public int? SubListId { get; }
+
+        public AddTodoItemCommand(Guid todoListId, string title, string description, DateTime? dueDate, int? subListId)
+        {
+            TodoListId = todoListId;
+            Title = title;
+            Description = description;
+            DueDate = dueDate;
+            SubListId = subListId;
+        }
     }
 
     public class AddTodoItemCommandHandler : IRequestHandler<AddTodoItemCommand>
@@ -25,6 +35,9 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoItem
 
         public AddTodoItemCommandHandler(ITodoListRepository todoListRepository, IDateTime dateTimeProvider)
         {
+            Guard.Against.Null(todoListRepository, nameof(todoListRepository));
+            Guard.Against.Null(dateTimeProvider, nameof(dateTimeProvider));
+            
             _todoListRepository = todoListRepository;
             _dateTimeProvider = dateTimeProvider;
         }

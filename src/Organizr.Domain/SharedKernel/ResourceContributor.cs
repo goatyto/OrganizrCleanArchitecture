@@ -11,7 +11,6 @@ namespace Organizr.Domain.SharedKernel
 
         internal ResourceContributor(Guid resourceId, string contributorId)
         {
-            Guard.Against.Default(resourceId, nameof(resourceId));
             Guard.Against.NullOrWhiteSpace(contributorId, nameof(contributorId));
 
             ResourceId = resourceId;

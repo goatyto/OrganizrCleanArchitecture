@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Domain.Lists.Entities.TodoListAggregate;
 
@@ -26,6 +27,8 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoSubList
 
         public AddTodoSubListCommandHandler(ITodoListRepository todoListRepository)
         {
+            Guard.Against.Null(todoListRepository, nameof(todoListRepository));
+
             _todoListRepository = todoListRepository;
         }
 

@@ -6,7 +6,7 @@ using Organizr.Domain.Guards;
 
 namespace Organizr.Domain.SharedKernel
 {
-    public abstract class ResourceEntity : Entity<Guid>, IAggregateRoot
+    public abstract class ResourceEntity : Entity<Guid>
     {
         public virtual string OwnerId { get; protected set; }
 

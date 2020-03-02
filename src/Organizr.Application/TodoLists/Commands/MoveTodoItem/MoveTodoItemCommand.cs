@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Domain.Lists.Entities.TodoListAggregate;
 
@@ -30,6 +31,8 @@ namespace Organizr.Application.TodoLists.Commands.MoveTodoItem
 
         public MoveTodoItemCommandHandler(ITodoListRepository todoListRepository)
         {
+            Guard.Against.Null(todoListRepository, nameof(todoListRepository));
+            
             _todoListRepository = todoListRepository;
         }
 

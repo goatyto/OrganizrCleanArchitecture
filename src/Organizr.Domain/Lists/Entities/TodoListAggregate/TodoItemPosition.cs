@@ -15,9 +15,6 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
         {
             Guard.Against.NegativeOrZero(ordinal, nameof(ordinal));
 
-            if (subListId.HasValue)
-                Guard.Against.NegativeOrZero(subListId.Value, nameof(subListId));
-
             Ordinal = ordinal;
             SubListId = subListId;
         }
