@@ -7,6 +7,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 {
     public class TodoSubList : Entity
     {
+        public Guid MainListId { get; protected set; }
         public string Title { get; protected set; }
         public string Description { get; protected set; }
         public int Ordinal { get; protected set; }
@@ -17,11 +18,12 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
 
         }
 
-        protected internal TodoSubList(string title, int ordinal, string description = null) : this()
+        protected internal TodoSubList(Guid mainListId, string title, int ordinal, string description = null) : this()
         {
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
             Guard.Against.NegativeOrZero(ordinal, nameof(ordinal));
 
+            MainListId = mainListId;
             Title = title;
             Ordinal = ordinal;
             Description = description;

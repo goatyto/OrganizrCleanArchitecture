@@ -22,6 +22,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             var insertedSubList = fixture.TodoList.SubLists.Last();
 
             insertedSubList.Id.Should().Be(default(int));
+            insertedSubList.MainListId.Should().Be(fixture.TodoListId);
             insertedSubList.Title.Should().Be(title);
             insertedSubList.Ordinal.Should().Be(fixture.TodoList.SubLists.Count);
             insertedSubList.Description.Should().Be(description);

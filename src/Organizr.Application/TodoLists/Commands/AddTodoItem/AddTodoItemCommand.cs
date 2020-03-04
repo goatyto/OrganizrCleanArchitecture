@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using MediatR;
+using Organizr.Application.Common.Exceptions;
 using Organizr.Domain.Lists.Entities.TodoListAggregate;
 using Organizr.Domain.SharedKernel;
 
@@ -18,7 +17,7 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoItem
         public DateTime? DueDate { get; }
         public int? SubListId { get; }
 
-        public AddTodoItemCommand(Guid todoListId, string title, string description, DateTime? dueDate, int? subListId)
+        public AddTodoItemCommand(Guid todoListId, string title, string description = null, DateTime? dueDate = null, int? subListId = null)
         {
             TodoListId = todoListId;
             Title = title;
@@ -45,6 +44,9 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoItem
         public async Task<Unit> Handle(AddTodoItemCommand request, CancellationToken cancellationToken)
         {
             var todoList = await _todoListRepository.GetByIdAsync(request.TodoListId, cancellationToken);
+
+            if(todoList == null)
+                throw new NotFoundException<TodoList>(request.TodoListId);
 
             todoList.AddTodo(request.Title, request.Description, request.DueDate, _dateTimeProvider, request.SubListId);
 

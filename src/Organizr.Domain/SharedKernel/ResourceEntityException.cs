@@ -18,7 +18,7 @@ namespace Organizr.Domain.SharedKernel
         public string ContributorId { get; private set; }
 
         public ContributorAlreadyOwnerException(Guid resourceId, string contributorId, Exception innerException = null)
-            : base($"Contributor \"{contributorId}\" is already set as an owner for resource \"{resourceId}\"",
+            : base($"Contributor \"{contributorId}\" is already set as an owner for resource \"{resourceId}\".",
                 innerException)
         {
             ResourceId = resourceId;
@@ -32,7 +32,7 @@ namespace Organizr.Domain.SharedKernel
         public string ContributorId { get; private set; }
 
         public ContributorAlreadyExistsException(Guid resourceId, string contributorId, Exception innerException = null)
-            : base($"Contributor \"{contributorId}\" already set for resource \"{resourceId}\"", innerException)
+            : base($"Contributor \"{contributorId}\" already set for resource \"{resourceId}\".", innerException)
         {
             ResourceId = resourceId;
             ContributorId = contributorId;

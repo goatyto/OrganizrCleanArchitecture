@@ -6,7 +6,7 @@ using Organizr.Domain.Guards;
 
 namespace Organizr.Domain.SharedKernel
 {
-    public abstract class ResourceEntity : Entity<Guid>
+    public abstract class ResourceEntity : Entity<Guid>, IAggregateRoot
     {
         public virtual string OwnerId { get; protected set; }
 
@@ -27,7 +27,7 @@ namespace Organizr.Domain.SharedKernel
 
             var resourceContributor = new ResourceContributor(Id, contributorId);
 
-            if (ResourceContributors.Any(rc=>rc == resourceContributor))
+            if (ResourceContributors.Any(rc => rc == resourceContributor))
                 throw new ContributorAlreadyExistsException(Id, contributorId);
 
             _resourceContributors.Add(resourceContributor);

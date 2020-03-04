@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Organizr.Application.Common.Exceptions;
 using Organizr.Domain.SharedKernel;
 
-namespace Organizr.Application.Common.Commands.RemoveContributor
+namespace Organizr.Application.Common.ResourceEntities.Commands.RemoveContributor
 {
     public class RemoveContributorCommand : IRequest
     {
@@ -32,6 +31,9 @@ namespace Organizr.Application.Common.Commands.RemoveContributor
         public async Task<Unit> Handle(RemoveContributorCommand request, CancellationToken cancellationToken)
         {
             var resourceEntity = await _resourceEntityRepository.GetByIdAsync(request.ResourceId, cancellationToken);
+
+            if (resourceEntity == null)
+                throw new ResourceNotFoundException(request.ResourceId);
 
             resourceEntity.RemoveContributor(request.ContributorId);
 

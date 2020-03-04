@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using MediatR;
+using Organizr.Application.Common.Exceptions;
 using Organizr.Domain.Lists.Entities.TodoListAggregate;
 
 namespace Organizr.Application.TodoLists.Commands.EditTodoList
@@ -15,7 +14,7 @@ namespace Organizr.Application.TodoLists.Commands.EditTodoList
         public string Title { get; }
         public string Description { get; }
 
-        public EditTodoListCommand(Guid id, string title, string description)
+        public EditTodoListCommand(Guid id, string title, string description = null)
         {
             Id = id;
             Title = title;
@@ -37,6 +36,9 @@ namespace Organizr.Application.TodoLists.Commands.EditTodoList
         public async Task<Unit> Handle(EditTodoListCommand request, CancellationToken cancellationToken)
         {
             var todoList = await _todoListRepository.GetByIdAsync(request.Id, cancellationToken);
+
+            if (todoList == null)
+                throw new NotFoundException<TodoList>(request.Id);
 
             todoList.Edit(request.Title, request.Description);
 

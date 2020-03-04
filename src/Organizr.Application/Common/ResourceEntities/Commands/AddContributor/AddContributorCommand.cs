@@ -2,9 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Organizr.Application.Common.Exceptions;
 using Organizr.Domain.SharedKernel;
 
-namespace Organizr.Application.Common.Commands.AddContributor
+namespace Organizr.Application.Common.ResourceEntities.Commands.AddContributor
 {
     public class AddContributorCommand : IRequest
     {
@@ -30,6 +31,9 @@ namespace Organizr.Application.Common.Commands.AddContributor
         public async Task<Unit> Handle(AddContributorCommand request, CancellationToken cancellationToken)
         {
             var resourceEntity = await _resourceEntityRepository.GetByIdAsync(request.ResourceId, cancellationToken);
+
+            if (resourceEntity == null)
+                throw new ResourceNotFoundException(request.ResourceId);
 
             resourceEntity.AddContributor(request.ContributorId);
 

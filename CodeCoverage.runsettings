@@ -31,6 +31,7 @@ Included items must then not match any entries in the exclude list to remain inc
               <Exclude>
                 <ModulePath>.*xunit(\..+)?\.dll$</ModulePath>
                 <ModulePath>.*unittests\.dll$</ModulePath>
+                <ModulePath>.*fluentvalidation\.dll$</ModulePath>
               </Exclude>
             </ModulePaths>
 

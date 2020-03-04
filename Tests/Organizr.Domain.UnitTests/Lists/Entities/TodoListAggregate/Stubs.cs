@@ -29,7 +29,7 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
 
     public class TodoSubListStub : TodoSubList
     {
-        public TodoSubListStub(int id, string title, int ordinal, string description = null, bool? isDeleted = null) : base(title, ordinal,
+        public TodoSubListStub(int id, Guid mainListId, string title, int ordinal, string description = null, bool? isDeleted = null) : base(mainListId, title, ordinal,
             description)
         {
             Id = id;

@@ -13,11 +13,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
         public string Title { get; protected set; }
 
         public string Description { get; protected set; }
-
-        public DateTime? DueDate => Items.Any(item => item.DueDate.HasValue)
-            ? Items.Where(item => item.DueDate.HasValue).Max(item => item.DueDate)
-            : null;
-
+        
         protected readonly List<TodoItem> _items;
         public IReadOnlyCollection<TodoItem> Items => _items.AsReadOnly();
 
@@ -54,7 +50,7 @@ namespace Organizr.Domain.Lists.Entities.TodoListAggregate
         {
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
 
-            var subList = new TodoSubList(title, GetNextSubListOrdinal(), description);
+            var subList = new TodoSubList(Id, title, GetNextSubListOrdinal(), description);
             _subLists.Add(subList);
         }
 

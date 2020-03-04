@@ -9,7 +9,7 @@ namespace Organizr.Domain.SharedKernel
         public Guid ResourceId { get; }
         public string ContributorId { get; }
 
-        internal ResourceContributor(Guid resourceId, string contributorId)
+        public ResourceContributor(Guid resourceId, string contributorId)
         {
             Guard.Against.NullOrWhiteSpace(contributorId, nameof(contributorId));
 

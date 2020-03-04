@@ -214,16 +214,6 @@ namespace Organizr.Domain.UnitTests.SharedKernel
                 yield return item;
             }
         }
-
-        public static bool operator ==(ValueObjectStub left, ValueObjectStub right)
-        {
-            return EqualOperator(left, right);
-        }
-
-        public static bool operator !=(ValueObjectStub left, ValueObjectStub right)
-        {
-            return NotEqualOperator(left, right);
-        }
     }
 
     public class ValueObjectStub2 : ValueObject

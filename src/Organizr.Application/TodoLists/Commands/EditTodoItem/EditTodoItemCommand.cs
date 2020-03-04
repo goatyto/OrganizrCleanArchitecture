@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using MediatR;
+using Organizr.Application.Common.Exceptions;
 using Organizr.Domain.Lists.Entities.TodoListAggregate;
+using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.TodoLists.Commands.EditTodoItem
 {
@@ -17,7 +17,7 @@ namespace Organizr.Application.TodoLists.Commands.EditTodoItem
         public string Description { get; }
         public DateTime? DueDate { get; }
 
-        public EditTodoItemCommand(Guid todoListId, int id, string title, string description, DateTime? dueDate)
+        public EditTodoItemCommand(Guid todoListId, int id, string title, string description = null, DateTime? dueDate = null)
         {
             TodoListId = todoListId;
             Id = id;
@@ -30,19 +30,24 @@ namespace Organizr.Application.TodoLists.Commands.EditTodoItem
     public class EditTodoItemCommandHandler : IRequestHandler<EditTodoItemCommand>
     {
         private readonly ITodoListRepository _todoListRepository;
+        private readonly IDateTime _dateTimeProvider;
 
-        public EditTodoItemCommandHandler(ITodoListRepository todoListRepository)
+        public EditTodoItemCommandHandler(ITodoListRepository todoListRepository, IDateTime dateTimeProvider)
         {
             Guard.Against.Null(todoListRepository, nameof(todoListRepository));
             
             _todoListRepository = todoListRepository;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<Unit> Handle(EditTodoItemCommand request, CancellationToken cancellationToken)
         {
             var todoList = await _todoListRepository.GetByIdAsync(request.TodoListId, cancellationToken);
 
-            todoList.EditTodo(request.Id, request.Title, request.Description, request.DueDate);
+            if (todoList == null)
+                throw new NotFoundException<TodoList>(request.TodoListId);
+
+            todoList.EditTodo(request.Id, request.Title, request.Description, request.DueDate, _dateTimeProvider);
 
             _todoListRepository.Update(todoList);
 

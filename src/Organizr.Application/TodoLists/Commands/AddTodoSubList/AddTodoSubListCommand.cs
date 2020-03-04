@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using MediatR;
+using Organizr.Application.Common.Exceptions;
 using Organizr.Domain.Lists.Entities.TodoListAggregate;
 
 namespace Organizr.Application.TodoLists.Commands.AddTodoSubList
@@ -13,7 +14,7 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoSubList
         public string Title { get; }
         public string Description { get; }
 
-        public AddTodoSubListCommand(Guid todoListId, string title, string description)
+        public AddTodoSubListCommand(Guid todoListId, string title, string description = null)
         {
             TodoListId = todoListId;
             Title = title;
@@ -35,6 +36,9 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoSubList
         public async Task<Unit> Handle(AddTodoSubListCommand request, CancellationToken cancellationToken)
         {
             var todoList = await _todoListRepository.GetByIdAsync(request.TodoListId, cancellationToken);
+
+            if (todoList == null)
+                throw new NotFoundException<TodoList>(request.TodoListId);
 
             todoList.AddTodo(request.Title, request.Description);
 

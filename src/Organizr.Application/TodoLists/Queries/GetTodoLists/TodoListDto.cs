@@ -5,10 +5,10 @@ namespace Organizr.Application.TodoLists.Queries.GetTodoLists
 {
     public class TodoListDto
     {
-        public Guid Id { get; }
+        public Guid Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public DateTime? DueDate { get; set; }
         public IEnumerable<TodoSubListDto> SubLists { get; set; }
+        public IEnumerable<TodoItemDto> Items { get; set; }
     }
 }

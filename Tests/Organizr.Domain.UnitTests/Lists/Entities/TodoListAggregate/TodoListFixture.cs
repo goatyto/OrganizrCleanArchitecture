@@ -24,11 +24,11 @@ namespace Organizr.Domain.UnitTests.Lists.Entities.TodoListAggregate
             TodoList = new TodoListStub(TodoListId, "User1", "Todo List 1", "Todo List 1 Description",
                 new List<TodoSubList>
                 {
-                    new TodoSubListStub(1, "Todo Sublist 1", 1, "Todo Sublist 1 Description"),
-                    new TodoSubListStub(2, "Todo Sublist 2", 2, "Todo Sublist 2 Description", true),
-                    new TodoSubListStub(3, "Todo Sublist 3", 2, "Todo Sublist 3 Description"),
-                    new TodoSubListStub(4, "Todo Sublist 4", 3, "Todo Sublist 4 Description"),
-                    new TodoSubListStub(5, "Todo Sublist 5", 4, "Todo Sublist 5 Description"),
+                    new TodoSubListStub(1, TodoListId, "Todo Sublist 1", 1, "Todo Sublist 1 Description"),
+                    new TodoSubListStub(2, TodoListId, "Todo Sublist 2", 2, "Todo Sublist 2 Description", true),
+                    new TodoSubListStub(3, TodoListId, "Todo Sublist 3", 2, "Todo Sublist 3 Description"),
+                    new TodoSubListStub(4, TodoListId, "Todo Sublist 4", 3, "Todo Sublist 4 Description"),
+                    new TodoSubListStub(5, TodoListId, "Todo Sublist 5", 4, "Todo Sublist 5 Description"),
                 },
                 new List<TodoItem>
                 {
