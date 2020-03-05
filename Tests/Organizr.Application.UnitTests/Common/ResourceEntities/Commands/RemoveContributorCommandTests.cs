@@ -4,17 +4,18 @@ using FluentAssertions;
 using Moq;
 using Organizr.Application.Common.Exceptions;
 using Organizr.Application.Common.ResourceEntities.Commands.RemoveContributor;
+using Organizr.Domain.SharedKernel;
 using Xunit;
 
 namespace Organizr.Application.UnitTests.Common.ResourceEntities.Commands
 {
     public class RemoveContributorCommandTests: ResourceEntityCommandTestBase
     {
-        private readonly RemoveContributorCommandHandler _sut;
+        private readonly RemoveContributorCommandHandler<ResourceEntityStub> _sut;
 
         public RemoveContributorCommandTests()
         {
-            _sut = new RemoveContributorCommandHandler(ResourceEntityRepositoryMock.Object);
+            _sut = new RemoveContributorCommandHandler<ResourceEntityStub>(ResourceEntityRepositoryMock.Object);
         }
 
         [Fact]

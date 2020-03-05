@@ -8,9 +8,9 @@ namespace Organizr.Domain.SharedKernel
     {
         IUnitOfWork UnitOfWork { get; }
 
-        Task<ResourceEntity> GetByIdAsync(Guid id,
-            CancellationToken cancellationToken = default(CancellationToken));
+        Task<TResource> GetByIdAsync<TResource>(Guid id,
+            CancellationToken cancellationToken = default(CancellationToken)) where TResource: ResourceEntity;
 
-        void Update(ResourceEntity resourceEntity);
+        void Update<TResource>(TResource resourceEntity) where TResource : ResourceEntity;
     }
 }

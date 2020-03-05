@@ -19,7 +19,7 @@ namespace Organizr.Application.Common.ResourceEntities.Commands.AddContributor
         }
     }
 
-    public class AddContributorCommandHandler : IRequestHandler<AddContributorCommand>
+    public class AddContributorCommandHandler<TResource> : IRequestHandler<AddContributorCommand> where TResource: ResourceEntity
     {
         private readonly IResourceEntityRepository _resourceEntityRepository;
 
@@ -30,7 +30,8 @@ namespace Organizr.Application.Common.ResourceEntities.Commands.AddContributor
 
         public async Task<Unit> Handle(AddContributorCommand request, CancellationToken cancellationToken)
         {
-            var resourceEntity = await _resourceEntityRepository.GetByIdAsync(request.ResourceId, cancellationToken);
+            var resourceEntity =
+                await _resourceEntityRepository.GetByIdAsync<TResource>(request.ResourceId, cancellationToken);
 
             if (resourceEntity == null)
                 throw new ResourceNotFoundException(request.ResourceId);

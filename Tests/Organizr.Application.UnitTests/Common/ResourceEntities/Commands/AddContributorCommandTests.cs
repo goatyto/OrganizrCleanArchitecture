@@ -4,17 +4,18 @@ using FluentAssertions;
 using Moq;
 using Organizr.Application.Common.Exceptions;
 using Organizr.Application.Common.ResourceEntities.Commands.AddContributor;
+using Organizr.Domain.SharedKernel;
 using Xunit;
 
 namespace Organizr.Application.UnitTests.Common.ResourceEntities.Commands
 {
     public class AddContributorCommandTests: ResourceEntityCommandTestBase
     {
-        private readonly AddContributorCommandHandler _sut;
+        private readonly AddContributorCommandHandler<ResourceEntityStub> _sut;
 
         public AddContributorCommandTests()
         {
-            _sut = new AddContributorCommandHandler(ResourceEntityRepositoryMock.Object);
+            _sut = new AddContributorCommandHandler<ResourceEntityStub>(ResourceEntityRepositoryMock.Object);
         }
 
         [Fact]

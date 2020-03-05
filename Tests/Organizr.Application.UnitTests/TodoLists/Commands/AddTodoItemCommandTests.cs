@@ -18,7 +18,8 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
 
         public AddTodoItemCommandTests()
         {
-            _sut = new AddTodoItemCommandHandler(TodoListRepositoryMock.Object, DateTimeProviderMock.Object);
+            _sut = new AddTodoItemCommandHandler(CurrentUserServiceMock.Object, ResourceAccessServiceMock.Object,
+                TodoListRepositoryMock.Object, DateTimeProviderMock.Object);
         }
 
         [Fact]
@@ -38,6 +39,19 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
 
             _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should()
                 .Throw<NotFoundException<TodoList>>().And.Id.Should().Be(nonExistentTodoListId);
+        }
+
+        [Fact]
+        public void Handle_CurrentUserHasNoAccess_ThrowsNotFoundException()
+        {
+            var noAccessUserId = "User2";
+            CurrentUserServiceMock.Setup(m => m.UserId).Returns(noAccessUserId);
+
+            var request = new AddTodoItemCommand(TodoListId, "Title", "Description", DateTimeProviderMock.Object.Today.AddDays(1));
+
+            _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should()
+                .Throw<AccessDeniedException>().Where(exception =>
+                    exception.ResourceId == TodoListId && exception.UserId == noAccessUserId);
         }
     }
 }

@@ -7,7 +7,7 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Infrastructure.Identity
 {
-    class ResourceAuthorizationHandler: AuthorizationHandler<IsOwnerOrContributorRequirement, ResourceEntity>
+    class ResourceAuthorizationHandler : AuthorizationHandler<IsOwnerOrContributorRequirement, ResourceEntity>
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IsOwnerOrContributorRequirement requirement,
             ResourceEntity resource)

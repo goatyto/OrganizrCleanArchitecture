@@ -17,7 +17,8 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
 
         public MoveTodoItemCommandTests()
         {
-            _sut = new MoveTodoItemCommandHandler(TodoListRepositoryMock.Object);
+            _sut = new MoveTodoItemCommandHandler(CurrentUserServiceMock.Object, ResourceAccessServiceMock.Object,
+                TodoListRepositoryMock.Object);
         }
 
         [Fact]
@@ -37,6 +38,19 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
 
             _sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>())).Should()
                 .Throw<NotFoundException<TodoList>>().And.Id.Should().Be(nonExistentTodoListId);
+        }
+
+        [Fact]
+        public void Handle_CurrentUserHasNoAccess_ThrowsNotFoundException()
+        {
+            var noAccessUserId = "User2";
+            CurrentUserServiceMock.Setup(m => m.UserId).Returns(noAccessUserId);
+
+            var request = new MoveTodoItemCommand(TodoListId, 1, 2);
+
+            _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should()
+                .Throw<AccessDeniedException>().Where(exception =>
+                    exception.ResourceId == TodoListId && exception.UserId == noAccessUserId);
         }
     }
 }

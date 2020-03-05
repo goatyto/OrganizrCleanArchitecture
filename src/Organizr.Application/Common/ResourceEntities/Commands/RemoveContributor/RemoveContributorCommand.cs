@@ -19,7 +19,7 @@ namespace Organizr.Application.Common.ResourceEntities.Commands.RemoveContributo
         }
     }
 
-    public class RemoveContributorCommandHandler : IRequestHandler<RemoveContributorCommand>
+    public class RemoveContributorCommandHandler<TResource> : IRequestHandler<RemoveContributorCommand> where TResource: ResourceEntity
     {
         private readonly IResourceEntityRepository _resourceEntityRepository;
 
@@ -30,7 +30,7 @@ namespace Organizr.Application.Common.ResourceEntities.Commands.RemoveContributo
 
         public async Task<Unit> Handle(RemoveContributorCommand request, CancellationToken cancellationToken)
         {
-            var resourceEntity = await _resourceEntityRepository.GetByIdAsync(request.ResourceId, cancellationToken);
+            var resourceEntity = await _resourceEntityRepository.GetByIdAsync<TResource>(request.ResourceId, cancellationToken);
 
             if (resourceEntity == null)
                 throw new ResourceNotFoundException(request.ResourceId);

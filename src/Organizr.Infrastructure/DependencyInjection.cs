@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Organizr.Infrastructure.Data;
 using Organizr.Infrastructure.Identity;
 using Organizr.Web.Data;
 using Microsoft.Extensions.Configuration;
+using Organizr.Infrastructure.Persistence;
 
 namespace Organizr.Infrastructure
 {

@@ -15,7 +15,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
 
         public CreateTodoListCommandTests()
         {
-            _sut = new CreateTodoListCommandHandler(TodoListRepositoryMock.Object, CurrentUserServiceMock.Object);
+            _sut = new CreateTodoListCommandHandler(CurrentUserServiceMock.Object, TodoListRepositoryMock.Object);
         }
 
         [Fact]

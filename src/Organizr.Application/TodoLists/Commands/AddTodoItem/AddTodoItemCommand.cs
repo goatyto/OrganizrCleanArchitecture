@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Common.Exceptions;
+using Organizr.Application.Common.Interfaces;
 using Organizr.Domain.Lists.Entities.TodoListAggregate;
 using Organizr.Domain.SharedKernel;
 
@@ -29,14 +30,22 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoItem
 
     public class AddTodoItemCommandHandler : IRequestHandler<AddTodoItemCommand>
     {
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IResourceAccessService _resourceAccessService;
         private readonly ITodoListRepository _todoListRepository;
         private readonly IDateTime _dateTimeProvider;
 
-        public AddTodoItemCommandHandler(ITodoListRepository todoListRepository, IDateTime dateTimeProvider)
+        public AddTodoItemCommandHandler(ICurrentUserService currentUserService,
+            IResourceAccessService resourceAccessService, ITodoListRepository todoListRepository,
+            IDateTime dateTimeProvider)
         {
+            Guard.Against.Null(currentUserService, nameof(currentUserService));
+            Guard.Against.Null(resourceAccessService, nameof(resourceAccessService));
             Guard.Against.Null(todoListRepository, nameof(todoListRepository));
             Guard.Against.Null(dateTimeProvider, nameof(dateTimeProvider));
-            
+
+            _currentUserService = currentUserService;
+            _resourceAccessService = resourceAccessService;
             _todoListRepository = todoListRepository;
             _dateTimeProvider = dateTimeProvider;
         }
@@ -45,8 +54,11 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoItem
         {
             var todoList = await _todoListRepository.GetByIdAsync(request.TodoListId, cancellationToken);
 
-            if(todoList == null)
+            if (todoList == null)
                 throw new NotFoundException<TodoList>(request.TodoListId);
+
+            if (!_resourceAccessService.CanAccess(request.TodoListId, _currentUserService.UserId))
+                throw new AccessDeniedException(request.TodoListId, _currentUserService.UserId);
 
             todoList.AddTodo(request.Title, request.Description, request.DueDate, _dateTimeProvider, request.SubListId);
 

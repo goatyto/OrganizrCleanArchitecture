@@ -24,7 +24,7 @@ namespace Organizr.Application.TodoLists.Commands.CreateTodoList
         private readonly ITodoListRepository _todoListRepository;
         private readonly ICurrentUserService _currentUserService;
 
-        public CreateTodoListCommandHandler(ITodoListRepository todoListRepository, ICurrentUserService currentUserService)
+        public CreateTodoListCommandHandler(ICurrentUserService currentUserService, ITodoListRepository todoListRepository)
         {
             Guard.Against.Null(todoListRepository, nameof(todoListRepository));
             Guard.Against.Null(currentUserService, nameof(currentUserService));

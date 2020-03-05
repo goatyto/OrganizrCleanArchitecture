@@ -20,7 +20,7 @@ namespace Organizr.Application.UnitTests.Common.ResourceEntities.Commands
 
             ResourceEntityRepositoryMock = new Mock<IResourceEntityRepository>();
             ResourceEntityRepositoryMock
-                .Setup(repository => repository.GetByIdAsync(ResourceId, It.IsAny<CancellationToken>())).ReturnsAsync(
+                .Setup(repository => repository.GetByIdAsync<ResourceEntityStub>(ResourceId, It.IsAny<CancellationToken>())).ReturnsAsync(
                     new ResourceEntityStub("User1", new List<ResourceContributor>
                     {
                         new ResourceContributor(ResourceId, "User2")

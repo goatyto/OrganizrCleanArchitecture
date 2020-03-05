@@ -12,13 +12,21 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
     public abstract class TodoListCommandsTestBase
     {
         protected readonly Guid TodoListId;
+        protected readonly Mock<ICurrentUserService> CurrentUserServiceMock;
+        protected readonly Mock<IResourceAccessService> ResourceAccessServiceMock;
         protected readonly Mock<ITodoListRepository> TodoListRepositoryMock;
         protected readonly Mock<IDateTime> DateTimeProviderMock;
-        protected readonly Mock<ICurrentUserService> CurrentUserServiceMock;
 
         public TodoListCommandsTestBase()
         {
             TodoListId = Guid.NewGuid();
+            var ownerId = "User1";
+
+            CurrentUserServiceMock = new Mock<ICurrentUserService>();
+            CurrentUserServiceMock.Setup(m => m.UserId).Returns(ownerId);
+
+            ResourceAccessServiceMock = new Mock<IResourceAccessService>();
+            ResourceAccessServiceMock.Setup(m => m.CanAccess(TodoListId, ownerId)).Returns(true);
 
             DateTimeProviderMock = new Mock<IDateTime>();
             DateTimeProviderMock.Setup(m => m.Now).Returns(DateTime.UtcNow);
@@ -27,7 +35,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
             TodoListRepositoryMock = new Mock<ITodoListRepository>();
             TodoListRepositoryMock.Setup(m => m.GetByIdAsync(TodoListId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() =>
-                    new TodoListStub(TodoListId, "User1", "TodoList Title", "TodoList Description",
+                    new TodoListStub(TodoListId, ownerId, "TodoList Title", "TodoList Description",
                         new List<TodoSubList>
                         {
                             new TodoSubListStub(1, TodoListId, "TodoSubList Title", 1,
@@ -45,9 +53,6 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
                         }));
             TodoListRepositoryMock.Setup(m => m.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-
-            CurrentUserServiceMock = new Mock<ICurrentUserService>();
-            CurrentUserServiceMock.Setup(m => m.UserId).Returns("User1");
         }
     }
 
