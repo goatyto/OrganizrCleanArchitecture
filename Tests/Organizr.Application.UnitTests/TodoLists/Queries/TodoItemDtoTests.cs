@@ -20,7 +20,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
             var isDeleted = true;
             var dueDate = DateTime.Today;
 
-            var todoItemDto = new TodoItemDto
+            var sut = new TodoItemDto
             {
                 Id = id,
                 Title = title,
@@ -31,13 +31,13 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
                 DueDate = dueDate
             };
 
-            todoItemDto.Id.Should().Be(id);
-            todoItemDto.Title.Should().Be(title);
-            todoItemDto.Description.Should().Be(description);
-            todoItemDto.Ordinal.Should().Be(ordinal);
-            todoItemDto.IsComplated.Should().Be(isCompleted);
-            todoItemDto.IsDeleted.Should().Be(isDeleted);
-            todoItemDto.DueDate.Should().Be(dueDate);
+            sut.Id.Should().Be(id);
+            sut.Title.Should().Be(title);
+            sut.Description.Should().Be(description);
+            sut.Ordinal.Should().Be(ordinal);
+            sut.IsComplated.Should().Be(isCompleted);
+            sut.IsDeleted.Should().Be(isDeleted);
+            sut.DueDate.Should().Be(dueDate);
         }
     }
 }

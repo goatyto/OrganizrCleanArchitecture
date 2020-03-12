@@ -7,7 +7,9 @@ using FluentAssertions;
 using MediatR;
 using Moq;
 using Organizr.Application.Common.Exceptions;
-using Organizr.Domain.Lists.Entities.TodoListAggregate;
+using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
+using Organizr.Domain.Planning.Services;
+using Organizr.Domain.SharedKernel;
 using Xunit;
 
 namespace Organizr.Application.UnitTests.TodoLists.Commands
@@ -18,14 +20,15 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
 
         public AddTodoItemCommandTests()
         {
-            _sut = new AddTodoItemCommandHandler(CurrentUserServiceMock.Object, ResourceAccessServiceMock.Object,
-                TodoListRepositoryMock.Object, DateTimeProviderMock.Object);
+            _sut = new AddTodoItemCommandHandler(CurrentUserServiceMock.Object, ResourceAuthorizationServiceMock.Object,
+                ClientDateValidator, TodoListRepositoryMock.Object);
         }
 
         [Fact]
         public void Handle_ValidRequest_DoesNotThrowException()
         {
-            var request = new AddTodoItemCommand(TodoListId, "Title", "Description", DateTimeProviderMock.Object.Today.AddDays(1));
+            var request = new AddTodoItemCommand(TodoListId, "Title", "Description", ClientDateToday.AddDays(1),
+                ClientTimeZoneOffsetInMinutes);
 
             _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should().NotThrow();
         }
@@ -35,22 +38,24 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
         {
             var nonExistentTodoListId = Guid.NewGuid();
 
-            var request = new AddTodoItemCommand(nonExistentTodoListId, "Title", "Description", DateTimeProviderMock.Object.Today.AddDays(1));
+            var request = new AddTodoItemCommand(nonExistentTodoListId, "Title", "Description",
+                ClientDateToday.AddDays(1), ClientTimeZoneOffsetInMinutes);
 
             _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should()
-                .Throw<NotFoundException<TodoList>>().And.Id.Should().Be(nonExistentTodoListId);
+                .Throw<ResourceNotFoundException<TodoList>>().And.ResourceId.Should().Be(nonExistentTodoListId);
         }
 
         [Fact]
-        public void Handle_CurrentUserHasNoAccess_ThrowsNotFoundException()
+        public void Handle_CurrentUserHasNoAccess_ThrowsAccessDeniedException()
         {
             var noAccessUserId = "User2";
             CurrentUserServiceMock.Setup(m => m.UserId).Returns(noAccessUserId);
 
-            var request = new AddTodoItemCommand(TodoListId, "Title", "Description", DateTimeProviderMock.Object.Today.AddDays(1));
+            var request = new AddTodoItemCommand(TodoListId, "Title", "Description", ClientDateToday.AddDays(1),
+                ClientTimeZoneOffsetInMinutes);
 
             _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should()
-                .Throw<AccessDeniedException>().Where(exception =>
+                .Throw<AccessDeniedException<TodoList>>().Where(exception =>
                     exception.ResourceId == TodoListId && exception.UserId == noAccessUserId);
         }
     }

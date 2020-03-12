@@ -5,7 +5,8 @@ using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Common.Exceptions;
 using Organizr.Application.Common.Interfaces;
-using Organizr.Domain.Lists.Entities.TodoListAggregate;
+using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
+using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.TodoLists.Commands.EditTodoList
 {
@@ -25,31 +26,33 @@ namespace Organizr.Application.TodoLists.Commands.EditTodoList
 
     public class EditTodoListCommandHandler : IRequestHandler<EditTodoListCommand>
     {
-        private readonly ICurrentUserService _currentUserService;
-        private readonly IResourceAccessService _resourceAccessService;
+        private readonly IIdentityService _identityService;
+        private readonly IResourceAuthorizationService<TodoList> _resourceAuthorizationService;
         private readonly ITodoListRepository _todoListRepository;
 
-        public EditTodoListCommandHandler(ICurrentUserService currentUserService,
-            IResourceAccessService resourceAccessService, ITodoListRepository todoListRepository)
+        public EditTodoListCommandHandler(IIdentityService identityService,
+            IResourceAuthorizationService<TodoList> resourceAuthorizationService,
+            ITodoListRepository todoListRepository)
         {
-            Guard.Against.Null(currentUserService, nameof(currentUserService));
-            Guard.Against.Null(resourceAccessService, nameof(resourceAccessService));
+            Guard.Against.Null(identityService, nameof(identityService));
+            Guard.Against.Null(resourceAuthorizationService, nameof(resourceAuthorizationService));
             Guard.Against.Null(todoListRepository, nameof(todoListRepository));
 
-            _currentUserService = currentUserService;
-            _resourceAccessService = resourceAccessService;
+            _identityService = identityService;
+            _resourceAuthorizationService = resourceAuthorizationService;
             _todoListRepository = todoListRepository;
         }
-
         public async Task<Unit> Handle(EditTodoListCommand request, CancellationToken cancellationToken)
         {
             var todoList = await _todoListRepository.GetByIdAsync(request.Id, cancellationToken);
 
             if (todoList == null)
-                throw new NotFoundException<TodoList>(request.Id);
+                throw new ResourceNotFoundException<TodoList>(request.Id);
 
-            if (!_resourceAccessService.CanAccess(request.Id, _currentUserService.UserId))
-                throw new AccessDeniedException(request.Id, _currentUserService.UserId);
+            var currentUserId = _identityService.UserId;
+
+            if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
+                throw new AccessDeniedException<TodoList>(request.Id, currentUserId);
 
             todoList.Edit(request.Title, request.Description);
 

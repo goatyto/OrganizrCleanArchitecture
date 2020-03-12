@@ -13,14 +13,14 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
     public abstract class TodoListQueryCommandTestBase
     {
         protected readonly string UserId;
-        protected readonly Mock<ICurrentUserService> CurrentUserServiceMock;
+        protected readonly Mock<IIdentityService> CurrentUserServiceMock;
         protected readonly Mock<ITodoListQueries> TodoListQueriesMock;
 
         public TodoListQueryCommandTestBase()
         {
             UserId = "User1";
 
-            CurrentUserServiceMock = new Mock<ICurrentUserService>();
+            CurrentUserServiceMock = new Mock<IIdentityService>();
             CurrentUserServiceMock.Setup(m => m.UserId).Returns(UserId);
 
             TodoListQueriesMock = new Mock<ITodoListQueries>();

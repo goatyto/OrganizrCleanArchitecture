@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Remove="SharedKernel\Enumeration.cs" />
+    <Compile Remove="SharedKernel\IDateTime.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -13,9 +13,9 @@ namespace Organizr.Application.TodoLists.Queries.GetTodoLists
     public class GetTodoListsCommandHandler : IRequestHandler<GetTodoListsCommand, TodoListsVm>
     {
         private readonly ITodoListQueries _todoListQueries;
-        private readonly ICurrentUserService _currentUserService;
+        private readonly IIdentityService _currentUserService;
 
-        public GetTodoListsCommandHandler(ITodoListQueries todoListQueries, ICurrentUserService currentUserService)
+        public GetTodoListsCommandHandler(ITodoListQueries todoListQueries, IIdentityService currentUserService)
         {
             _todoListQueries = todoListQueries;
             _currentUserService = currentUserService;

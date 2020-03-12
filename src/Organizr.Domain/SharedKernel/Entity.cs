@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Ardalis.GuardClauses;
 
 namespace Organizr.Domain.SharedKernel
@@ -8,7 +9,34 @@ namespace Organizr.Domain.SharedKernel
         int? _requestedHashCode;
 
         public virtual TKey Id { get; protected set; }
-        
+
+        private readonly List<IDomainEvent> _domainEvents;
+        public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+        protected Entity()
+        {
+            _domainEvents = new List<IDomainEvent>();
+        }
+
+        public void AddDomainEvent(IDomainEvent domainEvent)
+        {
+            Guard.Against.Null(domainEvent, nameof(domainEvent));
+
+            _domainEvents.Add(domainEvent);
+        }
+
+        public void RemoveDomainEvent(IDomainEvent domainEvent)
+        {
+            Guard.Against.Null(domainEvent, nameof(domainEvent));
+
+            _domainEvents.Remove(domainEvent);
+        }
+
+        public void ClearDomainEvents()
+        {
+            _domainEvents.Clear();
+        }
+
         public bool IsTransient()
         {
             return Id.Equals(default(TKey));

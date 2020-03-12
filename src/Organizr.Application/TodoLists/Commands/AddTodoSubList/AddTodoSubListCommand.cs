@@ -5,7 +5,8 @@ using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Common.Exceptions;
 using Organizr.Application.Common.Interfaces;
-using Organizr.Domain.Lists.Entities.TodoListAggregate;
+using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
+using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.TodoLists.Commands.AddTodoSubList
 {
@@ -25,19 +26,20 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoSubList
 
     public class AddTodoSubListCommandHandler : IRequestHandler<AddTodoSubListCommand>
     {
-        private readonly ICurrentUserService _currentUserService;
-        private readonly IResourceAccessService _resourceAccessService;
+        private readonly IIdentityService _identityService;
+        private readonly IResourceAuthorizationService<TodoList> _resourceAuthorizationService;
         private readonly ITodoListRepository _todoListRepository;
 
-        public AddTodoSubListCommandHandler(ICurrentUserService currentUserService,
-            IResourceAccessService resourceAccessService, ITodoListRepository todoListRepository)
+        public AddTodoSubListCommandHandler(IIdentityService identityService,
+            IResourceAuthorizationService<TodoList> resourceAuthorizationService,
+            ITodoListRepository todoListRepository)
         {
-            Guard.Against.Null(currentUserService, nameof(currentUserService));
-            Guard.Against.Null(resourceAccessService, nameof(resourceAccessService));
+            Guard.Against.Null(identityService, nameof(identityService));
+            Guard.Against.Null(resourceAuthorizationService, nameof(resourceAuthorizationService));
             Guard.Against.Null(todoListRepository, nameof(todoListRepository));
 
-            _currentUserService = currentUserService;
-            _resourceAccessService = resourceAccessService;
+            _identityService = identityService;
+            _resourceAuthorizationService = resourceAuthorizationService;
             _todoListRepository = todoListRepository;
         }
 
@@ -46,12 +48,14 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoSubList
             var todoList = await _todoListRepository.GetByIdAsync(request.TodoListId, cancellationToken);
 
             if (todoList == null)
-                throw new NotFoundException<TodoList>(request.TodoListId);
+                throw new ResourceNotFoundException<TodoList>(request.TodoListId);
 
-            if (!_resourceAccessService.CanAccess(request.TodoListId, _currentUserService.UserId))
-                throw new AccessDeniedException(request.TodoListId, _currentUserService.UserId);
+            var currentUserId = _identityService.UserId;
 
-            todoList.AddTodo(request.Title, request.Description);
+            if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
+                throw new AccessDeniedException<TodoList>(request.TodoListId, currentUserId);
+
+            todoList.AddSubList(request.Title, request.Description);
 
             _todoListRepository.Update(todoList);
 

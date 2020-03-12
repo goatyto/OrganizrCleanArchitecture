@@ -14,12 +14,12 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
         {
             var todoLists = new List<TodoListDto> { new TodoListDto() };
 
-            var todoListsVm = new TodoListsVm
+            var sut = new TodoListsVm
             {
                 TodoLists = todoLists
             };
 
-            todoListsVm.TodoLists.Should().BeEquivalentTo(todoLists);
+            sut.TodoLists.Should().BeEquivalentTo(todoLists);
         }
     }
 }

@@ -8,6 +8,32 @@ namespace Organizr.Domain.UnitTests.SharedKernel
 {
     public class EntityTests
     {
+        [Fact]
+        public void AddDomainEvent_ValidEvent_EventAddedToList()
+        {
+            var sut = new EntityStub();
+            var initialDomainEventCount = sut.DomainEvents.Count;
+            var domainEvent = new DomainEventStub();
+
+            sut.AddDomainEvent(domainEvent);
+
+            sut.DomainEvents.Should().HaveCount(initialDomainEventCount + 1).And
+                .ContainSingle(@event => @event == domainEvent);
+        }
+
+        [Fact]
+        public void RemoveDomainEvent_ValidEvent_EventRemovedToList()
+        {
+            var sut = new EntityStub();
+            var initialDomainEventCount = sut.DomainEvents.Count;
+            var domainEvent = new DomainEventStub();
+
+            sut.AddDomainEvent(domainEvent);
+
+            sut.DomainEvents.Should().HaveCount(initialDomainEventCount + 1).And
+                .ContainSingle(@event => @event == domainEvent);
+        }
+
         public static IEnumerable<object[]> TransientEqualityTestData = new List<object[]>
         {
             new object[] {new EntityStub(Guid.NewGuid()), new EntityStub()},
@@ -17,54 +43,54 @@ namespace Organizr.Domain.UnitTests.SharedKernel
         [Fact]
         public void IsTransient_DefaultId_ReturnsTrue()
         {
-            var entity = new EntityStub();
+            var sut = new EntityStub();
 
-            entity.IsTransient().Should().Be(true);
+            sut.IsTransient().Should().Be(true);
         }
 
         [Fact]
         public void IsTransient_NonDefaultId_ReturnsFalse()
         {
-            var entity = new EntityStub(Guid.NewGuid());
+            var suot = new EntityStub(Guid.NewGuid());
 
-            entity.IsTransient().Should().Be(false);
+            suot.IsTransient().Should().Be(false);
         }
 
         [Fact]
         public void Equals_NonEntityObject_ReturnsFalse()
         {
-            var entity = new EntityStub(Guid.NewGuid());
+            var sut = new EntityStub(Guid.NewGuid());
             var compareObject = new CompareObjectDummy();
 
-            entity.Equals(compareObject).Should().Be(false);
+            sut.Equals(compareObject).Should().Be(false);
         }
 
         [Fact]
         public void Equals_DifferentEntitesWithSameIds_ReturnsFalse()
         {
             var entityId = Guid.NewGuid();
-            var entity1 = new EntityStub(entityId);
-            var entity2 = new CompareEntityDummy(entityId);
+            var sut1 = new EntityStub(entityId);
+            var sut2 = new CompareEntityDummy(entityId);
 
-            entity1.Equals(entity2).Should().Be(false);
-            entity2.Equals(entity1).Should().Be(false);
+            sut1.Equals(sut2).Should().Be(false);
+            sut2.Equals(sut1).Should().Be(false);
         }
 
         [Fact]
         public void Equals_SameEntityReference_ReturnsTrue()
         {
-            var entity1 = new EntityStub(Guid.NewGuid());
-            var entity2 = entity1;
+            var sut1 = new EntityStub(Guid.NewGuid());
+            var sut2 = sut1;
 
-            entity1.Equals(entity2).Should().Be(true);
-            entity2.Equals(entity1).Should().Be(true);
+            sut1.Equals(sut2).Should().Be(true);
+            sut2.Equals(sut1).Should().Be(true);
         }
 
         [Theory, MemberData(nameof(TransientEqualityTestData))]
-        public void Equals_TransientEntity_ReturnsFalse(EntityStub entity1, EntityStub entity2)
+        public void Equals_TransientEntity_ReturnsFalse(EntityStub sut1, EntityStub sut2)
         {
-            entity1.Equals(entity2).Should().Be(false);
-            entity2.Equals(entity1).Should().Be(false);
+            sut1.Equals(sut2).Should().Be(false);
+            sut2.Equals(sut1).Should().Be(false);
         }
 
         [Fact]
@@ -72,11 +98,11 @@ namespace Organizr.Domain.UnitTests.SharedKernel
         {
             var entityId = Guid.NewGuid();
 
-            var entity1 = new EntityStub(entityId);
-            var entity2 = new EntityStub(entityId);
+            var sut1 = new EntityStub(entityId);
+            var sut2 = new EntityStub(entityId);
 
-            entity1.Equals(entity2).Should().Be(true);
-            entity2.Equals(entity1).Should().Be(true);
+            sut1.Equals(sut2).Should().Be(true);
+            sut2.Equals(sut1).Should().Be(true);
         }
 
         [Fact]
@@ -84,47 +110,47 @@ namespace Organizr.Domain.UnitTests.SharedKernel
         {
             var entityId = Guid.NewGuid();
 
-            var entity1 = new EntityStub(entityId);
-            var entity2 = new EntityStub(entityId);
+            var sut1 = new EntityStub(entityId);
+            var sut2 = new EntityStub(entityId);
 
-            entity1.GetHashCode().Should().Be(entity2.GetHashCode());
+            sut1.GetHashCode().Should().Be(sut2.GetHashCode());
         }
 
         [Fact]
         public void GetHashCode_TransientEntities_RandomHashCodes()
         {
-            var entity1 = new EntityStub();
-            var entity2 = new EntityStub();
+            var sut1 = new EntityStub();
+            var sut2 = new EntityStub();
 
-            entity1.GetHashCode().Should().NotBe(entity2.GetHashCode());
+            sut1.GetHashCode().Should().NotBe(sut2.GetHashCode());
         }
 
         [Fact]
         public void EqualityOperator_DifferentEntitesWithSameIds_ReturnsFalse()
         {
             var entityId = Guid.NewGuid();
-            var entity1 = new EntityStub(entityId);
-            var entity2 = new CompareEntityDummy(entityId);
+            var sut1 = new EntityStub(entityId);
+            var sut2 = new CompareEntityDummy(entityId);
 
-            (entity1 == entity2).Should().Be(false);
-            (entity2 == entity1).Should().Be(false);
+            (sut1 == sut2).Should().Be(false);
+            (sut2 == sut1).Should().Be(false);
         }
 
         [Fact]
         public void EqualityOperator_SameEntityReference_ReturnsTrue()
         {
-            var entity1 = new EntityStub(Guid.NewGuid());
-            var entity2 = entity1;
+            var sut1 = new EntityStub(Guid.NewGuid());
+            var sut2 = sut1;
 
-            (entity1 == entity2).Should().Be(true);
-            (entity2 == entity1).Should().Be(true);
+            (sut1 == sut2).Should().Be(true);
+            (sut2 == sut1).Should().Be(true);
         }
 
         [Theory, MemberData(nameof(TransientEqualityTestData))]
-        public void EqualityOperator_TransientEntity_ReturnsFalse(EntityStub entity1, EntityStub entity2)
+        public void EqualityOperator_TransientEntity_ReturnsFalse(EntityStub sut1, EntityStub sut2)
         {
-            (entity1 == entity2).Should().Be(false);
-            (entity2 == entity1).Should().Be(false);
+            (sut1 == sut2).Should().Be(false);
+            (sut2 == sut1).Should().Be(false);
         }
 
         [Fact]
@@ -132,55 +158,59 @@ namespace Organizr.Domain.UnitTests.SharedKernel
         {
             var entityId = Guid.NewGuid();
 
-            var entity1 = new EntityStub(entityId);
-            var entity2 = new EntityStub(entityId);
+            var sut1 = new EntityStub(entityId);
+            var sut2 = new EntityStub(entityId);
 
-            (entity1 == entity2).Should().Be(true);
-            (entity2 == entity1).Should().Be(true);
+            (sut1 == sut2).Should().Be(true);
+            (sut2 == sut1).Should().Be(true);
         }
 
         [Fact]
         public void EqualityOperator_NullLeftOperand_ReturnsFalse()
         {
-            EntityStub entity1 = null;
-            EntityStub entity2 = new EntityStub();
+            EntityStub sut1 = null;
+            EntityStub sut2 = new EntityStub();
 
-            (entity1 == entity2).Should().Be(false);
+            (sut1 == sut2).Should().Be(false);
         }
 
         [Fact]
         public void EqualityOperator_NullOperands_ReturnsTrue()
         {
-            EntityStub entity1 = null;
-            EntityStub entity2 = null;
+            EntityStub sut1 = null;
+            EntityStub sut2 = null;
 
-            (entity1 == entity2).Should().Be(true);
+            (sut1 == sut2).Should().Be(true);
         }
 
         [Fact]
         public void InequalityOperator_EntitiesWithSameIds_ReturnsFalse()
         {
             var entityId = Guid.NewGuid();
-            var entity1 = new EntityStub(entityId);
-            var entity2 = new EntityStub(entityId);
+            var sut1 = new EntityStub(entityId);
+            var sut2 = new EntityStub(entityId);
 
-            (entity1 != entity2).Should().Be(false);
+            (sut1 != sut2).Should().Be(false);
         }
 
         [Fact]
         public void InequalityOperator_EntitiesWithDifferentIds_ReturnsTrue()
         {
-            var entity1 = new EntityStub(Guid.NewGuid());
-            var entity2 = new EntityStub(Guid.NewGuid());
+            var sut1 = new EntityStub(Guid.NewGuid());
+            var sut2 = new EntityStub(Guid.NewGuid());
 
-            (entity1 != entity2).Should().Be(true);
+            (sut1 != sut2).Should().Be(true);
         }
 
         public class EntityStub : Entity<Guid>
         {
-            public EntityStub(Guid id = default(Guid))
+            public EntityStub(Guid id = default(Guid), IEnumerable<IDomainEvent> domainEvents =  null)
             {
                 Id = id;
+
+                if(domainEvents != null)
+                    foreach(var domainEvent in domainEvents) 
+                        AddDomainEvent(domainEvent);
             }
         }
 
@@ -195,6 +225,11 @@ namespace Organizr.Domain.UnitTests.SharedKernel
             {
                 Id = id;
             }
+        }
+
+        public class DomainEventStub : IDomainEvent
+        {
+
         }
     }
 }

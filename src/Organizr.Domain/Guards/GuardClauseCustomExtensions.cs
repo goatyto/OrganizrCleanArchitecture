@@ -8,16 +8,22 @@ namespace Organizr.Domain.Guards
 {
     public static class GuardClauseCustomExtensions
     {
-        /// <summary>Empties the result.</summary>
-        /// <typeparam name="TElement">The type of the element.</typeparam>
-        /// <param name="guardClause">The guard clause.</param>
-        /// <param name="result">The result.</param>
-        /// <param name="parameterName">Name of the parameter.</param>
-        /// <exception cref="ArgumentException">Required input {parameterName} produced an empty result.</exception>
         public static void NullQueryResult<TElement>(this IGuardClause guardClause, TElement result, string parameterName)
         {
             if (result == null)
                 throw new ArgumentException($"Required input {parameterName} produced an empty result.", parameterName);
+        }
+
+        public static void HavingTimeComponent(this IGuardClause guardClause, DateTime dateTime, string parameterName)
+        {
+            if(dateTime.Date < dateTime)
+                throw new ArgumentException("Required DateTime input contains time component.", parameterName);
+        }
+
+        public static void NonUtcDateTime(this IGuardClause guardClause, DateTime dateTime, string parameterName)
+        {
+            if(dateTime.Kind != DateTimeKind.Utc)
+                throw new ArgumentException("Required DateTime input is not of UTC kind.", parameterName);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
             var isDeleted = true;
             var items = new List<TodoItemDto> { new TodoItemDto() };
 
-            var todoSubListDto = new TodoSubListDto
+            var sut = new TodoSubListDto
             {
                 Id = id,
                 Title = title,
@@ -29,12 +29,12 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
                 Items = items
             };
 
-            todoSubListDto.Id.Should().Be(id);
-            todoSubListDto.Title.Should().Be(title);
-            todoSubListDto.Description.Should().Be(description);
-            todoSubListDto.Ordinal.Should().Be(ordinal);
-            todoSubListDto.IsDeleted.Should().Be(isDeleted);
-            todoSubListDto.Items.Should().BeEquivalentTo(items);
+            sut.Id.Should().Be(id);
+            sut.Title.Should().Be(title);
+            sut.Description.Should().Be(description);
+            sut.Ordinal.Should().Be(ordinal);
+            sut.IsDeleted.Should().Be(isDeleted);
+            sut.Items.Should().BeEquivalentTo(items);
         }
     }
 }

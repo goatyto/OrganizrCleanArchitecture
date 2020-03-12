@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Common.Interfaces;
-using Organizr.Domain.Lists.Entities.TodoListAggregate;
+using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 
 namespace Organizr.Application.TodoLists.Commands.CreateTodoList
 {
@@ -21,23 +21,27 @@ namespace Organizr.Application.TodoLists.Commands.CreateTodoList
 
     public class CreateTodoListCommandHandler : IRequestHandler<CreateTodoListCommand>
     {
+        private readonly IIdGenerator _idGenerator;
+        private readonly IIdentityService _identityService;
         private readonly ITodoListRepository _todoListRepository;
-        private readonly ICurrentUserService _currentUserService;
 
-        public CreateTodoListCommandHandler(ICurrentUserService currentUserService, ITodoListRepository todoListRepository)
+        public CreateTodoListCommandHandler(IIdGenerator idGenerator, IIdentityService identityService, ITodoListRepository todoListRepository)
         {
+            Guard.Against.Null(idGenerator, nameof(idGenerator));
+            Guard.Against.Null(identityService, nameof(identityService));
             Guard.Against.Null(todoListRepository, nameof(todoListRepository));
-            Guard.Against.Null(currentUserService, nameof(currentUserService));
 
+            _idGenerator = idGenerator;
+            _identityService = identityService;
             _todoListRepository = todoListRepository;
-            _currentUserService = currentUserService;
         }
 
         public async Task<Unit> Handle(CreateTodoListCommand request, CancellationToken cancellationToken)
         {
-            var currentUserId = _currentUserService.UserId;
+            var todoListId = _idGenerator.GenerateNext<TodoList>();
+            var currentUserId = _identityService.UserId;
 
-            var todoList = new TodoList(currentUserId, request.Title, request.Description);
+            var todoList = new TodoList(todoListId, currentUserId, request.Title, request.Description);
 
             _todoListRepository.Add(todoList);
 

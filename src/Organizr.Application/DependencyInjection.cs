@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Microsoft.Extensions.DependencyInjection;
-using Organizr.Domain.Lists.Entities.TodoListAggregate;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application

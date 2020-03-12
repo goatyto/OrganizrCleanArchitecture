@@ -6,7 +6,8 @@ using FluentAssertions;
 using Moq;
 using Organizr.Application.Common.Exceptions;
 using Organizr.Application.TodoLists.Commands.MoveTodoSubList;
-using Organizr.Domain.Lists.Entities.TodoListAggregate;
+using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
+using Organizr.Domain.SharedKernel;
 using Xunit;
 
 namespace Organizr.Application.UnitTests.TodoLists.Commands
@@ -17,8 +18,8 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
 
         public MoveTodoSubListCommandTests()
         {
-            _sut = new MoveTodoSubListCommandHandler(CurrentUserServiceMock.Object, ResourceAccessServiceMock.Object,
-                TodoListRepositoryMock.Object);
+            _sut = new MoveTodoSubListCommandHandler(CurrentUserServiceMock.Object,
+                ResourceAuthorizationServiceMock.Object, TodoListRepositoryMock.Object);
         }
 
         [Fact]
@@ -37,11 +38,11 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
             var request = new MoveTodoSubListCommand(nonExistentTodoListId, 1, 2);
 
             _sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>())).Should()
-                .Throw<NotFoundException<TodoList>>().And.Id.Should().Be(nonExistentTodoListId);
+                .Throw<ResourceNotFoundException<TodoList>>().And.ResourceId.Should().Be(nonExistentTodoListId);
         }
 
         [Fact]
-        public void Handle_CurrentUserHasNoAccess_ThrowsNotFoundException()
+        public void Handle_CurrentUserHasNoAccess_ThrowsAccessDeniedException()
         {
             var noAccessUserId = "User2";
             CurrentUserServiceMock.Setup(m => m.UserId).Returns(noAccessUserId);
@@ -49,7 +50,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
             var request = new MoveTodoSubListCommand(TodoListId, 1, 2);
 
             _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should()
-                .Throw<AccessDeniedException>().Where(exception =>
+                .Throw<AccessDeniedException<TodoList>>().Where(exception =>
                     exception.ResourceId == TodoListId && exception.UserId == noAccessUserId);
         }
     }

@@ -6,5 +6,6 @@ namespace Organizr.Domain.SharedKernel
     {
         DateTime Now { get; }
         DateTime Today { get; }
+        DateTime UtcNow { get; }
     }
 }
