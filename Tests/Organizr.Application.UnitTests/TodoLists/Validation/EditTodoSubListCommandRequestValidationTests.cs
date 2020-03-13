@@ -27,7 +27,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new EditTodoSubListCommand(Guid.NewGuid(), 1, "Title", "Description");
 
-            Sut.Invoking(s=>s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object)).Should().NotThrow();
+            Sut.Invoking(s=>s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object)).Should().NotThrow();
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new EditTodoSubListCommand(Guid.Empty, 1, "Title", "Description");
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(EditTodoSubListCommand.TodoListId));
         }
@@ -47,7 +47,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new EditTodoSubListCommand(Guid.NewGuid(), negativeOrZeroSubListId, "Title", "Description");
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should()
                 .ContainSingle(failure => failure.PropertyName == nameof(EditTodoSubListCommand.Id));
         }
@@ -60,7 +60,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new EditTodoSubListCommand(Guid.NewGuid(), 1, nullOrWhiteSpaceTitle, "Description");
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(EditTodoSubListCommand.Title));
         }

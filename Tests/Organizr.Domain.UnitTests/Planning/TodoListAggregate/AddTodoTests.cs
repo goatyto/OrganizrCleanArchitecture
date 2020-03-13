@@ -112,5 +112,19 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
                     fixture.ClientDateValidator)).Should().Throw<DueDateBeforeTodayException>().And.DueDate.Should()
                 .Be(dueDateUtc);
         }
+
+        [Fact]
+        public void AddTodo_DueDateWithTimeComponent_ThrowsArgumentException()
+        {
+            var fixture = new TodoListFixture();
+
+            var title = "Todo";
+            var description = "Todo Description";
+            var dueDateUtc = new DateTime(fixture.ClientDateTimeToday.Ticks + 1, DateTimeKind.Utc);
+
+            fixture.Sut.Invoking(l => l.AddTodo(title, description, dueDateUtc, fixture.ClientTimeZoneOffsetInMinutes,
+                    fixture.ClientDateValidator)).Should().Throw<ArgumentException>().And.ParamName.Should()
+                .Be("dueDateUtc");
+        }
     }
 }

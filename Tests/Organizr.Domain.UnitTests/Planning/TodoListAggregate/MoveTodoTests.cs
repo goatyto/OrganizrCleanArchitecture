@@ -50,6 +50,35 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             }
         }
 
+        [Fact]
+        public void MoveTodo_SamePosition_PositionDoesNotChange()
+        {
+            var fixture = new TodoListFixture();
+
+            var todoId = 1;
+
+            var todoToBeMoved = fixture.Sut.Items.Single(item => item.Id == todoId);
+
+            var samePosition = (TodoItemPosition)todoToBeMoved.Position.GetCopy();
+
+            fixture.Sut.MoveTodo(todoId, samePosition);
+
+            todoToBeMoved.Position.Should().Be(samePosition);
+
+            for (int subListIndex = 0; subListIndex < fixture.Sut.SubLists.Count; subListIndex++)
+            {
+                var activeItemsInSubList = fixture.Sut.Items.Where(item =>
+                        !item.IsDeleted && item.Position.SubListId == fixture.Sut.SubLists.ElementAt(subListIndex).Id)
+                    .ToList();
+
+                for (int todoItemIndex = 0; todoItemIndex < activeItemsInSubList.Count; todoItemIndex++)
+                {
+                    activeItemsInSubList[todoItemIndex].Position.Ordinal.Should().Be(todoItemIndex + 1);
+                }
+            }
+
+        }
+
         public static IEnumerable<object[]> MoveTodoInvalidPositionTestData = new[]
         {
             new object[]{1, new TodoItemPosition(99, null) },

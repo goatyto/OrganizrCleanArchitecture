@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using FluentAssertions;
+using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 using Xunit;
 
@@ -10,67 +11,43 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
     public class UserGroupDomainEventTests
     {
         [Fact]
-        public void SharedTodoListCreatedConstructor_ValidData_ObjectInitialized()
+        public void UserGroupCreatedConstructor_ValidData_ObjectInitialized()
         {
-            var userGroupId = Guid.NewGuid();
-            var todoListId = Guid.NewGuid();
+            var userGroup = UserGroup.Create(Guid.NewGuid(), "User1", "Name", "Description");
 
-            var sut = new SharedTodoListCreated(userGroupId, todoListId);
+            var sut = new UserGroupCreated(userGroup);
 
-            sut.UserGroupId.Should().Be(userGroupId);
-            sut.TodoListId.Should().Be(todoListId);
+            sut.UserGroup.Should().Be(userGroup);
         }
 
         [Fact]
-        public void SharedTodoListCreatedConstructor_DefaultUserGroupId_ThrowsArgumentException()
+        public void UserGroupCreatedConstructor_NullUserGroup_ThrowsArgumentException()
         {
-            var defaultUserGroupId = Guid.Empty;
+            UserGroup nullUserGroup =  null;
 
-            Func<SharedTodoListCreated> sut = () => new SharedTodoListCreated(defaultUserGroupId, Guid.NewGuid());
+            Func<UserGroupCreated> sut = () => new UserGroupCreated(nullUserGroup);
 
-            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("userGroupId");
+            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("userGroup");
         }
 
         [Fact]
-        public void SharedTodoListCreatedConstructor_DefaultTodoListId_ThrowsArgumentException()
+        public void UserGroupEditedConstructor_ValidData_ObjectInitialized()
         {
-            var defaultTodoListId = Guid.Empty;
+            var userGroup = UserGroup.Create(Guid.NewGuid(), "User1", "Name", "Description");
 
-            Func<SharedTodoListCreated> sut = () => new SharedTodoListCreated(Guid.NewGuid(), defaultTodoListId);
+            var sut = new UserGroupEdited(userGroup);
 
-            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("todoListId");
+            sut.UserGroup.Should().Be(userGroup);
         }
 
         [Fact]
-        public void SharedTodoListDeletedConstructor_ValidData_ObjectInitialized()
+        public void UserGroupEditedConstructor_NullUserGroup_ThrowsArgumentException()
         {
-            var userGroupId = Guid.NewGuid();
-            var todoListId = Guid.NewGuid();
+            UserGroup nullUserGroup = null;
 
-            var sut = new SharedTodoListDeleted(userGroupId, todoListId);
+            Func<UserGroupEdited> sut = () => new UserGroupEdited(nullUserGroup);
 
-            sut.UserGroupId.Should().Be(userGroupId);
-            sut.TodoListId.Should().Be(todoListId);
-        }
-
-        [Fact]
-        public void SharedTodoListDeletedConstructor_DefaultUserGroupId_ThrowsArgumentException()
-        {
-            var defaultUserGroupId = Guid.Empty;
-
-            Func<SharedTodoListDeleted> sut = () => new SharedTodoListDeleted(defaultUserGroupId, Guid.NewGuid());
-
-            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("userGroupId");
-        }
-
-        [Fact]
-        public void SharedTodoListDeletedConstructor_DefaultTodoListId_ThrowsArgumentException()
-        {
-            var defaultTodoListId = Guid.Empty;
-
-            Func<SharedTodoListDeleted> sut = () => new SharedTodoListDeleted(Guid.NewGuid(), defaultTodoListId);
-
-            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("todoListId");
+            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("userGroup");
         }
 
         [Fact]

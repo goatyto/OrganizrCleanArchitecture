@@ -16,7 +16,7 @@ namespace Organizr.Domain.Guards
 
         public static void HavingTimeComponent(this IGuardClause guardClause, DateTime dateTime, string parameterName)
         {
-            if(dateTime.Date < dateTime)
+            if(dateTime > dateTime.Date)
                 throw new ArgumentException("Required DateTime input contains time component.", parameterName);
         }
 

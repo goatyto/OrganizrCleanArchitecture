@@ -33,7 +33,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
             var request = new EditTodoItemCommand(Guid.NewGuid(), 1, "Title", "Description",
                 ClientDateToday.AddDays(1), _clientTimeZoneOffsetInMinutes);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object)).Should().NotThrow();
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object)).Should().NotThrow();
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
             var request = new EditTodoItemCommand(Guid.Empty, 1, "Title", "Description",
                 ClientDateToday.AddDays(1), _clientTimeZoneOffsetInMinutes);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(EditTodoItemCommand.TodoListId));
         }
@@ -55,7 +55,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
             var request = new EditTodoItemCommand(Guid.NewGuid(), negativeOrZeroTodoId, "Title", "Description",
                 ClientDateToday.AddDays(1), _clientTimeZoneOffsetInMinutes);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should()
                 .ContainSingle(failure => failure.PropertyName == nameof(EditTodoItemCommand.Id));
         }
@@ -69,7 +69,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
             var request = new EditTodoItemCommand(Guid.NewGuid(), 1, nullOrWhiteSpaceTitle, "Description",
                 ClientDateToday.AddDays(1), _clientTimeZoneOffsetInMinutes);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(EditTodoItemCommand.Title));
         }
@@ -80,7 +80,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
             var request = new EditTodoItemCommand(Guid.NewGuid(), 1, "Title", "Description",
                 ClientDateToday.AddDays(-1), _clientTimeZoneOffsetInMinutes);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(EditTodoItemCommand.DueDateUtc));
         }

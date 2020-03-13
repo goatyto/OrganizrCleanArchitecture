@@ -26,7 +26,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new MoveTodoSubListCommand(Guid.NewGuid(), 1, 1);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().NotThrow();
         }
 
@@ -35,7 +35,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new MoveTodoSubListCommand(Guid.Empty, 1, 1);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(MoveTodoSubListCommand.TodoListId));
         }
@@ -47,7 +47,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new MoveTodoSubListCommand(Guid.NewGuid(), negativeOrZeroTodoId, 1);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should()
                 .ContainSingle(failure => failure.PropertyName == nameof(MoveTodoSubListCommand.Id));
         }
@@ -59,7 +59,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new MoveTodoSubListCommand(Guid.NewGuid(), 1, negativeOrZeroOrdinal);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should()
                 .ContainSingle(failure => failure.PropertyName == nameof(MoveTodoSubListCommand.NewOrdinal));
         }

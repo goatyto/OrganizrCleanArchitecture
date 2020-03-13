@@ -57,18 +57,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             fixture.Sut.Invoking(l => l.SetCompletedTodo(todoId, isCompleted)).Should()
                 .Throw<TodoSubListDeletedException>().And.SubListId.Should().Be(deletedSubListId);
         }
-
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        public void SetCompletedTodo_InvalidTodoId_ThrowsArgumentException(int invalidTodoId)
-        {
-            var fixture = new TodoListFixture();
-
-            fixture.Sut.Invoking(l => l.SetCompletedTodo(invalidTodoId)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be("todoId");
-        }
-
+        
         [Fact]
         public void SetCompletedTodo_NonExistentTodoId_ThrowsTodoItemDoesNotExistException()
         {

@@ -30,7 +30,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
             var request = new AddTodoItemCommand(Guid.NewGuid(), "Title", "Description", ClientDateToday.AddDays(1), _clientTimeZoneOffsetInMinutes, 1);
 
             Sut.Invoking(s =>
-                    s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object)).Should()
+                    s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object)).Should()
                 .NotThrow();
         }
 
@@ -39,7 +39,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new AddTodoItemCommand(Guid.Empty, "Title", "Description", ClientDateToday.AddDays(1), _clientTimeZoneOffsetInMinutes, 1);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object)).Should()
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object)).Should()
                 .Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(AddTodoItemCommand.TodoListId));
         }
@@ -52,7 +52,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new AddTodoItemCommand(Guid.NewGuid(), nullOrEmptyTitle, "Description", ClientDateToday.AddDays(1), _clientTimeZoneOffsetInMinutes, 1);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(AddTodoItemCommand.Title));
         }
@@ -60,9 +60,21 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         [Fact]
         public void Handle_DueDateInThePast_ThrowsValidationException()
         {
-            var request = new AddTodoItemCommand(Guid.NewGuid(), "Title", "Description", ClientDateToday.AddDays(-1), _clientTimeZoneOffsetInMinutes, 1);
+            var request = new AddTodoItemCommand(Guid.NewGuid(), "Title", "Description", ClientDateToday.AddDays(-1),
+                _clientTimeZoneOffsetInMinutes, 1);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
+                .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
+                    failure.PropertyName == nameof(AddTodoItemCommand.DueDateUtc));
+        }
+
+        [Fact]
+        public void Handle_DueDateWithTimeComponent_ThrowsValidationException()
+        {
+            var request = new AddTodoItemCommand(Guid.NewGuid(), "Title", "Description", ClientDateToday.AddTicks(1),
+                _clientTimeZoneOffsetInMinutes, 1);
+
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(AddTodoItemCommand.DueDateUtc));
         }
@@ -70,11 +82,12 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         [Theory]
         [InlineData(-1)]
         [InlineData(0)]
-        public void Handle_NonExistentSubListId_ThrowsValidationException(int invalidSubListId)
+        public void Handle_NegativeOrNullSubListId_ThrowsValidationException(int negativeOrNullSubListid)
         {
-            var request = new AddTodoItemCommand(Guid.NewGuid(), "Title", "Description", ClientDateToday.AddDays(1), _clientTimeZoneOffsetInMinutes, invalidSubListId);
+            var request = new AddTodoItemCommand(Guid.NewGuid(), "Title", "Description", ClientDateToday.AddDays(1),
+                _clientTimeZoneOffsetInMinutes, negativeOrNullSubListid);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(AddTodoItemCommand.SubListId));
         }

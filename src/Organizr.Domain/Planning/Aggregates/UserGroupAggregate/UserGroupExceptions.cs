@@ -59,11 +59,11 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
         }
     }
 
-    public class SharedResourceDoesNotExistException<TSharedResource> : UserGroupExceptionBase where TSharedResource : Entity<Guid>, IAggregateRoot
+    public class ResourceNotSharedInGroupException<TSharedResource> : UserGroupExceptionBase where TSharedResource : Entity<Guid>, IAggregateRoot
     {
         public Guid SharedResourceId { get; }
 
-        public SharedResourceDoesNotExistException(Guid userGroupId, Guid sharedResourceId,
+        public ResourceNotSharedInGroupException(Guid userGroupId, Guid sharedResourceId,
             Exception innerException = null) : base(userGroupId,
             $"Resource of type {nameof(TSharedResource)} with id \"{sharedResourceId}\" does not exist in group with id \"{userGroupId}\"",
             innerException)

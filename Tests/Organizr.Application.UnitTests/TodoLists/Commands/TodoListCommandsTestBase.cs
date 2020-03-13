@@ -30,7 +30,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
             ClientDateToday = DateTime.UtcNow.Date;
             ClientTimeZoneOffsetInMinutes = 0;
 
-            var todoList = new TodoList(TodoListId, creatorUserId, "TodoList Title", "TodoList Description");
+            var todoList = TodoList.Create(TodoListId, creatorUserId, "TodoList Title", "TodoList Description");
 
             todoList.AddSubList("TodoSubList Title", "TodoSubList Description");
             todoList.AddSubList("TodoSubList Title2", "TodoSubList Description2");
@@ -47,7 +47,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
             ResourceAuthorizationServiceMock.Setup(m => m.CanDelete(creatorUserId, todoList)).Returns(true);
 
             TodoListRepositoryMock = new Mock<ITodoListRepository>();
-            TodoListRepositoryMock.Setup(m => m.GetByIdAsync(TodoListId, It.IsAny<CancellationToken>()))
+            TodoListRepositoryMock.Setup(m => m.GetAsync(TodoListId, null, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => todoList);
             TodoListRepositoryMock.Setup(m => m.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);

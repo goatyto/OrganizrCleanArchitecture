@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using FluentAssertions;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
@@ -10,29 +11,30 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
     public class UserGroupTests
     {
         [Fact]
-        public void Constructor_ValidData_ObjectInitialized()
+        public void Create_ValidData_ObjectInitialized()
         {
             var id = Guid.NewGuid();
-            string name = "GroupName";
-            string creatorUserId = "User1";
-            string description = "GroupDescription";
+            var name = "GroupName";
+            var creatorUserId = "User1";
+            var description = "GroupDescription";
+            var memberUserIds = new List<string> {"User1", "User2", "User3"};
 
-            var sut = new UserGroup(id, creatorUserId, name, description);
+            var sut = UserGroup.Create(id, creatorUserId, name, description, memberUserIds);
 
             sut.Id.Should().Be(id);
             sut.Name.Should().Be(name);
             sut.CreatorUserId.Should().Be(creatorUserId);
             sut.Description.Should().Be(description);
-            sut.Membership.Should().NotBeNull().And.Contain(membership => membership.UserId == creatorUserId);
-            sut.SharedTodoLists.Should().NotBeNull();
+            sut.Membership.Should().NotBeNull().And
+                .Contain(memberUserIds.Select(uid => new UserGroupMembership(id, uid)));
         }
 
         [Fact]
-        public void Constructor_DefaultId_ThrowsArgumentException()
+        public void Create_DefaultId_ThrowsArgumentException()
         {
             var defaultId = Guid.Empty;
 
-            Func<UserGroup> sut = () => new UserGroup(defaultId, "User1", "GroupName", "GroupDescription");
+            Func<UserGroup> sut = () => UserGroup.Create(defaultId, "User1", "GroupName", "GroupDescription");
 
             sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("id");
         }
@@ -41,11 +43,11 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void Constructor_NullOrWhiteSpaceCreatorUserId_ThrowsArgumentException(
+        public void Create_NullOrWhiteSpaceCreatorUserId_ThrowsArgumentException(
             string nullOrWhiteSpaceCreatorUserId)
         {
             Func<UserGroup> sut = () =>
-                new UserGroup(Guid.NewGuid(), nullOrWhiteSpaceCreatorUserId, "GroupName", "GroupDescription");
+                UserGroup.Create(Guid.NewGuid(), nullOrWhiteSpaceCreatorUserId, "GroupName", "GroupDescription");
 
             sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("creatorUserId");
         }
@@ -54,10 +56,10 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void Constructor_NullOrWhiteSpaceName_ThrowsArgumentException(string nullOrWhiteSpaceName)
+        public void Create_NullOrWhiteSpaceName_ThrowsArgumentException(string nullOrWhiteSpaceName)
         {
             Func<UserGroup> sut = () =>
-                new UserGroup(Guid.NewGuid(), "User1", nullOrWhiteSpaceName, "GroupDescription");
+                UserGroup.Create(Guid.NewGuid(), "User1", nullOrWhiteSpaceName, "GroupDescription");
 
             sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("name");
         }
@@ -68,7 +70,7 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
             var newName = "NewName";
             var newDescription = "NewDescription";
 
-            var sut = new UserGroup(Guid.NewGuid(), "User1", "GroupName", "GroupDescription");
+            var sut = UserGroup.Create(Guid.NewGuid(), "User1", "GroupName", "GroupDescription");
 
             sut.Edit(newName, newDescription);
 
@@ -84,7 +86,7 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
         {
             var newDescription = "NewDescription";
 
-            var sut = new UserGroup(Guid.NewGuid(), "User1", "GroupName", "GroupDescription");
+            var sut = UserGroup.Create(Guid.NewGuid(), "User1", "GroupName", "GroupDescription");
 
             sut.Invoking(s => s.Edit(nullOrWhiteSpaceName, newDescription)).Should().Throw<ArgumentException>().And
                 .ParamName.Should().Be("name");

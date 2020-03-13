@@ -11,31 +11,45 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
     {
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public string CreatorUserId { get; }
+        public string CreatorUserId { get; private set; }
 
         private readonly List<UserGroupMembership> _membership;
         public IReadOnlyCollection<UserGroupMembership> Membership => _membership.AsReadOnly();
 
-        private readonly List<SharedTodoList> _sharedTodoLists;
-        public IReadOnlyCollection<SharedTodoList> SharedTodoLists => _sharedTodoLists.AsReadOnly();
+        private UserGroup()
+        {
+            _membership = new List<UserGroupMembership>();
+        }
 
-        public UserGroup(Guid id, string creatorUserId, string name, string description = null)
+        public static UserGroup Create(Guid id, string creatorUserId, string name, string description = null,
+            IEnumerable<string> groupMemberIds = null)
         {
             Guard.Against.Default(id, nameof(id));
             Guard.Against.NullOrWhiteSpace(creatorUserId, nameof(creatorUserId));
             Guard.Against.NullOrWhiteSpace(name, nameof(name));
 
-            Id = id;
-            CreatorUserId = creatorUserId;
-            Name = name;
-            Description = description;
+            var userGroup = new UserGroup();
 
-            _membership = new List<UserGroupMembership>
+            userGroup.Id = id;
+            userGroup.CreatorUserId = creatorUserId;
+            userGroup.Name = name;
+            userGroup.Description = description;
+
+            userGroup._membership.Add(new UserGroupMembership(id, creatorUserId));
+
+            if (groupMemberIds != null)
             {
-                new UserGroupMembership(id, creatorUserId)
-            };
+                foreach (var userId in groupMemberIds.Distinct())
+                {
+                    if (userId == creatorUserId) continue;
 
-            _sharedTodoLists = new List<SharedTodoList>();
+                    userGroup._membership.Add(new UserGroupMembership(id, userId));
+                }
+            }
+
+            userGroup.AddDomainEvent(new UserGroupCreated(userGroup));
+
+            return userGroup;
         }
 
         public void Edit(string name, string description = null)
@@ -44,6 +58,8 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 
             Name = name;
             Description = description;
+
+            AddDomainEvent(new UserGroupEdited(this));
         }
 
         public void AddMember(string userId)
@@ -79,37 +95,12 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 
         public TodoList CreateSharedTodoList(Guid id, string creatorUserId, string title, string description = null)
         {
-            Guard.Against.Default(id, nameof(id));
-            Guard.Against.NullOrWhiteSpace(creatorUserId, nameof(creatorUserId));
-            Guard.Against.NullOrWhiteSpace(title, nameof(title));
-
             if (_membership.All(m => m.UserId != creatorUserId))
                 throw new UserNotAMemberException(Id, creatorUserId);
-            
-            var newSharedTodoList = new SharedTodoList(Id, id);
 
-            if (_sharedTodoLists.Any(tl => newSharedTodoList == tl))
-                throw new SharedResourceAlreadyExistsException<TodoList>(Id, id);
+            var todoList = TodoList.CreateShared(id, creatorUserId, Id, title, description);
 
-            _sharedTodoLists.Add(newSharedTodoList);
-
-            AddDomainEvent(new SharedTodoListCreated(Id, id));
-
-            return new TodoList(id, creatorUserId, title, description);
-        }
-
-        public void DeleteSharedTodoList(Guid id)
-        {
-            Guard.Against.Default(id, nameof(id));
-
-            var sharedTodoListToBeRemoved = _sharedTodoLists.SingleOrDefault(tl => tl.TodoListId == id);
-
-            if (sharedTodoListToBeRemoved == null)
-                throw new SharedResourceDoesNotExistException<TodoList>(Id, id);
-
-            sharedTodoListToBeRemoved.Delete();
-
-            AddDomainEvent(new SharedTodoListDeleted(Id, id));
+            return todoList;
         }
     }
 }

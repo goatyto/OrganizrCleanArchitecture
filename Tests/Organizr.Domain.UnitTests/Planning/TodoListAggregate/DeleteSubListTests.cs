@@ -31,16 +31,5 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             fixture.Sut.Invoking(l => l.DeleteSubList(nonExistentSubListId)).Should()
                 .Throw<ArgumentException>().And.ParamName.Should().Be("subListId");
         }
-
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        public void DeleteSubList_InvalidSubListId_ThrowsArgumentException(int invalidSubListId)
-        {
-            var fixture = new TodoListFixture();
-
-            fixture.Sut.Invoking(l => l.DeleteSubList(invalidSubListId)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be("subListId");
-        }
     }
 }

@@ -19,9 +19,10 @@ namespace Organizr.Infrastructure.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<TodoList> GetByIdAsync(Guid id, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<TodoList> GetAsync(Guid id, Guid? userGroupId = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await _context.TodoLists.FindAsync(id, cancellationToken);
+            return await _context.TodoLists.SingleAsync(l => l.Id == id && l.UserGroupId == userGroupId,
+                cancellationToken);
         }
 
         public void Add(TodoList todoList)

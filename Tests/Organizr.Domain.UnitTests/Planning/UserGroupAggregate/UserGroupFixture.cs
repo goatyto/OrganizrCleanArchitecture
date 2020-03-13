@@ -20,7 +20,7 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
             ExistingUserGroupMemberId = "User2";
             SharedTodoListId = Guid.NewGuid();
 
-            Sut = new UserGroup(UserGroupId, UserGroupCreatorId, "UserGroupName", "UserGroupDescription");
+            Sut = UserGroup.Create(UserGroupId, UserGroupCreatorId, "UserGroupName", "UserGroupDescription");
 
             Sut.AddMember(ExistingUserGroupMemberId);
 

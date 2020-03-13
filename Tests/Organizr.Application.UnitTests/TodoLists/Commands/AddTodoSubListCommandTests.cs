@@ -27,7 +27,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
         {
             var request = new AddTodoSubListCommand(TodoListId, "Title", "Description");
 
-            _sut.Invoking(s=>s.Handle(request, It.IsAny<CancellationToken>())).Should().NotThrow();
+            _sut.Invoking(s=>s.Handle(request, CancellationToken.None)).Should().NotThrow();
         }
 
         [Fact]

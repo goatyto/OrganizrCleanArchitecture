@@ -53,7 +53,7 @@ namespace Organizr.Domain.UnitTests.Planning
 
             var sut = new ClientDateValidator();
 
-            sut.Invoking(s => s.IsDateBeforeClientToday(clientDate, It.IsAny<int>())).Should()
+            sut.Invoking(s => s.IsDateBeforeClientToday(clientDate, 0)).Should()
                 .Throw<ArgumentException>().And.ParamName.Should().Be("date");
         }
     }

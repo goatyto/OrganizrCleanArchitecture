@@ -70,19 +70,5 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             fixture.Sut.Invoking(l => l.EditSubList(subListId, newTitle, newDescription)).Should().Throw<ArgumentException>()
                 .And.ParamName.Should().Be("title");
         }
-
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        public void EditSubList_InvalidSubListId_ThrowsArgumentException(int invalidSubListId)
-        {
-            var fixture = new TodoListFixture();
-
-            var newTitle = "Todo Sub List";
-            var newDescription = "Todo Sub List Description";
-
-            fixture.Sut.Invoking(l => l.EditSubList(invalidSubListId, newTitle, newDescription)).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be("subListId");
-        }
     }
 }

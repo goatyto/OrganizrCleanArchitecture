@@ -22,9 +22,11 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoItem
 
             When(c => c.DueDateUtc.HasValue, () =>
             {
-                RuleFor(c => c.ClientTimeZoneOffsetInMinutes).NotNull().When(c => c.DueDateUtc.HasValue);
-
-                RuleFor(c => c.DueDateUtc.Value.Kind).Equal(DateTimeKind.Utc);
+                RuleFor(c => c.ClientTimeZoneOffsetInMinutes).NotNull();
+                RuleFor(c => c.DueDateUtc).Must((c, dueDateUtc) => dueDateUtc.Value == dueDateUtc.Value.Date)
+                    .WithMessage("Todo item due date cannot have a time component.");
+                RuleFor(c => c.DueDateUtc).Must((c, dueDateUtc) => dueDateUtc.Value.Kind == DateTimeKind.Utc)
+                    .WithMessage("Todo item due date must be UTC.");
                 RuleFor(c => c.DueDateUtc).Must((c, dueDateUtc) =>
                     !_clientDateValidator.IsDateBeforeClientToday(dueDateUtc.Value, c.ClientTimeZoneOffsetInMinutes.Value))
                     .WithMessage("Todo item due date must be in the future.");

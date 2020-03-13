@@ -25,13 +25,28 @@ namespace Organizr.Domain.UnitTests.SharedKernel
         public void RemoveDomainEvent_ValidEvent_EventRemovedToList()
         {
             var sut = new EntityStub();
-            var initialDomainEventCount = sut.DomainEvents.Count;
             var domainEvent = new DomainEventStub();
 
             sut.AddDomainEvent(domainEvent);
+            var initialDomainEventCount = sut.DomainEvents.Count;
 
-            sut.DomainEvents.Should().HaveCount(initialDomainEventCount + 1).And
-                .ContainSingle(@event => @event == domainEvent);
+            sut.RemoveDomainEvent(domainEvent);
+
+            sut.DomainEvents.Should().HaveCount(initialDomainEventCount -1).And
+                .NotContain(@event => @event == domainEvent);
+        }
+
+        [Fact]
+        public void ClearDomainEvents_DomainEventListCleared()
+        {
+            var sut = new EntityStub();
+            var domainEvent = new DomainEventStub();
+
+            sut.AddDomainEvent(domainEvent);
+            
+            sut.ClearDomainEvents();
+
+            sut.DomainEvents.Should().BeEmpty();
         }
 
         public static IEnumerable<object[]> TransientEqualityTestData = new List<object[]>
@@ -51,9 +66,9 @@ namespace Organizr.Domain.UnitTests.SharedKernel
         [Fact]
         public void IsTransient_NonDefaultId_ReturnsFalse()
         {
-            var suot = new EntityStub(Guid.NewGuid());
+            var sut = new EntityStub(Guid.NewGuid());
 
-            suot.IsTransient().Should().Be(false);
+            sut.IsTransient().Should().Be(false);
         }
 
         [Fact]

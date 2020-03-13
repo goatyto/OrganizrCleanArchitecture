@@ -77,7 +77,7 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
             var innerExceptionMessage = "Inner Exception";
             var innerException = new Exception(innerExceptionMessage);
 
-            var sut = new SharedResourceDoesNotExistException<AnySharedResourceType>(userGroupId, sharedResourceId, innerException);
+            var sut = new ResourceNotSharedInGroupException<AnySharedResourceType>(userGroupId, sharedResourceId, innerException);
 
             sut.UserGroupId.Should().Be(userGroupId);
             sut.SharedResourceId.Should().Be(sharedResourceId);

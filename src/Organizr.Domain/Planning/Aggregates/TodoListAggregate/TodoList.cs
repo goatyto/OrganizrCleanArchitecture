@@ -10,7 +10,8 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 {
     public class TodoList : Entity<Guid>, IAggregateRoot
     {
-        public string CreatorUserId { get; }
+        public string CreatorUserId { get; private set; }
+        public Guid? UserGroupId { get; private set; }
         public string Title { get; private set; }
         public string Description { get; private set; }
 
@@ -22,22 +23,40 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
         private TodoList()
         {
-
+            _items = new List<TodoItem>();
+            _subLists = new List<TodoSubList>();
         }
 
-        public TodoList(Guid id, string creatorUserId, string title, string description = null) : this()
+        public static TodoList Create(Guid id, string creatorUserId, string title, string description = null)
         {
             Guard.Against.Default(id, nameof(id));
             Guard.Against.NullOrWhiteSpace(creatorUserId, nameof(creatorUserId));
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
 
-            Id = id;
-            CreatorUserId = creatorUserId;
-            Title = title;
-            Description = description;
+            var todoList = new TodoList();
 
-            _items = new List<TodoItem>();
-            _subLists = new List<TodoSubList>();
+            todoList.Id = id;
+            todoList.CreatorUserId = creatorUserId;
+            todoList.Title = title;
+            todoList.Description = description;
+
+            todoList.AddDomainEvent(new TodoListCreated(todoList));
+
+            return todoList;
+        }
+
+        internal static TodoList CreateShared(Guid id, string creatorUserId, Guid userGroupId, string title,
+            string description = null)
+        {
+            Guard.Against.Default(userGroupId, nameof(userGroupId));
+
+            var todoList = Create(id, creatorUserId, title, description);
+
+            todoList.UserGroupId = userGroupId;
+
+            todoList.AddDomainEvent(new TodoListCreated(todoList));
+
+            return todoList;
         }
 
         public void Edit(string title, string description = null)
@@ -46,6 +65,8 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
             Title = title;
             Description = description;
+
+            AddDomainEvent(new TodoListUpdated(this));
         }
 
         public void AddSubList(string title, string description = null)
@@ -54,6 +75,8 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
             var subList = new TodoSubList(GetNextSubListId(), Id, title, GetNextSubListOrdinal(), description);
             _subLists.Add(subList);
+
+            AddDomainEvent(new TodoListUpdated(this));
         }
 
         public void EditSubList(int subListId, string title, string description = null)
@@ -68,11 +91,13 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
                 throw new TodoSubListDeletedException(Id, subListId);
 
             subList.Edit(title, description);
+
+            AddDomainEvent(new TodoListUpdated(this));
         }
 
         public void MoveSubList(int subListId, int newOrdinal)
         {
-            Guard.Against.OutOfRange(newOrdinal, nameof(newOrdinal), 1, SubLists.Count);
+            Guard.Against.OutOfRange(newOrdinal, nameof(newOrdinal), 1, SubLists.Count(sl => !sl.IsDeleted));
 
             var targetSubList = SubLists.SingleOrDefault(sl => sl.Id == subListId);
 
@@ -94,6 +119,8 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             ShiftSubLists(otherListsShiftDirection, otherListsShiftStartOrdinal, otherListsShiftEndOrdinal);
 
             targetSubList.SetOrdinal(newOrdinal);
+
+            AddDomainEvent(new TodoListUpdated(this));
         }
 
         public void DeleteSubList(int subListId)
@@ -108,6 +135,8 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             subList.Delete();
 
             ShiftSubLists(ShiftDirection.Down, subList.Ordinal + 1);
+
+            AddDomainEvent(new TodoListUpdated(this));
         }
 
         public void AddTodo(string title, string description = null, DateTime? dueDateUtc = null,
@@ -141,6 +170,8 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             var todo = new TodoItem(GetNextItemId(), Id, title,
                 new TodoItemPosition(GetNextItemOrdinal(subListId), subListId), description, dueDateUtc);
             _items.Add(todo);
+
+            AddDomainEvent(new TodoListUpdated(this));
         }
 
         public void EditTodo(int todoId, string title, string description = null, DateTime? dueDateUtc = null,
@@ -178,6 +209,8 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
                 throw new TodoItemDeletedException(Id, todoId);
 
             todo.Edit(title, description, dueDateUtc);
+
+            AddDomainEvent(new TodoListUpdated(this));
         }
 
         public void SetCompletedTodo(int todoId, bool isCompleted = true)
@@ -200,6 +233,8 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
                 return;
 
             todo.SetCompleted(isCompleted);
+
+            AddDomainEvent(new TodoListUpdated(this));
         }
 
         public void MoveTodo(int todoId, TodoItemPosition newPosition)
@@ -255,49 +290,9 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
                 ShiftTodoItems(ShiftDirection.Up, newPosition.Ordinal, subListId: destinationSubListId);
             }
 
-            //if (sourceSubListId == destinationSubListId)
-            //{
-            //    var listTransformationStartOrdinal = Math.Min(todoToBeMoved.Position.Ordinal, newPosition.Ordinal);
-            //    var listTransformationEndOrdinal = Math.Max(todoToBeMoved.Position.Ordinal, newPosition.Ordinal);
-
-            //    var isMovingUp = todoToBeMoved.Position.Ordinal < newPosition.Ordinal;
-
-            //    var otherItems = Items.Where(item =>
-            //        item.Position.SubListId == destinationSubListId && !item.IsDeleted && item.Id != todoId &&
-            //        item.Position.Ordinal >= listTransformationStartOrdinal &&
-            //        item.Position.Ordinal <= listTransformationEndOrdinal).ToList();
-
-            //    for (int i = 0; i < otherItems.Count; i++)
-            //    {
-            //        var newCalculatedOrdinal = isMovingUp
-            //            ? i + listTransformationStartOrdinal
-            //            : i + listTransformationStartOrdinal + 1;
-
-            //        otherItems[i].SetPosition(new TodoItemPosition(newCalculatedOrdinal, destinationSubListId));
-            //    }
-            //}
-            //else
-            //{
-            //    var sourceListOtherItems = Items.Where(item =>
-            //        item.Position.SubListId == sourceSubListId && !item.IsDeleted && item.Id != todoId &&
-            //        item.Position.Ordinal > todoToBeMoved.Position.Ordinal).ToList();
-
-            //    for (int i = 0; i < sourceListOtherItems.Count; i++)
-            //    {
-            //        sourceListOtherItems[i].SetPosition(new TodoItemPosition(i + todoToBeMoved.Position.Ordinal, sourceSubListId));
-            //    }
-
-            //    var destinationListOtherMovedItems = Items.Where(item =>
-            //        item.Position.SubListId == destinationSubListId && !item.IsDeleted &&
-            //        item.Position.Ordinal >= newPosition.Ordinal).ToList();
-
-            //    for (int i = 0; i < destinationListOtherMovedItems.Count; i++)
-            //    {
-            //        destinationListOtherMovedItems[i].SetPosition(new TodoItemPosition(i + newPosition.Ordinal + 1, destinationSubListId));
-            //    }
-            //}
-
             todoToBeMoved.SetPosition(newPosition);
+
+            AddDomainEvent(new TodoListUpdated(this));
         }
 
         public void DeleteTodo(int todoId)
@@ -319,11 +314,14 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             todo.Delete();
 
             ShiftTodoItems(ShiftDirection.Down, todo.Position.Ordinal + 1, subListId: todo.Position.SubListId);
+
+            AddDomainEvent(new TodoListUpdated(this));
         }
 
         private int GetNextSubListId()
         {
-            return SubLists.Count + 1;
+            if (!SubLists.Any()) return 1;
+            return SubLists.Max(sl => sl.Id) + 1;
         }
 
         private int GetNextSubListOrdinal()
@@ -333,7 +331,8 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
         private int GetNextItemId()
         {
-            return Items.Count + 1;
+            if (!Items.Any()) return 1;
+            return Items.Max(i => i.Id) + 1;
         }
 
         private int GetNextItemOrdinal(int? subListId = null)

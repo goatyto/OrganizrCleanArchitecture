@@ -41,7 +41,7 @@ namespace Organizr.Application.TodoLists.Commands.CreateTodoList
             var todoListId = _idGenerator.GenerateNext<TodoList>();
             var currentUserId = _identityService.UserId;
 
-            var todoList = new TodoList(todoListId, currentUserId, request.Title, request.Description);
+            var todoList = TodoList.Create(todoListId, currentUserId, request.Title, request.Description);
 
             _todoListRepository.Add(todoList);
 

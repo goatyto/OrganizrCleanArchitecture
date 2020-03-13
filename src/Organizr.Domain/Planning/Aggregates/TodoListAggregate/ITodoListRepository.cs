@@ -7,7 +7,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 {
     public interface ITodoListRepository: IRepository<TodoList>
     {
-        Task<TodoList> GetByIdAsync(Guid id, CancellationToken cancellationToken = default(CancellationToken));
+        Task<TodoList> GetAsync(Guid id, Guid? userGroupId = null, CancellationToken cancellationToken = default(CancellationToken));
         void Add(TodoList todoList);
         void Update(TodoList todoList);
     }

@@ -17,7 +17,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 
         public TodoListFixture()
         {
-            Sut = new TodoList(TodoListId, "User1", "Todo List 1", "Todo List 1 Description");
+            Sut = TodoList.Create(TodoListId, "User1", "Todo List 1", "Todo List 1 Description");
 
             ClientDateValidator = new ClientDateValidator();
 

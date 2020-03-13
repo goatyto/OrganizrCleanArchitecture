@@ -55,17 +55,6 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
                 .ParamName.Should().Be("newOrdinal");
         }
 
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        public void MoveSubList_InvalidSubListId_ThrowsArgumentException(int invalidSubListId)
-        {
-            var fixture = new TodoListFixture();
-
-            fixture.Sut.Invoking(l => l.MoveSubList(invalidSubListId, 4)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be("subListId");
-        }
-
         [Fact]
         public void MoveSubList_NonExistentSubListId_ThrowsTodoSubListDeletedException()
         {

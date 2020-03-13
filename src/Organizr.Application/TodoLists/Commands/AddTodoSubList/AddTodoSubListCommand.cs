@@ -10,7 +10,7 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.TodoLists.Commands.AddTodoSubList
 {
-    public class AddTodoSubListCommand: IRequest
+    public class AddTodoSubListCommand : IRequest
     {
         public Guid TodoListId { get; }
         public string Title { get; }
@@ -45,7 +45,7 @@ namespace Organizr.Application.TodoLists.Commands.AddTodoSubList
 
         public async Task<Unit> Handle(AddTodoSubListCommand request, CancellationToken cancellationToken)
         {
-            var todoList = await _todoListRepository.GetByIdAsync(request.TodoListId, cancellationToken);
+            var todoList = await _todoListRepository.GetAsync(request.TodoListId, cancellationToken: cancellationToken);
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.TodoListId);

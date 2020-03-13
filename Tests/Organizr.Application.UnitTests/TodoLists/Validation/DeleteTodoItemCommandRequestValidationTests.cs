@@ -26,7 +26,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new DeleteTodoItemCommand(Guid.NewGuid(), 1);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().NotThrow();
         }
 
@@ -35,7 +35,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new DeleteTodoItemCommand(Guid.Empty, 1);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(DeleteTodoItemCommand.TodoListId));
         }
@@ -47,7 +47,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
         {
             var request = new DeleteTodoItemCommand(Guid.NewGuid(), negativeOrZeroTodoId);
 
-            Sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>(), RequestHandlerDelegateMock.Object))
+            Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should().ContainSingle(failure =>
                     failure.PropertyName == nameof(DeleteTodoItemCommand.Id));
         }

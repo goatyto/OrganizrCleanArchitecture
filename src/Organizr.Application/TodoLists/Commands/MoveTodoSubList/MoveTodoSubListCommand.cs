@@ -45,7 +45,7 @@ namespace Organizr.Application.TodoLists.Commands.MoveTodoSubList
 
         public async Task<Unit> Handle(MoveTodoSubListCommand request, CancellationToken cancellationToken)
         {
-            var todoList = await _todoListRepository.GetByIdAsync(request.TodoListId, cancellationToken);
+            var todoList = await _todoListRepository.GetAsync(request.TodoListId, cancellationToken: cancellationToken);
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.TodoListId);

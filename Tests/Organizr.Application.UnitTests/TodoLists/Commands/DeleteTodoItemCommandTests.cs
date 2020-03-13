@@ -27,7 +27,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
         {
             var request = new DeleteTodoItemCommand(TodoListId, 1);
 
-            _sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>())).Should().NotThrow();
+            _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should().NotThrow();
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
             
             var request = new DeleteTodoItemCommand(nonExistentTodoListId, 1);
 
-            _sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>())).Should()
+            _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should()
                 .Throw<ResourceNotFoundException<TodoList>>().And.ResourceId.Should().Be(nonExistentTodoListId);
         }
 

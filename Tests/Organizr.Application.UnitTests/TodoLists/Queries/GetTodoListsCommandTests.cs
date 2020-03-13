@@ -23,7 +23,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
         {
             var request = new GetTodoListsCommand();
 
-            _sut.Invoking(s => s.Handle(request, It.IsAny<CancellationToken>())).Should().NotThrow();
+            _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should().NotThrow();
         }
     }
 }

@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SharedKernel\CompositeKeyEntity.cs" />
     <Compile Remove="SharedKernel\Enumeration.cs" />
     <Compile Remove="SharedKernel\IDateTime.cs" />
   </ItemGroup>
