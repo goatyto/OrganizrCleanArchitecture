@@ -6,8 +6,7 @@ using FluentAssertions;
 using FluentValidation;
 using MediatR;
 using Moq;
-using Organizr.Application.Common.Behaviors;
-using Organizr.Application.TodoLists.Commands.EditTodoList;
+using Organizr.Application.Planning.TodoLists.Commands.EditTodoList;
 using Organizr.Application.UnitTests.Common;
 using Xunit;
 

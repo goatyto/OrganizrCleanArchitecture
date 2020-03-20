@@ -5,7 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="SharedKernel\CompositeKeyEntity.cs" />
+    <Compile Remove="Planning\Aggregates\TodoListAggregate\TodoItemPosition.cs" />
+    <Compile Remove="Planning\Aggregates\TodoListAggregate\TodoSubListPosition.cs" />
     <Compile Remove="SharedKernel\Enumeration.cs" />
     <Compile Remove="SharedKernel\IDateTime.cs" />
   </ItemGroup>

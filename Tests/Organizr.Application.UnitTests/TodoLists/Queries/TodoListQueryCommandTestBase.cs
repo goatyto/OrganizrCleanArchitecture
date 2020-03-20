@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using Moq;
-using Organizr.Application.Common.Interfaces;
-using Organizr.Application.TodoLists.Queries;
-using Organizr.Application.TodoLists.Queries.GetTodoLists;
+using Organizr.Application.Planning.Common.Interfaces;
+using Organizr.Application.Planning.TodoLists.Queries;
+using Organizr.Application.Planning.TodoLists.Queries.GetTodoLists;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.UnitTests.TodoLists.Queries

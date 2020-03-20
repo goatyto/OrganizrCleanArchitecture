@@ -4,8 +4,8 @@ using System.Text;
 using System.Threading;
 using FluentAssertions;
 using Moq;
-using Organizr.Application.Common.Interfaces;
-using Organizr.Application.TodoLists.Commands.CreateTodoList;
+using Organizr.Application.Planning.Common.Interfaces;
+using Organizr.Application.Planning.TodoLists.Commands.CreateTodoList;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Xunit;
 

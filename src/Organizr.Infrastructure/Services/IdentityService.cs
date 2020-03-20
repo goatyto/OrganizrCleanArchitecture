@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Http;
-using Organizr.Application.Common.Interfaces;
+using Organizr.Application.Planning.Common.Interfaces;
 
 namespace Organizr.Infrastructure.Services
 {

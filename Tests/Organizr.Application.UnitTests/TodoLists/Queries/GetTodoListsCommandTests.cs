@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using FluentAssertions;
 using Moq;
-using Organizr.Application.TodoLists.Queries.GetTodoLists;
+using Organizr.Application.Planning.TodoLists.Queries.GetTodoLists;
 using Xunit;
 
 namespace Organizr.Application.UnitTests.TodoLists.Queries

@@ -22,7 +22,6 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var insertedSubList = fixture.Sut.SubLists.Last();
 
             insertedSubList.Id.Should().Be(initialSubListCount + 1);
-            insertedSubList.TodoListId.Should().Be(fixture.TodoListId);
             insertedSubList.Title.Should().Be(title);
             insertedSubList.Ordinal.Should().Be(fixture.Sut.SubLists.Count(list => !list.IsDeleted));
             insertedSubList.Description.Should().Be(description);

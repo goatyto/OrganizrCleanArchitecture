@@ -27,12 +27,10 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var addedTodo = fixture.Sut.Items.Last();
 
             addedTodo.Id.Should().Be(initialTodoListCount + 1);
-            addedTodo.TodoListId.Should().Be(fixture.TodoListId);
             addedTodo.Title.Should().Be(title);
             addedTodo.Description.Should().Be(description);
             addedTodo.DueDateUtc.Should().Be(dueDateUtc);
-            addedTodo.Position.Should().Be(new TodoItemPosition(
-                fixture.Sut.Items.Count(item => item.Position.SubListId == subListId && !item.IsDeleted), subListId));
+            addedTodo.Ordinal.Should().Be(fixture.Sut.Items.Count(item => item.SubListId == subListId && !item.IsDeleted));
             addedTodo.IsCompleted.Should().Be(false);
             addedTodo.IsDeleted.Should().Be(false);
         }

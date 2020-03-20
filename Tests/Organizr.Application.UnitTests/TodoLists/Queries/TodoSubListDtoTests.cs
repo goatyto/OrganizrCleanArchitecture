@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using FluentAssertions;
-using Organizr.Application.TodoLists.Queries.GetTodoLists;
+using Organizr.Application.Planning.TodoLists.Queries.GetTodoLists;
 using Xunit;
 
 namespace Organizr.Application.UnitTests.TodoLists.Queries

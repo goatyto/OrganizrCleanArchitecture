@@ -11,42 +11,42 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
     {
         public static IEnumerable<object[]> MoveTodoValidTestData = new[]
         {
-            new object[]{1, new TodoItemPosition(3, null) },
-            new object[]{4, new TodoItemPosition(2, null) },
-            new object[]{1, new TodoItemPosition(3, 1) },
-            new object[]{4, new TodoItemPosition(2, 1) },
-            new object[]{5, new TodoItemPosition(3, null) },
-            new object[]{9, new TodoItemPosition(2, null) },
+            new object[]{1, 3, null },
+            new object[]{4, 2, null },
+            new object[]{1, 3, 1 },
+            new object[]{4, 2, 1 },
+            new object[]{5, 3, null },
+            new object[]{9, 2, null },
         };
 
         [Theory, MemberData(nameof(MoveTodoValidTestData))]
-        public void MoveTodo_ValidPosition_PositionChanged(int todoId, TodoItemPosition newPosition)
+        public void MoveTodo_ValidPosition_PositionChanged(int todoId, int destinationOrdinal, int? destinationSubListId)
         {
             var fixture = new TodoListFixture();
 
             var todoToBeMoved = fixture.Sut.Items.Single(item => item.Id == todoId);
-            var sourceSubListId = todoToBeMoved.Position.SubListId;
-            var destinationSubListId = newPosition.SubListId;
+            var sourceSubListId = todoToBeMoved.SubListId;
 
-            fixture.Sut.MoveTodo(todoId, newPosition);
+            fixture.Sut.MoveTodo(todoId, destinationOrdinal, destinationSubListId);
 
-            todoToBeMoved.Position.Should().Be(newPosition);
+            todoToBeMoved.Ordinal.Should().Be(destinationOrdinal);
+            todoToBeMoved.SubListId.Should().Be(destinationSubListId);
 
             var sourceSubListItems =
-                fixture.Sut.Items.Where(item => !item.IsDeleted && item.Position.SubListId == sourceSubListId)
-                    .OrderBy(item => item.Position.Ordinal).ToList();
+                fixture.Sut.Items.Where(item => !item.IsDeleted && item.SubListId == sourceSubListId)
+                    .OrderBy(item => item.Ordinal).ToList();
             var destinationSubListItems =
-                fixture.Sut.Items.Where(item => !item.IsDeleted && item.Position.SubListId == destinationSubListId).
-                    OrderBy(item => item.Position.Ordinal).ToList();
+                fixture.Sut.Items.Where(item => !item.IsDeleted && item.SubListId == destinationSubListId).
+                    OrderBy(item => item.Ordinal).ToList();
 
             for (int i = 0; i < sourceSubListItems.Count; i++)
             {
-                sourceSubListItems[i].Position.Ordinal.Should().Be(i + 1);
+                sourceSubListItems[i].Ordinal.Should().Be(i + 1);
             }
 
             for (int i = 0; i < destinationSubListItems.Count; i++)
             {
-                destinationSubListItems[i].Position.Ordinal.Should().Be(i + 1);
+                destinationSubListItems[i].Ordinal.Should().Be(i + 1);
             }
         }
 
@@ -59,21 +59,23 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 
             var todoToBeMoved = fixture.Sut.Items.Single(item => item.Id == todoId);
 
-            var samePosition = (TodoItemPosition)todoToBeMoved.Position.GetCopy();
+            var sameOrdinal = todoToBeMoved.Ordinal;
+            var sameSubListId = todoToBeMoved.SubListId;
 
-            fixture.Sut.MoveTodo(todoId, samePosition);
+            fixture.Sut.MoveTodo(todoId, sameOrdinal, sameSubListId);
 
-            todoToBeMoved.Position.Should().Be(samePosition);
+            todoToBeMoved.Ordinal.Should().Be(sameOrdinal);
+            todoToBeMoved.SubListId.Should().Be(sameSubListId);
 
             for (int subListIndex = 0; subListIndex < fixture.Sut.SubLists.Count; subListIndex++)
             {
                 var activeItemsInSubList = fixture.Sut.Items.Where(item =>
-                        !item.IsDeleted && item.Position.SubListId == fixture.Sut.SubLists.ElementAt(subListIndex).Id)
+                        !item.IsDeleted && item.SubListId == fixture.Sut.SubLists.ElementAt(subListIndex).Id)
                     .ToList();
 
                 for (int todoItemIndex = 0; todoItemIndex < activeItemsInSubList.Count; todoItemIndex++)
                 {
-                    activeItemsInSubList[todoItemIndex].Position.Ordinal.Should().Be(todoItemIndex + 1);
+                    activeItemsInSubList[todoItemIndex].Ordinal.Should().Be(todoItemIndex + 1);
                 }
             }
 
@@ -81,34 +83,34 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 
         public static IEnumerable<object[]> MoveTodoInvalidPositionTestData = new[]
         {
-            new object[]{1, new TodoItemPosition(99, null) },
-            new object[]{4, new TodoItemPosition(99, 1) },
-            new object[]{9, new TodoItemPosition(99, null) }
+            new object[]{1, 99, null },
+            new object[]{4, 99, 1 },
+            new object[]{9, 99, null }
         };
 
         [Theory, MemberData(nameof(MoveTodoInvalidPositionTestData))]
-        public void MoveTodo_InvalidPosition_ThrowsArgumentException(int todoId, TodoItemPosition invalidPosition)
+        public void MoveTodo_InvalidOrdinal_ThrowsArgumentException(int todoId, int invalidOrdinal, int? subListId)
         {
             var fixture = new TodoListFixture();
 
-            fixture.Sut.Invoking(l => l.MoveTodo(todoId, invalidPosition)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be("newPosition");
+            fixture.Sut.Invoking(l => l.MoveTodo(todoId, invalidOrdinal, subListId)).Should().Throw<ArgumentException>().And
+                .ParamName.Should().Be("newOrdinal");
         }
 
         public static IEnumerable<object[]> MoveTodoDeletedTodoTestData = new[]
         {
-            new object[]{3, new TodoItemPosition(4, null) },
-            new object[]{3, new TodoItemPosition(4, 1) },
-            new object[]{8, new TodoItemPosition(1, 1) },
-            new object[]{8, new TodoItemPosition(1, null) },
+            new object[]{3, 4, null },
+            new object[]{3, 4, 1 },
+            new object[]{8, 1, 1 },
+            new object[]{8, 1, null },
         };
 
         [Theory, MemberData(nameof(MoveTodoDeletedTodoTestData))]
-        public void MoveTodo_DeletedTodoId_ThrowsTodoItemDeletedException(int deletedTodoId, TodoItemPosition newPosition)
+        public void MoveTodo_DeletedTodoId_ThrowsTodoItemDeletedException(int deletedTodoId, int ordinal, int? subListId)
         {
             var fixture = new TodoListFixture();
 
-            fixture.Sut.Invoking(l => l.MoveTodo(deletedTodoId, newPosition)).Should()
+            fixture.Sut.Invoking(l => l.MoveTodo(deletedTodoId, ordinal, subListId)).Should()
                 .Throw<TodoItemDeletedException>().And.TodoId.Should().Be(deletedTodoId);
         }
 
@@ -118,10 +120,11 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var fixture = new TodoListFixture();
 
             var deletedSubListTodoId = 11;
-            var newPosition = new TodoItemPosition(1, null);
+            var newOrdinal = 1;
+            int? newSubListId = null;
             var deletedSubListId = 2;
 
-            fixture.Sut.Invoking(l => l.MoveTodo(deletedSubListTodoId, newPosition)).Should()
+            fixture.Sut.Invoking(l => l.MoveTodo(deletedSubListTodoId, newOrdinal, newSubListId)).Should()
                 .Throw<TodoSubListDeletedException>().And.SubListId.Should().Be(deletedSubListId);
         }
 
@@ -131,10 +134,10 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var fixture = new TodoListFixture();
 
             var todoId = 1;
-            var newPosition = new TodoItemPosition(1, 2);
+            var newOrdinal = 1;
             var deletedSubListId = 2;
 
-            fixture.Sut.Invoking(l => l.MoveTodo(todoId, newPosition)).Should()
+            fixture.Sut.Invoking(l => l.MoveTodo(todoId, newOrdinal, deletedSubListId)).Should()
                 .Throw<TodoSubListDeletedException>().And.SubListId.Should().Be(deletedSubListId);
         }
 
@@ -144,11 +147,11 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var fixture = new TodoListFixture();
 
             var todoId = 1;
+            var newOrdinal = 1;
             var nonExistentSubListId = 99;
-            var newPosition = new TodoItemPosition(1, nonExistentSubListId);
 
-            fixture.Sut.Invoking(l => l.MoveTodo(todoId, newPosition)).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be("SubListId");
+            fixture.Sut.Invoking(l => l.MoveTodo(todoId, newOrdinal, nonExistentSubListId)).Should()
+                .Throw<ArgumentException>().And.ParamName.Should().Be("newSubListId");
         }
 
         [Fact]
@@ -157,9 +160,10 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var fixture = new TodoListFixture();
 
             var nonExistentTodoId = 99;
-            var newPosition = new TodoItemPosition(1, 1);
+            var newOrdinal = 1;
+            var newSubListId = 1;
 
-            fixture.Sut.Invoking(l => l.MoveTodo(nonExistentTodoId, newPosition)).Should()
+            fixture.Sut.Invoking(l => l.MoveTodo(nonExistentTodoId, newOrdinal, newSubListId)).Should()
                 .Throw<ArgumentException>().And.ParamName.Should().Be("todoId");
         }
     }

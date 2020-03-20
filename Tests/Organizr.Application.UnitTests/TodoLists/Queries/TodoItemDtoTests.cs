@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using FluentAssertions;
-using Organizr.Application.TodoLists.Queries.GetTodoLists;
+using Organizr.Application.Planning.TodoLists.Queries.GetTodoLists;
 using Xunit;
 
 namespace Organizr.Application.UnitTests.TodoLists.Queries
@@ -26,7 +26,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
                 Title = title,
                 Description = description,
                 Ordinal = ordinal,
-                IsComplated = isCompleted,
+                IsCompleted = isCompleted,
                 IsDeleted = isDeleted,
                 DueDate = dueDate
             };
@@ -35,7 +35,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
             sut.Title.Should().Be(title);
             sut.Description.Should().Be(description);
             sut.Ordinal.Should().Be(ordinal);
-            sut.IsComplated.Should().Be(isCompleted);
+            sut.IsCompleted.Should().Be(isCompleted);
             sut.IsDeleted.Should().Be(isDeleted);
             sut.DueDate.Should().Be(dueDate);
         }

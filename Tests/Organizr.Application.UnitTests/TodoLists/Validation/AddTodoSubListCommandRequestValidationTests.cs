@@ -5,9 +5,7 @@ using System.Threading;
 using FluentAssertions;
 using FluentValidation;
 using Moq;
-using Organizr.Application.Common.Behaviors;
-using Organizr.Application.TodoLists.Commands.AddTodoItem;
-using Organizr.Application.TodoLists.Commands.AddTodoSubList;
+using Organizr.Application.Planning.TodoLists.Commands.AddTodoSubList;
 using Organizr.Application.UnitTests.Common;
 using Xunit;
 

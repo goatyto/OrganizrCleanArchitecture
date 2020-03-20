@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 using Moq;
-using Organizr.Application.Common.Behaviors;
+using Organizr.Application.Planning.Common.Behaviors;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.UnitTests.Common

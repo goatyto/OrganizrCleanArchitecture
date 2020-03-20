@@ -7,7 +7,7 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 {
     public interface IUserGroupRepository: IRepository<UserGroup>
     {
-        Task<UserGroup> GetByIdAsync(Guid id, CancellationToken cancellationToken = default(CancellationToken));
+        Task<UserGroup> GetAsync(Guid id, CancellationToken cancellationToken = default(CancellationToken));
         void Add(UserGroup userGroup);
         void Update(UserGroup userGroup);
     }

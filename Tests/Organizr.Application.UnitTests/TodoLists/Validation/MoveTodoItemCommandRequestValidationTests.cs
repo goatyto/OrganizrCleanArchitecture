@@ -6,8 +6,7 @@ using FluentAssertions;
 using FluentValidation;
 using MediatR;
 using Moq;
-using Organizr.Application.Common.Behaviors;
-using Organizr.Application.TodoLists.Commands.MoveTodoItem;
+using Organizr.Application.Planning.TodoLists.Commands.MoveTodoItem;
 using Organizr.Application.UnitTests.Common;
 using Xunit;
 
@@ -73,7 +72,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
 
             Sut.Invoking(s => s.Handle(request, CancellationToken.None, RequestHandlerDelegateMock.Object))
                 .Should().Throw<ValidationException>().And.Errors.Should()
-                .ContainSingle(failure => failure.PropertyName == nameof(MoveTodoItemCommand.SubListId));
+                .ContainSingle(failure => failure.PropertyName == nameof(MoveTodoItemCommand.NewSubListId));
         }
     }
 }

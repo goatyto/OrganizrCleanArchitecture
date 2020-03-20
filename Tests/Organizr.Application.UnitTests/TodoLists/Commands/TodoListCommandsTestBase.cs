@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
-using Organizr.Application.Common.Interfaces;
+using Organizr.Application.Planning.Common.Interfaces;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Domain.Planning.Services;
 using Organizr.Domain.SharedKernel;

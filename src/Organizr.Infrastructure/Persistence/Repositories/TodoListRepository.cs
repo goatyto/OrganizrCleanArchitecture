@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Infrastructure.Persistence.Repositories
 {
-    class TodoListRepository: ITodoListRepository
+    public class TodoListRepository : ITodoListRepository
     {
         private readonly OrganizrContext _context;
         public IUnitOfWork UnitOfWork => _context;
@@ -21,8 +22,11 @@ namespace Organizr.Infrastructure.Persistence.Repositories
 
         public async Task<TodoList> GetAsync(Guid id, Guid? userGroupId = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await _context.TodoLists.SingleAsync(l => l.Id == id && l.UserGroupId == userGroupId,
-                cancellationToken);
+            return await _context
+                .TodoLists
+                .Include(tl => tl.SubLists)
+                .Include(tl => tl.Items)
+                .SingleAsync(l => l.Id == id && l.UserGroupId == userGroupId, cancellationToken);
         }
 
         public void Add(TodoList todoList)

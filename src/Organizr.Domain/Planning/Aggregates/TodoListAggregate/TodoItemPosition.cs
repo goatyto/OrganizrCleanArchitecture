@@ -6,8 +6,8 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 {
     public class TodoItemPosition : ValueObject
     {
-        public int Ordinal { get; }
-        public int? SubListId { get; }
+        public int Ordinal { get; private set; }
+        public int? SubListId { get; private set; }
 
         public TodoItemPosition(int ordinal, int? subListId)
         {

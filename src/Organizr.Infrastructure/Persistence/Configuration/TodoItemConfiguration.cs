@@ -13,16 +13,17 @@ namespace Organizr.Infrastructure.Persistence.Configuration
         {
             builder.ToTable(nameof(OrganizrContext.TodoItems), OrganizrContext.LISTS_SCHEMA);
 
-            builder.HasKey(ti => ti.Id);
+            builder.HasKey("TodoListId", "Id");
 
-            builder.Property(ti => ti.Id).UseHiLo("todoitemseq", OrganizrContext.LISTS_SCHEMA);
-            builder.Property(ti => ti.TodoListId).IsRequired();
+            builder.Ignore(ti => ti.DomainEvents);
+
             builder.Property(ti => ti.Title).IsRequired();
             builder.Property(ti => ti.Description);
-            builder.OwnsOne(ti => ti.Position, navigationBuilder => navigationBuilder.WithOwner());
-            builder.Property(ti => ti.IsCompleted);
-            builder.Property(ti => ti.IsDeleted);
+            builder.Property(ti => ti.Ordinal).IsRequired();
+            builder.Property(ti => ti.IsCompleted).IsRequired();
+            builder.Property(ti => ti.IsDeleted).IsRequired();
             builder.Property(ti => ti.DueDateUtc);
+            builder.Property(ti => ti.SubListId);
         }
     }
 }
