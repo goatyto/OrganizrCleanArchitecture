@@ -241,13 +241,39 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
         public void MoveTodo(int todoId, int destinationOrdinal, int? destinationSubListId = null)
         {
+            var todoToBeMoved = FindTodoItem(todoId, out var sourceSubListId);
+            Guard.Against.NullQueryResult(todoToBeMoved, nameof(todoId));
+
+            if (todoToBeMoved.IsDeleted)
+                throw new TodoItemDeletedException(Id, todoId);
+
+            if (sourceSubListId == destinationSubListId && todoToBeMoved.Ordinal == destinationOrdinal)
+                return;
+
+            TodoSubList sourceSubList = null, destinationSubList = null;
+
+            if (sourceSubListId.HasValue)
+            {
+                sourceSubList = FindSubList(sourceSubListId.Value);
+
+                if (sourceSubList.IsDeleted)
+                    throw new TodoSubListDeletedException(Id, sourceSubListId.Value);
+            }
+
             if (destinationSubListId.HasValue)
             {
-                var destinationSubList = FindSubList(destinationSubListId.Value);
-                Guard.Against.NullQueryResult(destinationSubList, nameof(destinationSubListId));
+                if (sourceSubListId == destinationSubListId)
+                {
+                    destinationSubList = sourceSubList;
+                }
+                else
+                {
+                    destinationSubList = FindSubList(destinationSubListId.Value);
+                    Guard.Against.NullQueryResult(destinationSubList, nameof(destinationSubListId));
 
-                if (destinationSubList.IsDeleted)
-                    throw new TodoSubListDeletedException(Id, destinationSubListId.Value);
+                    if (destinationSubList.IsDeleted)
+                        throw new TodoSubListDeletedException(Id, destinationSubListId.Value);
+                }
 
                 Guard.Against.OutOfRange(destinationOrdinal, nameof(destinationOrdinal), 1,
                     destinationSubList.Items.Count(item => !item.IsDeleted));
@@ -258,24 +284,6 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
                     Items.Count(item => !item.IsDeleted));
             }
 
-            var todoToBeMoved = FindTodoItem(todoId, out var sourceSubListId);
-            Guard.Against.NullQueryResult(todoToBeMoved, nameof(todoId));
-
-            if (sourceSubListId.HasValue)
-            {
-                var sourceSubList = FindSubList(sourceSubListId.Value);
-                Guard.Against.NullQueryResult(sourceSubList, nameof(todoId));
-
-                if (sourceSubList.IsDeleted)
-                    throw new TodoSubListDeletedException(Id, sourceSubListId.Value);
-            }
-
-            if (todoToBeMoved.IsDeleted)
-                throw new TodoItemDeletedException(Id, todoId);
-
-            if (sourceSubListId == destinationSubListId && todoToBeMoved.Ordinal == destinationOrdinal)
-                return;
-
             if (sourceSubListId == destinationSubListId)
             {
                 var initialOrdinal = todoToBeMoved.Ordinal;
@@ -285,27 +293,27 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
                 var otherItemsShiftStartOrdinal = isMovingUp ? initialOrdinal + 1 : destinationOrdinal;
                 var otherItemsShiftEndOrdinal = isMovingUp ? destinationOrdinal : initialOrdinal - 1;
 
-                var itemsToBeShifted = !sourceSubListId.HasValue ? Items : FindSubList(sourceSubListId.Value).Items;
+                var itemsToBeShifted = !sourceSubListId.HasValue ? Items : sourceSubList.Items;
 
                 ShiftTodoItems(itemsToBeShifted, otherItemsShiftDirection, otherItemsShiftStartOrdinal, otherItemsShiftEndOrdinal);
             }
             else
             {
-                var sourceItemsToBeShifted = !sourceSubListId.HasValue ? Items : FindSubList(sourceSubListId.Value).Items;
+                var sourceItemsToBeShifted = !sourceSubListId.HasValue ? Items : sourceSubList.Items;
                 ShiftTodoItems(sourceItemsToBeShifted, ShiftDirection.Down, todoToBeMoved.Ordinal + 1);
 
-                var destinationItemsToBeShifted = !destinationSubListId.HasValue ? Items : FindSubList(destinationSubListId.Value).Items;
+                var destinationItemsToBeShifted = !destinationSubListId.HasValue ? Items : destinationSubList.Items;
                 ShiftTodoItems(destinationItemsToBeShifted, ShiftDirection.Up, destinationOrdinal);
 
                 if (!sourceSubListId.HasValue)
                     _items.Remove(todoToBeMoved);
                 else
-                    FindSubList(sourceSubListId.Value).RemoveTodo(todoToBeMoved);
+                    sourceSubList.RemoveTodo(todoToBeMoved);
 
                 if (!destinationSubListId.HasValue)
                     _items.Add(todoToBeMoved);
                 else
-                    FindSubList(destinationSubListId.Value).AddTodo(todoToBeMoved);
+                    destinationSubList.AddTodo(todoToBeMoved);
             }
 
             todoToBeMoved.SetPosition(destinationOrdinal);
@@ -318,9 +326,11 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             var todo = FindTodoItem(todoId, out var subListId);
             Guard.Against.NullQueryResult(todo, nameof(todoId));
 
+            TodoSubList subList = null;
+
             if (subListId.HasValue)
             {
-                var subList = FindSubList(subListId.Value);
+                subList = FindSubList(subListId.Value);
                 Guard.Against.NullQueryResult(subList, nameof(subListId));
 
                 if (subList.IsDeleted)
@@ -332,7 +342,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
             todo.Delete();
 
-            var todoItemsToBeShifted = !subListId.HasValue ? Items : FindSubList(subListId.Value).Items;
+            var todoItemsToBeShifted = !subListId.HasValue ? Items : subList.Items;
             ShiftTodoItems(todoItemsToBeShifted, ShiftDirection.Down, todo.Ordinal + 1);
 
             AddDomainEvent(new TodoListUpdated(this));
@@ -409,11 +419,11 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
                 switch (direction)
                 {
                     case ShiftDirection.Down:
-                        newCalculatedOrdinal = todoItemsToBeShifted[i].Ordinal - 1;
+                        newCalculatedOrdinal = i + startOrdinal - 1;
                         break;
                     case ShiftDirection.Up:
                     default:
-                        newCalculatedOrdinal = todoItemsToBeShifted[i].Ordinal + 1;
+                        newCalculatedOrdinal = i + startOrdinal + 1;
                         break;
                 }
 
