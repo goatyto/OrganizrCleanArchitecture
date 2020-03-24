@@ -17,7 +17,6 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 
             var todoToBeEdited = fixture.Sut.Items.Single(item => item.Id == todoId);
             var originalOrdinal = todoToBeEdited.Ordinal;
-            var originalSubListId = todoToBeEdited.SubListId;
             var originalIsCompleted = todoToBeEdited.IsCompleted;
             var originalIsDeleted = todoToBeEdited.IsDeleted;
 
@@ -33,7 +32,6 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             todoToBeEdited.Description.Should().Be(newDescription);
             todoToBeEdited.DueDateUtc.Should().Be(newDueDateUtc);
             todoToBeEdited.Ordinal.Should().Be(originalOrdinal);
-            todoToBeEdited.SubListId.Should().Be(originalSubListId);
             todoToBeEdited.IsCompleted.Should().Be(originalIsCompleted);
             todoToBeEdited.IsDeleted.Should().Be(originalIsDeleted);
         }

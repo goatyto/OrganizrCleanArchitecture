@@ -13,7 +13,8 @@ namespace Organizr.Infrastructure.Persistence.Configuration
         {
             builder.ToTable(nameof(OrganizrContext.TodoSubLists), OrganizrContext.LISTS_SCHEMA);
 
-            builder.HasKey("TodoListId", "Id");
+            builder.Property<int>("DbId");
+            builder.HasKey("DbId");
 
             builder.Ignore(sl => sl.DomainEvents);
 
@@ -22,8 +23,9 @@ namespace Organizr.Infrastructure.Persistence.Configuration
             builder.Property(sl => sl.IsDeleted).IsRequired();
             builder.Property(sl => sl.Ordinal).IsRequired();
 
-            builder.HasMany<TodoItem>().WithOne().HasForeignKey("TodoListId", "SubListId")
-                .HasPrincipalKey("TodoListId", "Id");
+            builder.HasMany(sl => sl.Items)
+                .WithOne()
+                .HasForeignKey("ParentSubListId");
         }
     }
 }

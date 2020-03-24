@@ -19,7 +19,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         {
             var fixture = new TodoListFixture();
 
-            var deletedTodo = fixture.Sut.Items.Single(item => item.Id == todoId);
+            var deletedTodo = fixture.GetTodoItemById(todoId);
 
             fixture.Sut.DeleteTodo(todoId);
 

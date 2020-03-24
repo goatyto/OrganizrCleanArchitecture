@@ -34,36 +34,37 @@ namespace Organizr.Infrastructure.Persistence.Queries
         {
             var todoListsQuery =
                 @"SELECT    [tl].[Id],
-                                [tl].[CreatorUserId],
-                                [tl].[UserGroupId],
-                                [tl].[Title],
-                                [tl].[Description]
+                            [tl].[CreatorUserId],
+                            [tl].[UserGroupId],
+                            [tl].[Title],
+                            [tl].[Description]
                     FROM [TodoLists] [tl]
                     WHERE [tl].[CreatorUserId] = @creatorUserId";
 
             var todoSubListsQuery =
                 @"SELECT    [sl].[Id],
-                                [sl].[TodoListId],
-                                [sl].[Title],
-                                [sl].[Description],
-                                [sl].[Ordinal],
-                                [sl].[IsDeleted]
+                            [sl].[Title],
+                            [sl].[Description],
+                            [sl].[Ordinal],
+                            [sl].[IsDeleted],
+                            [sl].[ParentListId]
                     FROM [TodoLists] as [tl]
-                    INNER JOIN [TodoSubLists] [sl] ON [tl].[Id] = [sl].[TodoListId]
+                    INNER JOIN [TodoSubLists] [sl] ON [tl].[Id] = [sl].[ParentListId]
                     WHERE [tl].[CreatorUserId] = @creatorUserId";
 
             var todoItemsQuery =
                 @"SELECT    [ti].[Id],
-                                [ti].[TodoListId],
-                                [ti].[Title],
-                                [ti].[Description],
-                                [ti].[IsCompleted],
-                                [ti].[IsDeleted],
-                                [ti].[DueDateUtc] as DueDate,
-                                [ti].[Ordinal],
-                                [ti].[SubListId]
+                            [ti].[Title],
+                            [ti].[Description],
+                            [ti].[IsCompleted],
+                            [ti].[IsDeleted],
+                            [ti].[DueDateUtc] as DueDate,
+                            [ti].[Ordinal],
+                            [ti].[ParentListId],
+                            [ti].[ParentSubListId]
                     FROM [TodoLists] [tl]
-                    INNER JOIN [TodoItems] [ti] ON [tl].[Id] = [ti].[TodoListId]
+                    INNER JOIN [TodoSubLists] [sl] ON [tl].[Id] = [sl].[ParentListId]
+                    INNER JOIN [TodoItems] [ti] ON [tl].[Id] = [ti].[ParentListId] OR [sl].[Id] = [ti].[ParentSubListId]
                     WHERE [tl].[CreatorUserId] = @creatorUserId";
 
             using (var dbConnection = _dbConnectionFactory.Create(_connectionString))
@@ -103,36 +104,37 @@ namespace Organizr.Infrastructure.Persistence.Queries
         {
             var todoListsQuery =
                 @"SELECT    [tl].[Id],
-                                [tl].[CreatorUserId],
-                                [tl].[UserGroupId],
-                                [tl].[Title],
-                                [tl].[Description]
+                            [tl].[CreatorUserId],
+                            [tl].[UserGroupId],
+                            [tl].[Title],
+                            [tl].[Description]
                     FROM [TodoLists] [tl]
                     WHERE [tl].[UserGroupId] = @userGroupId";
 
             var todoSubListsQuery =
                 @"SELECT    [sl].[Id],
-                                [sl].[TodoListId],
-                                [sl].[Title],
-                                [sl].[Description],
-                                [sl].[Ordinal],
-                                [sl].[IsDeleted]
+                            [sl].[Title],
+                            [sl].[Description],
+                            [sl].[Ordinal],
+                            [sl].[IsDeleted],
+                            [sl].[ParentListId]
                     FROM [TodoLists] as [tl]
-                    INNER JOIN [TodoSubLists] [sl] ON [tl].[Id] = [sl].[TodoListId]
+                    INNER JOIN [TodoSubLists] [sl] ON [tl].[Id] = [sl].[ParentListId]
                     WHERE [tl].[UserGroupId] = @userGroupId";
 
             var todoItemsQuery =
                 @"SELECT    [ti].[Id],
-                                [ti].[TodoListId],
-                                [ti].[Title],
-                                [ti].[Description],
-                                [ti].[IsCompleted],
-                                [ti].[IsDeleted],
-                                [ti].[DueDateUtc] as DueDate,
-                                [ti].[Ordinal],
-                                [ti].[SubListId]
+                            [ti].[Title],
+                            [ti].[Description],
+                            [ti].[IsCompleted],
+                            [ti].[IsDeleted],
+                            [ti].[DueDateUtc] as DueDate,
+                            [ti].[Ordinal],
+                            [ti].[ParentListId],
+                            [ti].[ParentSubListId]
                     FROM [TodoLists] [tl]
-                    INNER JOIN [TodoItems] [ti] ON [tl].[Id] = [ti].[TodoListId]
+                    INNER JOIN [TodoSubLists] [sl] ON [tl].[Id] = [sl].[ParentListId]
+                    INNER JOIN [TodoItems] [ti] ON [tl].[Id] = [ti].[ParentListId] OR [sl].[Id] = [ti].[ParentSubListId]
                     WHERE [tl].[UserGroupId] = @userGroupId";
 
             using (var dbConnection = _dbConnectionFactory.Create(_connectionString))

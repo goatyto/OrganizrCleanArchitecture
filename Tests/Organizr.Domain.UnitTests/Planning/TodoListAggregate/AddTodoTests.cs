@@ -19,18 +19,18 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var description = "Todo Description";
             var dueDateUtc = fixture.ClientDateTimeToday.AddDays(1);
 
-            var initialTodoListCount = fixture.Sut.Items.Count;
+            var initialTodoListCount = fixture.Sut.Items.Union(fixture.Sut.SubLists.SelectMany(sl => sl.Items)).Count();
 
             fixture.Sut.AddTodo(title, description, dueDateUtc, fixture.ClientTimeZoneOffsetInMinutes,
                 fixture.ClientDateValidator, subListId);
 
-            var addedTodo = fixture.Sut.Items.Last();
+            var addedTodo = fixture.GetTodoItems(subListId).Last();
 
             addedTodo.Id.Should().Be(initialTodoListCount + 1);
             addedTodo.Title.Should().Be(title);
             addedTodo.Description.Should().Be(description);
             addedTodo.DueDateUtc.Should().Be(dueDateUtc);
-            addedTodo.Ordinal.Should().Be(fixture.Sut.Items.Count(item => item.SubListId == subListId && !item.IsDeleted));
+            addedTodo.Ordinal.Should().Be(fixture.GetTodoItems(subListId).Count(item => !item.IsDeleted));
             addedTodo.IsCompleted.Should().Be(false);
             addedTodo.IsDeleted.Should().Be(false);
         }

@@ -84,8 +84,10 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Repositories
 
             persistedTodoList.SubLists.Single(sl => sl.Id == 2).IsDeleted.Should().Be(true);
 
-            persistedTodoList.Items.Single(it => it.Id == 2).IsDeleted.Should().Be(true);
-            persistedTodoList.Items.Single(it => it.Id == 4).IsDeleted.Should().Be(true);
+            var allTodoItems = persistedTodoList.Items.Union(persistedTodoList.SubLists.SelectMany(sl => sl.Items)).ToList();
+
+            allTodoItems.Single(it => it.Id == 2).IsDeleted.Should().Be(true);
+            allTodoItems.Single(it => it.Id == 4).IsDeleted.Should().Be(true);
         }
     }
 }

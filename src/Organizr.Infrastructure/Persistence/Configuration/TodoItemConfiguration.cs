@@ -13,7 +13,8 @@ namespace Organizr.Infrastructure.Persistence.Configuration
         {
             builder.ToTable(nameof(OrganizrContext.TodoItems), OrganizrContext.LISTS_SCHEMA);
 
-            builder.HasKey("TodoListId", "Id");
+            builder.Property<int>("DbId");
+            builder.HasKey("DbId");
 
             builder.Ignore(ti => ti.DomainEvents);
 
@@ -23,7 +24,6 @@ namespace Organizr.Infrastructure.Persistence.Configuration
             builder.Property(ti => ti.IsCompleted).IsRequired();
             builder.Property(ti => ti.IsDeleted).IsRequired();
             builder.Property(ti => ti.DueDateUtc);
-            builder.Property(ti => ti.SubListId);
         }
     }
 }

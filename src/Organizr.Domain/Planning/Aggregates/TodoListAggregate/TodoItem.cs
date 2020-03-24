@@ -14,21 +14,19 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
         public bool IsCompleted { get; private set; }
         public bool IsDeleted { get; private set; }
         public DateTime? DueDateUtc { get; private set; }
-        public int? SubListId { get; private set; }
 
         private TodoItem()
         {
 
         }
 
-        internal TodoItem(int id, string title, int ordinal, string description = null, DateTime? dueDateUtc = null, int? subListId = null) : this()
+        internal TodoItem(int id, string title, int ordinal, string description = null, DateTime? dueDateUtc = null) : this()
         {
             Id = id;
             Title = title;
             Ordinal = ordinal;
             Description = description;
             DueDateUtc = dueDateUtc;
-            SubListId = subListId;
         }
 
         internal void Edit(string title, string description = null, DateTime? dueDateUtc = null)
@@ -38,10 +36,9 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             DueDateUtc = dueDateUtc;
         }
 
-        internal void SetPosition(int ordinal, int? subListId = null)
+        internal void SetPosition(int ordinal)
         {
             Ordinal = ordinal;
-            SubListId = subListId;
         }
 
         internal void SetCompleted(bool isCompleted = true)

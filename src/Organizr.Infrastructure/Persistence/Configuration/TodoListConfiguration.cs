@@ -18,8 +18,8 @@ namespace Organizr.Infrastructure.Persistence.Configuration
             builder.Property(tl => tl.Title).IsRequired();
             builder.Property(tl => tl.Description);
             
-            builder.HasMany(tl => tl.SubLists).WithOne().HasPrincipalKey(tl => tl.Id).HasForeignKey("TodoListId");
-            builder.HasMany(tl => tl.Items).WithOne().HasPrincipalKey(tl => tl.Id).HasForeignKey("TodoListId");
+            builder.HasMany(tl => tl.SubLists).WithOne().HasPrincipalKey(tl => tl.Id).HasForeignKey("ParentListId");
+            builder.HasMany(tl => tl.Items).WithOne().HasPrincipalKey(tl => tl.Id).HasForeignKey("ParentListId");
         }
     }
 }

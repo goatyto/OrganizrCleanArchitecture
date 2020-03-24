@@ -52,7 +52,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var fixture = new TodoListFixture();
 
             fixture.Sut.Invoking(l => l.MoveSubList(3, invalidOrdinal)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be("newOrdinal");
+                .ParamName.Should().Be("destinationOrdinal");
         }
 
         [Fact]

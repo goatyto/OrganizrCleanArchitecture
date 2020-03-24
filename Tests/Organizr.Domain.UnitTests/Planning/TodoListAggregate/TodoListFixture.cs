@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Domain.Planning.Services;
@@ -57,6 +58,35 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             Sut.DeleteTodo(13);
 
             Sut.DeleteSubList(2);
+        }
+
+        public int? GetSubListIdForTodoItem(int todoId)
+        {
+            int? subListId = null;
+
+            if (Sut.Items.All(it => it.Id != todoId))
+            {
+                foreach (var subList in Sut.SubLists)
+                {
+                    if (subList.Items.Any(it => it.Id == todoId))
+                    {
+                        subListId = subList.Id;
+                        break;
+                    }
+                }
+            }
+
+            return subListId;
+        }
+
+        public IEnumerable<TodoItem> GetTodoItems(int? subListId = null)
+        {
+            return !subListId.HasValue ? Sut.Items : Sut.SubLists.Single(sl => sl.Id == subListId.Value).Items;
+        }
+
+        public TodoItem GetTodoItemById(int todoId)
+        {
+            return Sut.Items.Union(Sut.SubLists.SelectMany(sl => sl.Items)).Single(ti => ti.Id == todoId);
         }
 
         public void Dispose()
