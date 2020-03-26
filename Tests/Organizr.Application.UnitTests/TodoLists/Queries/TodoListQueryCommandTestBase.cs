@@ -21,7 +21,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
             UserId = "User1";
 
             CurrentUserServiceMock = new Mock<IIdentityService>();
-            CurrentUserServiceMock.Setup(m => m.UserId).Returns(UserId);
+            CurrentUserServiceMock.Setup(m => m.CurrentUserId).Returns(UserId);
 
             TodoListQueriesMock = new Mock<ITodoListQueries>();
             TodoListQueriesMock.Setup(m => m.GetTodoListsForUserAsync(UserId, It.IsAny<CancellationToken>()))

@@ -20,6 +20,7 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Queries
     {
         private readonly OrganizrContextFixture _fixture;
         private readonly ITodoListQueries _sut;
+        private readonly Guid UserGroupId;
 
         public TodoListQueriesTests(OrganizrContextFixture fixture)
         {
@@ -49,7 +50,28 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Queries
 
             var userGroupRepository = new UserGroupRepository(_fixture.Context);
 
-            var userGroup = UserGroup.Create(Guid.NewGuid(), "User1", "Group1");
+            UserGroupId = Guid.NewGuid();
+            var userGroup = UserGroup.Create(UserGroupId, "User1", "Group1");
+
+            var sharedTodoList1 = userGroup.CreateSharedTodoList(Guid.NewGuid(), "User1", "SharedTitle1", "SharedDescription1");
+            sharedTodoList1.AddSubList("SharedTodoSubList11");
+            sharedTodoList1.AddTodo("SharedTodoItem11");
+            sharedTodoList1.AddTodo("SharedTodoItem12", subListId: 1);
+            todoListRepository.Add(sharedTodoList1);
+
+            var sharedTodoList2 = userGroup.CreateSharedTodoList(Guid.NewGuid(), "User1", "SharedTitle2", "SharedDescription2");
+            sharedTodoList2.AddSubList("SharedTodoSubList21");
+            sharedTodoList2.AddTodo("SharedTodoItem21");
+            sharedTodoList2.AddTodo("SharedTodoItem22", subListId: 1);
+            todoListRepository.Add(sharedTodoList2);
+
+            var sharedTodoList3 = userGroup.CreateSharedTodoList(Guid.NewGuid(), "User1", "SharedTitle3", "SharedDescription3");
+            sharedTodoList3.AddSubList("SharedTodoSubList31");
+            sharedTodoList3.AddTodo("SharedTodoItem31");
+            sharedTodoList3.AddTodo("SharedTodoItem32", subListId: 1);
+            todoListRepository.Add(sharedTodoList3);
+
+            userGroupRepository.UnitOfWork.SaveChangesAsync().Wait();
 
             var contextDbConnection = _fixture.Context.Database.GetDbConnection();
 
@@ -70,12 +92,12 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Queries
             todoLists.Should().HaveCount(3);
         }
 
-        //[Fact]
-        //public async Task GetSharedTodoListsForGroupAsync_ValidUserGroupId_RetursTodoLists()
-        //{
-        //    var todoLists = await _sut.GetSharedTodoListsForGroupAsync("User1");
+        [Fact]
+        public async Task GetSharedTodoListsForGroupAsync_ValidUserGroupId_RetursTodoLists()
+        {
+            var todoLists = await _sut.GetSharedTodoListsForGroupAsync(UserGroupId);
 
-        //    todoLists.Should().HaveCount(3);
-        //}
+            todoLists.Should().HaveCount(3);
+        }
     }
 }

@@ -39,7 +39,7 @@ namespace Organizr.Application.Planning.TodoLists.Commands.CreateTodoList
         public async Task<Unit> Handle(CreateTodoListCommand request, CancellationToken cancellationToken)
         {
             var todoListId = _idGenerator.GenerateNext<TodoList>();
-            var currentUserId = _identityService.UserId;
+            var currentUserId = _identityService.CurrentUserId;
 
             var todoList = TodoList.Create(todoListId, currentUserId, request.Title, request.Description);
 

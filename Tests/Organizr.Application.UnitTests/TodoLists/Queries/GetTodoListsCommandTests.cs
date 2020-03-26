@@ -15,7 +15,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
 
         public GetTodoListsCommandTests()
         {
-            _sut = new GetTodoListsCommandHandler(TodoListQueriesMock.Object, CurrentUserServiceMock.Object);
+            _sut = new GetTodoListsCommandHandler(CurrentUserServiceMock.Object, TodoListQueriesMock.Object);
         }
 
         [Fact]

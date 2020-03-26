@@ -11,7 +11,7 @@ namespace Organizr.Infrastructure.Services
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public string UserId => _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+        public string CurrentUserId => _httpContextAccessor.HttpContext?.User?.Identity?.Name;
 
         public IdentityService(IHttpContextAccessor httpContextAccessor)
         {

@@ -49,7 +49,7 @@ namespace Organizr.Application.Planning.TodoLists.Commands.EditTodoList
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.Id);
 
-            var currentUserId = _identityService.UserId;
+            var currentUserId = _identityService.CurrentUserId;
 
             if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
                 throw new AccessDeniedException<TodoList>(request.Id, currentUserId);

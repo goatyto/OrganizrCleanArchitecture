@@ -39,7 +39,8 @@ namespace Organizr.Infrastructure.Persistence.Queries
                             [tl].[Title],
                             [tl].[Description]
                     FROM [TodoLists] [tl]
-                    WHERE [tl].[CreatorUserId] = @creatorUserId";
+                    WHERE [tl].[CreatorUserId] = @creatorUserId
+                    AND [tl].[UserGroupId] IS NULL";
 
             var todoSubListsQuery =
                 @"SELECT    [sl].[Id],
@@ -50,7 +51,8 @@ namespace Organizr.Infrastructure.Persistence.Queries
                             [sl].[ParentListId]
                     FROM [TodoLists] as [tl]
                     INNER JOIN [TodoSubLists] [sl] ON [tl].[Id] = [sl].[ParentListId]
-                    WHERE [tl].[CreatorUserId] = @creatorUserId";
+                    WHERE [tl].[CreatorUserId] = @creatorUserId
+                    AND [tl].[UserGroupId] IS NULL";
 
             var todoItemsQuery =
                 @"SELECT    [ti].[Id],
@@ -65,7 +67,8 @@ namespace Organizr.Infrastructure.Persistence.Queries
                     FROM [TodoLists] [tl]
                     INNER JOIN [TodoSubLists] [sl] ON [tl].[Id] = [sl].[ParentListId]
                     INNER JOIN [TodoItems] [ti] ON [tl].[Id] = [ti].[ParentListId] OR [sl].[Id] = [ti].[ParentSubListId]
-                    WHERE [tl].[CreatorUserId] = @creatorUserId";
+                    WHERE [tl].[CreatorUserId] = @creatorUserId
+                    AND [tl].[UserGroupId] IS NULL";
 
             using (var dbConnection = _dbConnectionFactory.Create(_connectionString))
             {

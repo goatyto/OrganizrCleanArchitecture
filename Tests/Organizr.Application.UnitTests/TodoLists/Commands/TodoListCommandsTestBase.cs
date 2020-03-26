@@ -39,7 +39,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
             todoList.AddTodo("TodoItem Title", "TodoItem Description", ClientDateToday.AddDays(2), ClientTimeZoneOffsetInMinutes, ClientDateValidator);
 
             CurrentUserServiceMock = new Mock<IIdentityService>();
-            CurrentUserServiceMock.Setup(m => m.UserId).Returns(creatorUserId);
+            CurrentUserServiceMock.Setup(m => m.CurrentUserId).Returns(creatorUserId);
 
             ResourceAuthorizationServiceMock = new Mock<IResourceAuthorizationService<TodoList>>();
             ResourceAuthorizationServiceMock.Setup(m => m.CanRead(creatorUserId, todoList)).Returns(true);

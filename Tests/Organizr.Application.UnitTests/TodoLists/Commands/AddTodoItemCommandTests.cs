@@ -49,7 +49,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
         public void Handle_CurrentUserHasNoAccess_ThrowsAccessDeniedException()
         {
             var noAccessUserId = "User2";
-            CurrentUserServiceMock.Setup(m => m.UserId).Returns(noAccessUserId);
+            CurrentUserServiceMock.Setup(m => m.CurrentUserId).Returns(noAccessUserId);
 
             var request = new AddTodoItemCommand(TodoListId, "Title", "Description", ClientDateToday.AddDays(1),
                 ClientTimeZoneOffsetInMinutes);

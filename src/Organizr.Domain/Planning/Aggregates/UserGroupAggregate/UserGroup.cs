@@ -35,7 +35,7 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
             userGroup.Name = name;
             userGroup.Description = description;
 
-            userGroup._membership.Add(new UserGroupMembership(id, creatorUserId));
+            userGroup._membership.Add(new UserGroupMembership(creatorUserId));
 
             if (groupMemberIds != null)
             {
@@ -43,7 +43,7 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
                 {
                     if (userId == creatorUserId) continue;
 
-                    userGroup._membership.Add(new UserGroupMembership(id, userId));
+                    userGroup._membership.Add(new UserGroupMembership(userId));
                 }
             }
 
@@ -66,7 +66,7 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
         {
             Guard.Against.NullOrWhiteSpace(userId, nameof(userId));
 
-            var newMembership = new UserGroupMembership(Id, userId);
+            var newMembership = new UserGroupMembership(userId);
 
             if (_membership.Any(m => m == newMembership))
                 throw new UserAlreadyMemberException(Id, userId);
@@ -83,12 +83,10 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
             if (userId == CreatorUserId)
                 throw new CreatorCannotBeRemovedException(Id);
 
-            var membershipToRemove = new UserGroupMembership(Id, userId);
-
-            if (_membership.All(m => m != membershipToRemove))
+            if (_membership.All(m => m != userId))
                 throw new UserNotAMemberException(Id, userId);
 
-            _membership.Remove(membershipToRemove);
+            _membership.Remove((UserGroupMembership)userId);
 
             AddDomainEvent(new UserGroupMemberRemoved(Id, userId));
         }

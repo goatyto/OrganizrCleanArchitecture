@@ -1,7 +1,10 @@
-﻿namespace Organizr.Application.Planning.Common.Interfaces
+﻿using System.Threading.Tasks;
+
+namespace Organizr.Application.Planning.Common.Interfaces
 {
     public interface IIdentityService
     {
-        string UserId { get; }
+        string CurrentUserId { get; }
+        Task<bool> UserExistsAsync(string userId);
     }
 }
