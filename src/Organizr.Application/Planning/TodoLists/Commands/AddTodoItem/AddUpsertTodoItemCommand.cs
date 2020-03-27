@@ -6,7 +6,6 @@ using MediatR;
 using Organizr.Application.Planning.Common.Exceptions;
 using Organizr.Application.Planning.Common.Interfaces;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
-using Organizr.Domain.Planning.Services;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.Planning.TodoLists.Commands.AddTodoItem
@@ -36,22 +35,18 @@ namespace Organizr.Application.Planning.TodoLists.Commands.AddTodoItem
     {
         private readonly IIdentityService _identityService;
         private readonly IResourceAuthorizationService<TodoList> _resourceAuthorizationService;
-        private readonly ClientDateValidator _clientDateValidator;
         private readonly ITodoListRepository _todoListRepository;
 
         public AddTodoItemCommandHandler(IIdentityService identityService,
             IResourceAuthorizationService<TodoList> resourceAuthorizationService,
-            ClientDateValidator clientDateValidator,
             ITodoListRepository todoListRepository)
         {
             Guard.Against.Null(identityService, nameof(identityService));
             Guard.Against.Null(resourceAuthorizationService, nameof(resourceAuthorizationService));
-            Guard.Against.Null(clientDateValidator, nameof(clientDateValidator));
             Guard.Against.Null(todoListRepository, nameof(todoListRepository));
 
             _identityService = identityService;
             _resourceAuthorizationService = resourceAuthorizationService;
-            _clientDateValidator = clientDateValidator;
             _todoListRepository = todoListRepository;
         }
 
@@ -67,8 +62,7 @@ namespace Organizr.Application.Planning.TodoLists.Commands.AddTodoItem
             if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
                 throw new AccessDeniedException<TodoList>(request.TodoListId, currentUserId);
 
-            todoList.AddTodo(request.Title, request.Description, request.DueDateUtc, request.ClientTimeZoneOffsetInMinutes,
-                _clientDateValidator, request.SubListId);
+            todoList.AddTodo(request.Title, request.Description, ClientDateUtc.Create(request.DueDateUtc, request.ClientTimeZoneOffsetInMinutes), request.SubListId);
 
             _todoListRepository.Update(todoList);
 

@@ -8,7 +8,6 @@ using MediatR;
 using Moq;
 using Organizr.Application.Planning.TodoLists.Commands.EditTodoItem;
 using Organizr.Application.UnitTests.Common;
-using Organizr.Domain.Planning.Services;
 using Organizr.Domain.SharedKernel;
 using Xunit;
 
@@ -16,7 +15,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Validation
 {
     public class EditTodoItemCommandRequestValidationTests : RequestValidationTestBase<EditTodoItemCommand>
     { 
-        protected override object[] ValidatorParams => new object[] { new ClientDateValidator() };
+        protected override object[] ValidatorParams => null;
         private readonly DateTime ClientDateToday = DateTime.UtcNow.Date;
         private readonly int _clientTimeZoneOffsetInMinutes = 0;
 

@@ -5,7 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Planning\Aggregates\TodoListAggregate\TodoItemPosition.cs" />
+    <Compile Remove="Planning\Services\**" />
+    <EmbeddedResource Remove="Planning\Services\**" />
+    <None Remove="Planning\Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Planning\Aggregates\TodoListAggregate\TodoSubListPosition.cs" />
     <Compile Remove="SharedKernel\Enumeration.cs" />
     <Compile Remove="SharedKernel\IDateTime.cs" />

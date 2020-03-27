@@ -9,70 +9,73 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 {
     public class MoveTodoTests
     {
+        private readonly TodoListFixture _fixture;
+
+        public MoveTodoTests()
+        {
+            _fixture = new TodoListFixture();
+        }
+
         public static IEnumerable<object[]> MoveTodoValidTestData = new[]
         {
-            new object[]{1, 3, null },
-            new object[]{4, 2, null },
-            new object[]{1, 3, 1 },
-            new object[]{4, 2, 1 },
-            new object[]{5, 3, null },
-            new object[]{9, 2, null },
+            new object[]{1, new TodoItemPosition(3), null },
+            new object[]{4, new TodoItemPosition(2), null },
+            new object[]{1, new TodoItemPosition(3), 1 },
+            new object[]{4, new TodoItemPosition(2), 1 },
+            new object[]{5, new TodoItemPosition(3), null },
+            new object[]{9, new TodoItemPosition(2), null },
         };
 
         [Theory, MemberData(nameof(MoveTodoValidTestData))]
-        public void MoveTodo_ValidPosition_PositionChanged(int todoId, int destinationOrdinal, int? destinationSubListId)
+        public void MoveTodo_ValidPosition_PositionChanged(int todoId, TodoItemPosition destinationPosition, int? destinationSubListId)
         {
-            var fixture = new TodoListFixture();
+            var todoToBeMoved = _fixture.GetTodoItemById(todoId);
+            var sourceSubListId = _fixture.GetSubListIdForTodoItem(todoId);
 
-            var todoToBeMoved = fixture.GetTodoItemById(todoId);
-            var sourceSubListId = fixture.GetSubListIdForTodoItem(todoId);
+            _fixture.Sut.MoveTodo(todoId, destinationPosition, destinationSubListId);
 
-            fixture.Sut.MoveTodo(todoId, destinationOrdinal, destinationSubListId);
-
-            todoToBeMoved.Ordinal.Should().Be(destinationOrdinal);
+            todoToBeMoved.Position.Should().Be(destinationPosition);
 
             var sourceSubListItems =
-                fixture.GetTodoItems(sourceSubListId).Where(item => !item.IsDeleted)
-                    .OrderBy(item => item.Ordinal).ToList();
+                _fixture.GetTodoItems(sourceSubListId).Where(item => !item.IsDeleted)
+                    .OrderBy(item => item.Position).ToList();
             var destinationSubListItems =
-                fixture.Sut.Items.Where(item => !item.IsDeleted).
-                    OrderBy(item => item.Ordinal).ToList();
+                _fixture.Sut.Items.Where(item => !item.IsDeleted).
+                    OrderBy(item => item.Position).ToList();
 
             for (int i = 0; i < sourceSubListItems.Count; i++)
             {
-                sourceSubListItems[i].Ordinal.Should().Be(i + 1);
+                sourceSubListItems[i].Position.Should().Be(i + 1);
             }
 
             for (int i = 0; i < destinationSubListItems.Count; i++)
             {
-                destinationSubListItems[i].Ordinal.Should().Be(i + 1);
+                destinationSubListItems[i].Position.Should().Be(i + 1);
             }
         }
 
         [Fact]
         public void MoveTodo_SamePosition_PositionDoesNotChange()
         {
-            var fixture = new TodoListFixture();
-
             var todoId = 1;
 
-            var todoToBeMoved = fixture.Sut.Items.Single(item => item.Id == todoId);
+            var todoToBeMoved = _fixture.Sut.Items.Single(item => item.Id == todoId);
 
-            var sameOrdinal = todoToBeMoved.Ordinal;
-            var sameSubListId = fixture.GetSubListIdForTodoItem(todoId);
+            var samePosition = todoToBeMoved.Position;
+            var sameSubListId = _fixture.GetSubListIdForTodoItem(todoId);
 
-            fixture.Sut.MoveTodo(todoId, sameOrdinal, sameSubListId);
+            _fixture.Sut.MoveTodo(todoId, samePosition, sameSubListId);
 
-            todoToBeMoved.Ordinal.Should().Be(sameOrdinal);
+            todoToBeMoved.Position.Should().Be(samePosition);
 
-            for (int subListIndex = 0; subListIndex < fixture.Sut.SubLists.Count; subListIndex++)
+            for (int subListIndex = 0; subListIndex < _fixture.Sut.SubLists.Count; subListIndex++)
             {
-                var activeItemsInSubList = fixture.GetTodoItems(sameSubListId).Where(item => !item.IsDeleted)
+                var activeItemsInSubList = _fixture.GetTodoItems(sameSubListId).Where(item => !item.IsDeleted)
                     .ToList();
 
                 for (int todoItemIndex = 0; todoItemIndex < activeItemsInSubList.Count; todoItemIndex++)
                 {
-                    activeItemsInSubList[todoItemIndex].Ordinal.Should().Be(todoItemIndex + 1);
+                    activeItemsInSubList[todoItemIndex].Position.Should().Be(todoItemIndex + 1);
                 }
             }
 
@@ -80,88 +83,75 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 
         public static IEnumerable<object[]> MoveTodoInvalidPositionTestData = new[]
         {
-            new object[]{1, 99, null },
-            new object[]{4, 99, 1 },
-            new object[]{9, 99, null }
+            new object[]{1, new TodoItemPosition(99), null },
+            new object[]{4, new TodoItemPosition(99), 1 },
+            new object[]{9, new TodoItemPosition(99), null }
         };
 
         [Theory, MemberData(nameof(MoveTodoInvalidPositionTestData))]
-        public void MoveTodo_InvalidOrdinal_ThrowsArgumentException(int todoId, int invalidOrdinal, int? subListId)
+        public void MoveTodo_InvalidOrdinal_ThrowsTodoListException(int todoId, TodoItemPosition invalidPosition, int? subListId)
         {
-            var fixture = new TodoListFixture();
-
-            fixture.Sut.Invoking(l => l.MoveTodo(todoId, invalidOrdinal, subListId)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be("destinationOrdinal");
+            _fixture.Sut.Invoking(l => l.MoveTodo(todoId, invalidPosition, subListId)).Should()
+                .Throw<TodoListException>().WithMessage("*position*out of range*");
         }
 
         public static IEnumerable<object[]> MoveTodoDeletedTodoTestData = new[]
         {
-            new object[]{3, 4, null },
-            new object[]{3, 4, 1 },
-            new object[]{8, 1, 1 },
-            new object[]{8, 1, null },
+            new object[]{3, new TodoItemPosition(4), null },
+            new object[]{3, new TodoItemPosition(4), 1 },
+            new object[]{8, new TodoItemPosition(1), 1 },
+            new object[]{8, new TodoItemPosition(1), null },
         };
 
         [Theory, MemberData(nameof(MoveTodoDeletedTodoTestData))]
-        public void MoveTodo_DeletedTodoId_ThrowsTodoItemDeletedException(int deletedTodoId, int ordinal, int? subListId)
+        public void MoveTodo_DeletedTodoId_ThrowsTodoListException(int deletedTodoId, TodoItemPosition position, int? subListId)
         {
-            var fixture = new TodoListFixture();
-
-            fixture.Sut.Invoking(l => l.MoveTodo(deletedTodoId, ordinal, subListId)).Should()
-                .Throw<TodoItemDeletedException>().And.TodoId.Should().Be(deletedTodoId);
+            _fixture.Sut.Invoking(l => l.MoveTodo(deletedTodoId, position, subListId)).Should()
+                .Throw<TodoListException>().WithMessage($"*todo item*{deletedTodoId}*does not exist*");
         }
 
         [Fact]
-        public void MoveTodo_DeletedSourceSubList_ThrowsTodoSubListDeletedException()
+        public void MoveTodo_DeletedSourceSubList_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
-
             var deletedSubListTodoId = 11;
-            var newOrdinal = 1;
+            var newPosition = new TodoItemPosition(1);
             int? newSubListId = null;
-            var deletedSubListId = 2;
 
-            fixture.Sut.Invoking(l => l.MoveTodo(deletedSubListTodoId, newOrdinal, newSubListId)).Should()
-                .Throw<TodoSubListDeletedException>().And.SubListId.Should().Be(deletedSubListId);
+            _fixture.Sut.Invoking(l => l.MoveTodo(deletedSubListTodoId, newPosition, newSubListId)).Should()
+                .Throw<TodoListException>().WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
         }
 
         [Fact]
-        public void MoveTodo_DeletedDestinationSubList_ThrowsTodoSubListDeletedException()
+        public void MoveTodo_DeletedDestinationSubList_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
-
             var todoId = 1;
-            var newOrdinal = 1;
+            var todoItemPosition = new TodoItemPosition(1);
             var deletedSubListId = 2;
 
-            fixture.Sut.Invoking(l => l.MoveTodo(todoId, newOrdinal, deletedSubListId)).Should()
-                .Throw<TodoSubListDeletedException>().And.SubListId.Should().Be(deletedSubListId);
+            _fixture.Sut.Invoking(l => l.MoveTodo(todoId, todoItemPosition, deletedSubListId)).Should()
+                .Throw<TodoListException>().WithMessage($"*sublist*{deletedSubListId}*does not exist*");
         }
 
         [Fact]
-        public void MoveTodo_NonExistentDestinationSubListId_ThrowsTodoSubListDoesNotExistException()
+        public void MoveTodo_NonExistentDestinationSubListId_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
-
             var todoId = 1;
-            var newOrdinal = 1;
+            var newPosition = new TodoItemPosition(1);
             var nonExistentSubListId = 99;
 
-            fixture.Sut.Invoking(l => l.MoveTodo(todoId, newOrdinal, nonExistentSubListId)).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be("destinationSubListId");
+            _fixture.Sut.Invoking(l => l.MoveTodo(todoId, newPosition, nonExistentSubListId)).Should()
+                .Throw<TodoListException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");
         }
 
         [Fact]
-        public void MoveTodo_NonExistentTodoId_ThrowsTodoSubListDoesNotExistException()
+        public void MoveTodo_NonExistentTodoId_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
-
             var nonExistentTodoId = 99;
-            var newOrdinal = 1;
+            var newPosition = new TodoItemPosition(1);
             var newSubListId = 1;
 
-            fixture.Sut.Invoking(l => l.MoveTodo(nonExistentTodoId, newOrdinal, newSubListId)).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be("todoId");
+            _fixture.Sut.Invoking(l => l.MoveTodo(nonExistentTodoId, newPosition, newSubListId)).Should()
+                .Throw<TodoListException>().WithMessage($"todo item*{nonExistentTodoId}*does not exist*");
         }
     }
 }

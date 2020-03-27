@@ -8,65 +8,52 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 {
     public class SetCompletedTodoTests
     {
+        private readonly TodoListFixture _fixture;
+
+        public SetCompletedTodoTests()
+        {
+            _fixture = new TodoListFixture();
+        }
+
         [Theory]
         [InlineData(1, true)]
-        [InlineData(2, true)]
-        [InlineData(4, true)]
-        [InlineData(5, true)]
         [InlineData(1, false)]
-        [InlineData(2, false)]
-        [InlineData(4, false)]
-        [InlineData(5, false)]
         public void SetCompletedTodo_ValidIdAndBool_CompletedStatusChanged(int todoId, bool isCompleted)
         {
-            var fixture = new TodoListFixture();
+            var editedTodo = _fixture.Sut.Items.Single(item => item.Id == todoId);
 
-            var editedTodo = fixture.Sut.Items.Single(item => item.Id == todoId);
-
-            fixture.Sut.SetCompletedTodo(todoId, isCompleted);
+            _fixture.Sut.SetCompletedTodo(todoId, isCompleted);
 
             editedTodo.IsCompleted.Should().Be(isCompleted);
         }
 
-        [Theory]
-        [InlineData(3, true)]
-        [InlineData(8, true)]
-        [InlineData(3, false)]
-        [InlineData(8, false)]
-        public void SetCompletedTodo_DeletedTodoId_ThrowsTodoItemDeletedException(int todoId, bool isCompleted)
+        [Fact]
+        public void SetCompletedTodo_DeletedTodoId_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
+            var deletedTodoId = 3;
+            var isCompleted = true;
 
-            fixture.Sut.Invoking(l => l.SetCompletedTodo(todoId, isCompleted)).Should()
-                .Throw<TodoItemDeletedException>().And.TodoId.Should().Be(todoId);
+            _fixture.Sut.Invoking(l => l.SetCompletedTodo(deletedTodoId, isCompleted)).Should()
+                .Throw<TodoListException>().WithMessage($"*todo item*{deletedTodoId}*does not exist*");
         }
 
-        [Theory]
-        [InlineData(11, true)]
-        [InlineData(12, true)]
-        [InlineData(13, true)]
-        [InlineData(11, false)]
-        [InlineData(12, false)]
-        [InlineData(13, false)]
-        public void SetCompletedTodo_DeletedSubListTodoId_ThrowsTodoSubListDeletedException(int todoId, bool isCompleted)
+        [Fact]
+        public void SetCompletedTodo_DeletedSubListTodoId_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
+            var deletedSubListTodoId = 11;
+            var isCompleted = true;
 
-            var deletedSubListId = 2;
-
-            fixture.Sut.Invoking(l => l.SetCompletedTodo(todoId, isCompleted)).Should()
-                .Throw<TodoSubListDeletedException>().And.SubListId.Should().Be(deletedSubListId);
+            _fixture.Sut.Invoking(l => l.SetCompletedTodo(deletedSubListTodoId, isCompleted)).Should()
+                .Throw<TodoListException>().WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
         }
         
         [Fact]
-        public void SetCompletedTodo_NonExistentTodoId_ThrowsTodoItemDoesNotExistException()
+        public void SetCompletedTodo_NonExistentTodoId_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
-
             var nonExistentTodoId = 99;
 
-            fixture.Sut.Invoking(l => l.SetCompletedTodo(nonExistentTodoId)).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be("todoId");
+            _fixture.Sut.Invoking(l => l.SetCompletedTodo(nonExistentTodoId)).Should()
+                .Throw<TodoListException>().WithMessage($"*todo item*{nonExistentTodoId}*does not exist*");
         }
     }
 }

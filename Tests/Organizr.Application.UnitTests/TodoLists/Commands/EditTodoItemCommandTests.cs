@@ -19,7 +19,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
         public EditTodoItemCommandTests()
         {
             _sut = new EditTodoItemCommandHandler(CurrentUserServiceMock.Object,
-                ResourceAuthorizationServiceMock.Object, ClientDateValidator, TodoListRepositoryMock.Object);
+                ResourceAuthorizationServiceMock.Object, TodoListRepositoryMock.Object);
         }
 
         [Fact]

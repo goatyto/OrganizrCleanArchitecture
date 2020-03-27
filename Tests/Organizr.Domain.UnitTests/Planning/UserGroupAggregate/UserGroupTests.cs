@@ -26,7 +26,7 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
             sut.CreatorUserId.Should().Be(creatorUserId);
             sut.Description.Should().Be(description);
             sut.Membership.Should().NotBeNull().And
-                .Contain(memberUserIds.Select(uid => new UserGroupMembership(id, uid)));
+                .Contain(memberUserIds.Select(uid => new UserGroupMembership(uid)));
         }
 
         [Fact]

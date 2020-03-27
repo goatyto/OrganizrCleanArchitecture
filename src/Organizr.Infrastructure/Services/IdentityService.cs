@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Http;
 using Organizr.Application.Planning.Common.Interfaces;
@@ -18,6 +19,11 @@ namespace Organizr.Infrastructure.Services
             Guard.Against.Null(httpContextAccessor, nameof(httpContextAccessor));
 
             _httpContextAccessor = httpContextAccessor;
+        }
+
+        public Task<bool> UserExistsAsync(string userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

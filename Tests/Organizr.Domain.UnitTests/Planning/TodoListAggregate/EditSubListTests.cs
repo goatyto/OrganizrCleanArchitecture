@@ -8,19 +8,24 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 {
     public class EditSubListTests
     {
+        private readonly TodoListFixture _fixture;
+
+        public EditSubListTests()
+        {
+            _fixture = new TodoListFixture();
+        }
+
         [Fact]
         public void EditSubList_NewSubListData_SubListInfoChanges()
         {
-            var fixture = new TodoListFixture();
-
             var subListId = 1;
-            var editedSubList = fixture.Sut.SubLists.Single(sl => sl.Id == subListId);
+            var editedSubList = _fixture.Sut.SubLists.Single(sl => sl.Id == subListId);
             var originalOrdinal = editedSubList.Ordinal;
 
             var newTitle = "Todo Sub List";
             var newDescription = "Todo Sub List Description";
 
-            fixture.Sut.EditSubList(subListId, newTitle, newDescription);
+            _fixture.Sut.EditSubList(subListId, newTitle, newDescription);
 
 
             editedSubList.Id.Should().Be(subListId);
@@ -31,29 +36,25 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         }
 
         [Fact]
-        public void EditSubList_NonExistingSubListId_ThrowsTodoSubListDoesNotExistException()
+        public void EditSubList_NonExistingSubListId_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
-
             var nonExistingSubListId = 99;
             var newTitle = "Todo Sub List";
             var newDescription = "Todo Sub List Description";
 
-            fixture.Sut.Invoking(l => l.EditSubList(nonExistingSubListId, newTitle, newDescription)).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be("subListId");
+            _fixture.Sut.Invoking(l => l.EditSubList(nonExistingSubListId, newTitle, newDescription)).Should()
+                .Throw<TodoListException>().WithMessage($"*sublist*{nonExistingSubListId}*does not exist*");
         }
 
         [Fact]
-        public void EditSubList_DeletedSubListId_ThrowsTodoSubListDeletedException()
+        public void EditSubList_DeletedSubListId_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
-
             var deletedSubListId = 2;
             var newTitle = "Todo Sub List";
             var newDescription = "Todo Sub List Description";
 
-            fixture.Sut.Invoking(l => l.EditSubList(deletedSubListId, newTitle, newDescription)).Should()
-                .Throw<TodoSubListDeletedException>().And.SubListId.Should().Be(deletedSubListId);
+            _fixture.Sut.Invoking(l => l.EditSubList(deletedSubListId, newTitle, newDescription)).Should()
+                .Throw<TodoListException>().WithMessage($"*sublist*{deletedSubListId}*does not exist*");
         }
 
         [Theory]
@@ -62,12 +63,10 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [InlineData(" ")]
         public void EditSubList_NullOrWhiteSpaceTitle_ThrowsArgumentException(string newTitle)
         {
-            var fixture = new TodoListFixture();
-
             var subListId = 1;
             var newDescription = "Todo Sub List Description";
 
-            fixture.Sut.Invoking(l => l.EditSubList(subListId, newTitle, newDescription)).Should().Throw<ArgumentException>()
+            _fixture.Sut.Invoking(l => l.EditSubList(subListId, newTitle, newDescription)).Should().Throw<ArgumentException>()
                 .And.ParamName.Should().Be("title");
         }
     }

@@ -2,104 +2,80 @@
 using System.Linq;
 using FluentAssertions;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
+using Organizr.Domain.SharedKernel;
 using Xunit;
 
 namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 {
     public class EditTodoTests
     {
-        [Theory]
-        [InlineData(1)]
-        [InlineData(4)]
-        public void EditTodo_ValidData_TodoEdited(int todoId)
-        {
-            var fixture = new TodoListFixture();
+        private readonly TodoListFixture _fixture;
 
-            var todoToBeEdited = fixture.Sut.Items.Single(item => item.Id == todoId);
-            var originalOrdinal = todoToBeEdited.Ordinal;
+        public EditTodoTests()
+        {
+            _fixture = new TodoListFixture();
+        }
+
+        [Fact]
+        public void EditTodo_ValidData_TodoEdited()
+        {
+            var todoId = 1;
+
+            var todoToBeEdited = _fixture.Sut.Items.Single(item => item.Id == todoId);
+            var originalPosition = todoToBeEdited.Position;
             var originalIsCompleted = todoToBeEdited.IsCompleted;
             var originalIsDeleted = todoToBeEdited.IsDeleted;
 
             var newTitle = "Todo";
             var newDescription = "Todo Description";
-            var newDueDateUtc = fixture.ClientDateTimeToday.AddDays(5);
+            var newDueDateUtc = _fixture.CreateClientDateUtcWithDaysOffset(5);
 
-            fixture.Sut.EditTodo(todoId, newTitle, newDescription, newDueDateUtc, fixture.ClientTimeZoneOffsetInMinutes,
-                fixture.ClientDateValidator);
+            _fixture.Sut.EditTodo(todoId, newTitle, newDescription, newDueDateUtc);
 
             todoToBeEdited.Id.Should().Be(todoId);
             todoToBeEdited.Title.Should().Be(newTitle);
             todoToBeEdited.Description.Should().Be(newDescription);
             todoToBeEdited.DueDateUtc.Should().Be(newDueDateUtc);
-            todoToBeEdited.Ordinal.Should().Be(originalOrdinal);
+            todoToBeEdited.Position.Should().Be(originalPosition);
             todoToBeEdited.IsCompleted.Should().Be(originalIsCompleted);
             todoToBeEdited.IsDeleted.Should().Be(originalIsDeleted);
         }
 
         [Fact]
-        public void EditTodo_NonExistingTodoId_ThrowsTodoItemDoesNotExistException()
+        public void EditTodo_NonExistingTodoId_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
-
             var newTitle = "Todo";
             var newDescription = "Todo Description";
-            var newDueDate = fixture.ClientDateTimeToday.AddDays(5);
+            var newDueDate = _fixture.CreateClientDateUtcWithDaysOffset(5);
             var nonExistentTodoId = 99;
 
-            fixture.Sut.Invoking(l => l.EditTodo(nonExistentTodoId, newTitle, newDescription, newDueDate,
-                    fixture.ClientTimeZoneOffsetInMinutes, fixture.ClientDateValidator)).Should()
-                .Throw<ArgumentException>()
-                .And.ParamName.Should().Be("todoId");
+            _fixture.Sut.Invoking(l => l.EditTodo(nonExistentTodoId, newTitle, newDescription, newDueDate)).Should()
+                .Throw<TodoListException>().WithMessage($"*todo item*{nonExistentTodoId}*does not exist*");
         }
 
-        [Theory]
-        [InlineData(2)]
-        [InlineData(7)]
-        public void EditTodo_CompletedTodoId_ThrowsTodoItemCompletedException(int todoId)
+        [Fact]
+        public void EditTodo_DeletedTodoId_ThrowsTodoItemDeletedException()
         {
-            var fixture = new TodoListFixture();
+            var deletedTodoId = 3;
 
             var newTitle = "Todo";
             var newDescription = "Todo Description";
-            var newDueDate = fixture.ClientDateTimeToday.AddDays(5);
+            var newDueDateUtc = _fixture.CreateClientDateUtcWithDaysOffset(5);
 
-            fixture.Sut.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate,
-                    fixture.ClientTimeZoneOffsetInMinutes, fixture.ClientDateValidator)).Should()
-                .Throw<TodoItemCompletedException>().And.TodoId.Should().Be(todoId);
+            _fixture.Sut.Invoking(l => l.EditTodo(deletedTodoId, newTitle, newDescription, newDueDateUtc)).Should()
+                .Throw<TodoListException>().WithMessage($"*todo item*{deletedTodoId}*does not exist*");
         }
 
-        [Theory]
-        [InlineData(3)]
-        [InlineData(8)]
-        public void EditTodo_DeletedTodoId_ThrowsTodoItemDeletedException(int todoId)
+        [Fact]
+        public void EditTodo_DeletedSubListTodoId_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
-
+            var deletedSubListTodoId = 11;
             var newTitle = "Todo";
             var newDescription = "Todo Description";
-            var newDueDateUtc = fixture.ClientDateTimeToday.AddDays(5);
+            var newDueDateUtc = _fixture.CreateClientDateUtcWithDaysOffset(5);
 
-            fixture.Sut.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDateUtc,
-                    fixture.ClientTimeZoneOffsetInMinutes, fixture.ClientDateValidator)).Should()
-                .Throw<TodoItemDeletedException>().And.TodoId.Should().Be(todoId);
-        }
-
-        [Theory]
-        [InlineData(11)]
-        [InlineData(12)]
-        [InlineData(13)]
-        public void EditTodo_DeletedSubListTodoId_ThrowsTodoSubListDeletedException(int deletedSubListTodoId)
-        {
-            var fixture = new TodoListFixture();
-
-            var newTitle = "Todo";
-            var newDescription = "Todo Description";
-            var newDueDateUtc = fixture.ClientDateTimeToday.AddDays(5);
-            var deletedSubListId = 2;
-
-            fixture.Sut.Invoking(l => l.EditTodo(deletedSubListTodoId, newTitle, newDescription, newDueDateUtc,
-                    fixture.ClientTimeZoneOffsetInMinutes, fixture.ClientDateValidator)).Should()
-                .Throw<TodoSubListDeletedException>().And.SubListId.Should().Be(deletedSubListId);
+            _fixture.Sut.Invoking(l => l.EditTodo(deletedSubListTodoId, newTitle, newDescription, newDueDateUtc)).Should()
+                .Throw<TodoListException>().WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
         }
 
         [Theory]
@@ -108,46 +84,24 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [InlineData(" ")]
         public void EditTodo_NullOrWhiteSpaceTitle_ThrowsArgumentException(string newTitle)
         {
-            var fixture = new TodoListFixture();
-
             var todoId = 1;
             var newDescription = "Todo Description";
-            var newDueDate = fixture.ClientDateTimeToday.AddDays(5);
+            var newDueDate = _fixture.CreateClientDateUtcWithDaysOffset(5);
 
-            fixture.Sut.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate,
-                    fixture.ClientTimeZoneOffsetInMinutes, fixture.ClientDateValidator)).Should()
-                .Throw<ArgumentException>()
-                .And.ParamName.Should().Be("title");
+            _fixture.Sut.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate)).Should()
+                .Throw<ArgumentException>().And.ParamName.Should().Be("title");
         }
 
         [Fact]
-        public void EditTodo_DueDateInThePast_ThrowsDueDateInThePastException()
+        public void EditTodo_DueDateInThePast_ThrowsTodoListException()
         {
-            var fixture = new TodoListFixture();
-
             var todoId = 1;
             var newTitle = "Todo";
             var newDescription = "Todo Description";
-            var newDueDateUtc = fixture.ClientDateTimeToday.AddDays(-1);
+            var newDueDateUtc = _fixture.CreateClientDateUtcWithDaysOffset(-1);
 
-            fixture.Sut.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDateUtc,
-                    fixture.ClientTimeZoneOffsetInMinutes, fixture.ClientDateValidator)).Should()
-                .Throw<DueDateBeforeTodayException>().And.DueDate.Should().Be(newDueDateUtc);
-        }
-
-        [Fact]
-        public void EditTodo_DueDateWithTimeComponent_ThrowsArgumentException()
-        {
-            var fixture = new TodoListFixture();
-
-            var todoId = 1;
-            var title = "Todo";
-            var description = "Todo Description";
-            var dueDateUtc = new DateTime(fixture.ClientDateTimeToday.Ticks + 1, DateTimeKind.Utc);
-
-            fixture.Sut.Invoking(l => l.EditTodo(todoId, title, description, dueDateUtc, fixture.ClientTimeZoneOffsetInMinutes,
-                    fixture.ClientDateValidator)).Should().Throw<ArgumentException>().And.ParamName.Should()
-                .Be("dueDateUtc");
+            _fixture.Sut.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDateUtc)).Should()
+                .Throw<TodoListException>().WithMessage("*due date*before client today*");
         }
     }
 }

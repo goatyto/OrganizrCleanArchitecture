@@ -8,7 +8,6 @@ using Moq;
 using Organizr.Application.Planning.Common.Exceptions;
 using Organizr.Application.Planning.TodoLists.Commands.AddTodoItem;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
-using Organizr.Domain.Planning.Services;
 using Organizr.Domain.SharedKernel;
 using Xunit;
 
@@ -21,7 +20,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
         public AddTodoItemCommandTests()
         {
             _sut = new AddTodoItemCommandHandler(CurrentUserServiceMock.Object, ResourceAuthorizationServiceMock.Object,
-                ClientDateValidator, TodoListRepositoryMock.Object);
+                TodoListRepositoryMock.Object);
         }
 
         [Fact]

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Moq;
 using Organizr.Application.Planning.Common.Interfaces;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
-using Organizr.Domain.Planning.Services;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.UnitTests.TodoLists.Commands
@@ -16,7 +15,6 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
         protected readonly Mock<IIdentityService> CurrentUserServiceMock;
         protected readonly Mock<IResourceAuthorizationService<TodoList>> ResourceAuthorizationServiceMock;
         protected readonly Mock<ITodoListRepository> TodoListRepositoryMock;
-        protected readonly ClientDateValidator ClientDateValidator;
         protected readonly DateTime ClientDateToday;
         protected readonly int ClientTimeZoneOffsetInMinutes;
 
@@ -24,8 +22,6 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
         {
             TodoListId = Guid.NewGuid();
             var creatorUserId = "User1";
-
-            ClientDateValidator = new ClientDateValidator();
 
             ClientDateToday = DateTime.UtcNow.Date;
             ClientTimeZoneOffsetInMinutes = 0;
@@ -35,8 +31,8 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
             todoList.AddSubList("TodoSubList Title", "TodoSubList Description");
             todoList.AddSubList("TodoSubList Title2", "TodoSubList Description2");
 
-            todoList.AddTodo("TodoItem Title", "TodoItem Description", ClientDateToday.AddDays(1), ClientTimeZoneOffsetInMinutes, ClientDateValidator);
-            todoList.AddTodo("TodoItem Title", "TodoItem Description", ClientDateToday.AddDays(2), ClientTimeZoneOffsetInMinutes, ClientDateValidator);
+            todoList.AddTodo("TodoItem Title", "TodoItem Description", ClientDateUtc.Create(ClientDateToday.AddDays(1), ClientTimeZoneOffsetInMinutes));
+            todoList.AddTodo("TodoItem Title", "TodoItem Description", ClientDateUtc.Create(ClientDateToday.AddDays(2), ClientTimeZoneOffsetInMinutes));
 
             CurrentUserServiceMock = new Mock<IIdentityService>();
             CurrentUserServiceMock.Setup(m => m.CurrentUserId).Returns(creatorUserId);

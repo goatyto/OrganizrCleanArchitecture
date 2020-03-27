@@ -7,23 +7,28 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 {
     public class AddSubListTests
     {
+        private readonly TodoListFixture _fixture;
+
+        public AddSubListTests()
+        {
+            _fixture = new TodoListFixture();
+        }
+
         [Fact]
         public void AddSubList_ValidData_SubListItemAdded()
         {
-            var fixture = new TodoListFixture();
-
             var title = "Todo Sub List";
             var description = "Todo Sub List Description";
 
-            var initialSubListCount = fixture.Sut.SubLists.Count;
+            var initialSubListCount = _fixture.Sut.SubLists.Count;
 
-            fixture.Sut.AddSubList(title, description);
+            _fixture.Sut.AddSubList(title, description);
 
-            var insertedSubList = fixture.Sut.SubLists.Last();
+            var insertedSubList = _fixture.Sut.SubLists.Last();
 
             insertedSubList.Id.Should().Be(initialSubListCount + 1);
             insertedSubList.Title.Should().Be(title);
-            insertedSubList.Ordinal.Should().Be(fixture.Sut.SubLists.Count(list => !list.IsDeleted));
+            insertedSubList.Ordinal.Should().Be(_fixture.Sut.SubLists.Count(list => !list.IsDeleted));
             insertedSubList.Description.Should().Be(description);
             insertedSubList.IsDeleted.Should().Be(false);
         }
@@ -34,11 +39,9 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [InlineData(" ")]
         public void AddSubList_NullOrWhiteSpaceTitle_ThrowsArgumentException(string title)
         {
-            var fixture = new TodoListFixture();
-
             var description = "Todo Sub List Description";
 
-            fixture.Sut.Invoking(l => l.AddSubList(title, description)).Should().Throw<ArgumentException>().And
+            _fixture.Sut.Invoking(l => l.AddSubList(title, description)).Should().Throw<ArgumentException>().And
                 .ParamName.Should().Be("title");
         }
     }

@@ -8,47 +8,41 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 {
     public class DeleteTodoTests
     {
-        [Theory]
-        [InlineData(1)]
-        [InlineData(2)]
-        [InlineData(3)]
-        [InlineData(4)]
-        [InlineData(5)]
-        [InlineData(6)]
-        public void DeleteTodo_ValidTodoId_TodoMarkedDeleted(int todoId)
+        private readonly TodoListFixture _fixture;
+
+        public DeleteTodoTests()
         {
-            var fixture = new TodoListFixture();
+            _fixture = new TodoListFixture();
+        }
 
-            var deletedTodo = fixture.GetTodoItemById(todoId);
+        [Fact]
+        public void DeleteTodo_ValidTodoId_TodoMarkedDeleted()
+        {
+            var todoId = 1;
 
-            fixture.Sut.DeleteTodo(todoId);
+            var deletedTodo = _fixture.GetTodoItemById(todoId);
+
+            _fixture.Sut.DeleteTodo(todoId);
 
             deletedTodo.IsDeleted.Should().Be(true);
         }
 
         [Fact]
-        public void DeleteTodo_NonExistentTodoId_ThrowsTodoItemDoesNotExistException()
+        public void DeleteTodo_NonExistentTodoId_TodoListException()
         {
-            var fixture = new TodoListFixture();
-
             var nonExistentTodoId = 99;
 
-            fixture.Sut.Invoking(l => l.DeleteTodo(nonExistentTodoId)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be("todoId");
+            _fixture.Sut.Invoking(l => l.DeleteTodo(nonExistentTodoId)).Should().Throw<TodoListException>()
+                .WithMessage($"*todo item*{nonExistentTodoId}*does not exist*");
         }
 
-        [Theory]
-        [InlineData(11)]
-        [InlineData(12)]
-        [InlineData(13)]
-        public void DeleteTodo_DeletedSubListTodoId_ThrowsTodoSubListDeletedException(int todoId)
+        [Fact]
+        public void DeleteTodo_DeletedSubListTodoId_ThrowsTodoSubListDeletedException()
         {
-            var fixture = new TodoListFixture();
+            var deletedSubListTodoId = 11;
 
-            var deletedSubListId = 2;
-
-            fixture.Sut.Invoking(l => l.DeleteTodo(todoId)).Should().Throw<TodoSubListDeletedException>().And
-                .SubListId.Should().Be(deletedSubListId);
+            _fixture.Sut.Invoking(l => l.DeleteTodo(deletedSubListTodoId)).Should().Throw<TodoListException>()
+                .WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
         }
     }
 }

@@ -57,7 +57,7 @@ namespace Organizr.Application.Planning.TodoLists.Commands.MoveTodoItem
             if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
                 throw new AccessDeniedException<TodoList>(request.TodoListId, currentUserId);
 
-            todoList.MoveTodo(request.Id, request.NewOrdinal, request.NewSubListId);
+            todoList.MoveTodo(request.Id, new TodoItemPosition(request.NewOrdinal), request.NewSubListId);
 
             _todoListRepository.Update(todoList);
 
