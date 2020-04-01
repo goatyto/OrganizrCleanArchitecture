@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Organizr.Domain.Planning;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Domain.SharedKernel;
 
@@ -9,13 +10,13 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
     public class TodoListFixture : IDisposable
     {
         public TodoList Sut { get; }
-        public Guid TodoListId => Guid.NewGuid();
+        public TodoListId TodoListId => new TodoListId(Guid.NewGuid());
         private readonly DateTime _clientDateTimeToday;
         private readonly int _clientTimeZoneOffsetInMinutes;
 
         public TodoListFixture()
         {
-            Sut = TodoList.Create(TodoListId, "User1", "Todo List 1", "Todo List 1 Description");
+            Sut = TodoList.Create(TodoListId, new CreatorUser("User1"), "Todo List 1", "Todo List 1 Description");
 
             var clientDateTimeNow = DateTime.UtcNow;
             
@@ -34,38 +35,38 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             Sut.AddTodo("Todo Item 4 in Main list", "Todo Item 4 in Main list Description", CreateClientDateUtcWithDaysOffset(4));
             Sut.AddTodo("Todo Item 5 in Main list", "Todo Item 5 in Main list Description", CreateClientDateUtcWithDaysOffset(5));
 
-            Sut.AddTodo("Todo Item 1 in Sublist 1", "Todo Item 1 in Sublist 1 Description", CreateClientDateUtcWithDaysOffset(1), 1);
-            Sut.AddTodo("Todo Item 2 in Sublist 1", "Todo Item 2 in Sublist 1 Description", CreateClientDateUtcWithDaysOffset(2), 1);
-            Sut.AddTodo("Todo Item 3 in Sublist 1", "Todo Item 3 in Sublist 1 Description", CreateClientDateUtcWithDaysOffset(3), 1);
-            Sut.AddTodo("Todo Item 4 in Sublist 1", "Todo Item 4 in Sublist 1 Description", CreateClientDateUtcWithDaysOffset(4), 1);
-            Sut.AddTodo("Todo Item 5 in Sublist 1", "Todo Item 5 in Sublist 1 Description", CreateClientDateUtcWithDaysOffset(5), 1);
+            Sut.AddTodo("Todo Item 1 in Sublist 1", "Todo Item 1 in Sublist 1 Description", CreateClientDateUtcWithDaysOffset(1), (TodoSubListId)1);
+            Sut.AddTodo("Todo Item 2 in Sublist 1", "Todo Item 2 in Sublist 1 Description", CreateClientDateUtcWithDaysOffset(2), (TodoSubListId)1);
+            Sut.AddTodo("Todo Item 3 in Sublist 1", "Todo Item 3 in Sublist 1 Description", CreateClientDateUtcWithDaysOffset(3), (TodoSubListId)1);
+            Sut.AddTodo("Todo Item 4 in Sublist 1", "Todo Item 4 in Sublist 1 Description", CreateClientDateUtcWithDaysOffset(4), (TodoSubListId)1);
+            Sut.AddTodo("Todo Item 5 in Sublist 1", "Todo Item 5 in Sublist 1 Description", CreateClientDateUtcWithDaysOffset(5), (TodoSubListId)1);
 
-            Sut.AddTodo("Todo Item 1 in Sublist 2", "Todo Item 1 in Sublist 2 Description", CreateClientDateUtcWithDaysOffset(1), 2);
-            Sut.AddTodo("Todo Item 2 in Sublist 2", "Todo Item 2 in Sublist 2 Description", CreateClientDateUtcWithDaysOffset(2), 2);
-            Sut.AddTodo("Todo Item 3 in Sublist 2", "Todo Item 3 in Sublist 2 Description", CreateClientDateUtcWithDaysOffset(3), 2);
+            Sut.AddTodo("Todo Item 1 in Sublist 2", "Todo Item 1 in Sublist 2 Description", CreateClientDateUtcWithDaysOffset(1), (TodoSubListId)2);
+            Sut.AddTodo("Todo Item 2 in Sublist 2", "Todo Item 2 in Sublist 2 Description", CreateClientDateUtcWithDaysOffset(2), (TodoSubListId)2);
+            Sut.AddTodo("Todo Item 3 in Sublist 2", "Todo Item 3 in Sublist 2 Description", CreateClientDateUtcWithDaysOffset(3), (TodoSubListId)2);
 
-            Sut.SetCompletedTodo(2);
-            Sut.SetCompletedTodo(7);
-            Sut.SetCompletedTodo(12);
+            Sut.SetCompletedTodo((TodoItemId)2);
+            Sut.SetCompletedTodo((TodoItemId)7);
+            Sut.SetCompletedTodo((TodoItemId)12);
 
-            Sut.DeleteTodo(3);
-            Sut.DeleteTodo(8);
-            Sut.DeleteTodo(13);
+            Sut.DeleteTodo((TodoItemId)3);
+            Sut.DeleteTodo((TodoItemId)8);
+            Sut.DeleteTodo((TodoItemId)13);
 
-            Sut.DeleteSubList(2);
+            Sut.DeleteSubList((TodoSubListId)2);
         }
 
-        public int? GetSubListIdForTodoItem(int todoId)
+        public TodoSubListId GetSubListIdForTodoItem(TodoItemId todoId)
         {
-            int? subListId = null;
+            TodoSubListId subListId = null;
 
-            if (Sut.Items.All(it => it.Id != todoId))
+            if (Sut.Items.All(it => it.TodoItemId != todoId))
             {
                 foreach (var subList in Sut.SubLists)
                 {
-                    if (subList.Items.Any(it => it.Id == todoId))
+                    if (subList.Items.Any(it => it.TodoItemId == todoId))
                     {
-                        subListId = subList.Id;
+                        subListId = subList.TodoSubListId;
                         break;
                     }
                 }
@@ -74,14 +75,14 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             return subListId;
         }
 
-        public IEnumerable<TodoItem> GetTodoItems(int? subListId = null)
+        public IEnumerable<TodoItem> GetTodoItems(TodoSubListId subListId = null)
         {
-            return !subListId.HasValue ? Sut.Items : Sut.SubLists.Single(sl => sl.Id == subListId.Value).Items;
+            return subListId == null ? Sut.Items : Sut.SubLists.Single(sl => sl.TodoSubListId == subListId).Items;
         }
 
-        public TodoItem GetTodoItemById(int todoId)
+        public TodoItem GetTodoItemById(TodoItemId todoId)
         {
-            return Sut.Items.Union(Sut.SubLists.SelectMany(sl => sl.Items)).Single(ti => ti.Id == todoId);
+            return Sut.Items.Union(Sut.SubLists.SelectMany(sl => sl.Items)).Single(ti => ti.TodoItemId == todoId);
         }
 
         public ClientDateUtc CreateClientDateUtcWithDaysOffset(int daysOffset)

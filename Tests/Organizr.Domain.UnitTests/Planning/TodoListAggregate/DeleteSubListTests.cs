@@ -18,9 +18,9 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void DeleteSubList_SubListId_MarksSubListAsDeleted()
         {
-            var subListId = 1;
+            var subListId = (TodoSubListId)1;
 
-            var subListToBeDeleted = _fixture.Sut.SubLists.Single(sl => sl.Id == subListId);
+            var subListToBeDeleted = _fixture.Sut.SubLists.Single(sl => sl.TodoSubListId == subListId);
 
             _fixture.Sut.DeleteSubList(subListId);
 
@@ -30,7 +30,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void DeleteSubList_NonExistentSubListId_ThrowsTodoListException()
         {
-            var nonExistentSubListId = 99;
+            var nonExistentSubListId = (TodoSubListId)99;
 
             _fixture.Sut.Invoking(l => l.DeleteSubList(nonExistentSubListId)).Should()
                 .Throw<TodoListException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");

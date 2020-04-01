@@ -10,87 +10,56 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
 {
     public class UserGroupMembershipTests
     {
+        private readonly UserGroupFixture _fixture;
+
+        public UserGroupMembershipTests()
+        {
+            _fixture = new UserGroupFixture();
+        }
+
         [Fact]
         public void AddMember_ValidData_MemberAdded()
         {
-            var fixture = new UserGroupFixture();
+            var newMemberId = new UserGroupMember("User3");
+            _fixture.Sut.AddMember(newMemberId);
 
-            var newMemberId = "User3";
-            fixture.Sut.AddMember(newMemberId);
+            var addedMemberId = _fixture.Sut.Members.Last();
 
-            var addedMemberId = fixture.Sut.Membership.Last();
-
-            addedMemberId.UserId.Should().Be(newMemberId);
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData(" ")]
-        public void AddMember_NullOrWhiteSpaceUserId_ThrowsArgumentException(string nullOrWhiteSpaceUserId)
-        {
-            var fixture = new UserGroupFixture();
-
-            fixture.Sut.Invoking(s => s.AddMember(nullOrWhiteSpaceUserId)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be("userId");
+            addedMemberId.Should().Be(newMemberId);
         }
 
         [Fact]
         public void AddMember_ExistingMemberId_ThrowsUserAlreadyMemberException()
         {
-            var fixture = new UserGroupFixture();
-
-            fixture.Sut.Invoking(s => s.AddMember(fixture.ExistingUserGroupMemberId)).Should()
-                .Throw<UserAlreadyMemberException>().Where(exception =>
-                    exception.UserGroupId == fixture.UserGroupId &&
-                    exception.UserId == fixture.ExistingUserGroupMemberId);
+            _fixture.Sut.Invoking(s => s.AddMember(_fixture.ExistingUserGroupMember)).Should()
+                .Throw<UserGroupException>().WithMessage($"*user*{_fixture.ExistingUserGroupMember}*already a member*");
         }
 
         [Fact]
         public void RemoveMember_ValidData_MemberRemoved()
         {
-            var fixture = new UserGroupFixture();
-            var initialMembershipCount = fixture.Sut.Membership.Count;
+            var initialMembershipCount = _fixture.Sut.Members.Count;
 
-            fixture.Sut.RemoveMember(fixture.ExistingUserGroupMemberId);
+            _fixture.Sut.RemoveMember(_fixture.ExistingUserGroupMember);
 
-            fixture.Sut.Membership.Should().HaveCount(initialMembershipCount - 1).And
-                .NotContain(membership => membership.UserId == fixture.ExistingUserGroupMemberId);
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData(" ")]
-        public void RemoveMember_NullOrWhiteSpaceUserId_ThrowsArgumentException(string nullOrWhiteSpaceUserId)
-        {
-            var fixture = new UserGroupFixture();
-
-            fixture.Sut.Invoking(s => s.RemoveMember(nullOrWhiteSpaceUserId)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be("userId");
+            _fixture.Sut.Members.Should().HaveCount(initialMembershipCount - 1).And
+                .NotContain(member => member == _fixture.ExistingUserGroupMember);
         }
 
         [Fact]
         public void RemoveMember_CreatorMemberId_ThrowsCreatorCannotBeRemovedException()
         {
-            var fixture = new UserGroupFixture();
-
-            fixture.Sut.Invoking(s => s.RemoveMember(fixture.UserGroupCreatorId)).Should()
-                .Throw<CreatorCannotBeRemovedException>()
-                .Where(exception => exception.UserGroupId == fixture.UserGroupId);
+            _fixture.Sut.Invoking(s => s.RemoveMember((UserGroupMember)_fixture.UserGroupCreator)).Should()
+                .Throw<UserGroupException>().WithMessage("*creator*cannot be removed*");
         }
 
         [Fact]
         public void RemoveMember_NonExistingMemberId_ThrowsUserNotAMemberException()
         {
-            var fixture = new UserGroupFixture();
+            var nonExistentMember = new UserGroupMember("User99");
 
-            var nonExistentMemberUserId = "User99";
-
-            fixture.Sut.Invoking(s => s.RemoveMember(nonExistentMemberUserId)).Should()
-                .Throw<UserNotAMemberException>().Where(exception =>
-                    exception.UserGroupId == fixture.UserGroupId &&
-                    exception.UserId == nonExistentMemberUserId);
+            _fixture.Sut.Invoking(s => s.RemoveMember(nonExistentMember)).Should()
+                .Throw<UserGroupException>().WithMessage($"*user*{nonExistentMember}*not a member*");
         }
     }
 }

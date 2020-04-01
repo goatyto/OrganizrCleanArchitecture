@@ -4,11 +4,11 @@ using Ardalis.GuardClauses;
 
 namespace Organizr.Domain.SharedKernel
 {
-    public abstract class Entity<TKey> where TKey: IEquatable<TKey>
+    public abstract class Entity<TKey> where TKey: ValueObject
     {
         int? _requestedHashCode;
 
-        public virtual TKey Id { get; protected set; }
+        protected abstract TKey Identity { get; }
 
         private readonly List<IDomainEvent> _domainEvents;
         public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
@@ -39,7 +39,7 @@ namespace Organizr.Domain.SharedKernel
 
         public bool IsTransient()
         {
-            return Id.Equals(default(TKey));
+            return Identity.Equals(default(TKey));
         }
 
         public override bool Equals(object obj)
@@ -58,7 +58,7 @@ namespace Organizr.Domain.SharedKernel
             if (item.IsTransient() || IsTransient())
                 return false;
             else
-                return item.Id.Equals(Id);
+                return item.Identity.Equals(Identity);
         }
 
         public override int GetHashCode()
@@ -66,7 +66,7 @@ namespace Organizr.Domain.SharedKernel
             if (!IsTransient())
             {
                 if (!_requestedHashCode.HasValue)
-                    _requestedHashCode = Id.GetHashCode() ^ 31; // XOR for random distribution (http://blogs.msdn.com/b/ericlippert/archive/2011/02/28/guidelines-and-rules-for-gethashcode.aspx)
+                    _requestedHashCode = Identity.GetHashCode() ^ 31; // XOR for random distribution (http://blogs.msdn.com/b/ericlippert/archive/2011/02/28/guidelines-and-rules-for-gethashcode.aspx)
 
                 return _requestedHashCode.Value;
             }
@@ -86,10 +86,5 @@ namespace Organizr.Domain.SharedKernel
         {
             return !(left == right);
         }
-    }
-
-    public abstract class Entity : Entity<int>
-    {
-
     }
 }

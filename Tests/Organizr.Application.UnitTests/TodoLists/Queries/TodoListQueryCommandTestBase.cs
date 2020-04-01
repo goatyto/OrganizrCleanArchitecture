@@ -12,7 +12,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Queries
 {
     public abstract class TodoListQueryCommandTestBase
     {
-        protected readonly string UserId;
+        private readonly string UserId;
         protected readonly Mock<IIdentityService> CurrentUserServiceMock;
         protected readonly Mock<ITodoListQueries> TodoListQueriesMock;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
@@ -15,53 +16,57 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             _fixture = new TodoListFixture();
         }
 
-        [Theory]
-        [InlineData(1, 4)]
-        [InlineData(3, 3)]
-        [InlineData(5, 2)]
-        [InlineData(3, 1)]
-        [InlineData(4, 3)]
-        public void MoveSubList_ValidPosition_SubListOrdinalChanges(int subListId, int targetOrdinal)
+        public static IEnumerable<object[]> MoveSubListValidMemberData = new List<object[]>
         {
-            var subListToBeMoved = _fixture.Sut.SubLists.Single(sl => sl.Id == subListId);
+            new object[]{(TodoSubListId)1, (TodoSubListPosition)4},
+            new object[]{(TodoSubListId)3, (TodoSubListPosition)3},
+            new object[]{(TodoSubListId)5, (TodoSubListPosition)2},
+            new object[]{(TodoSubListId)3, (TodoSubListPosition)1},
+            new object[]{(TodoSubListId)4, (TodoSubListPosition)3}
+        };
 
-            _fixture.Sut.MoveSubList(subListId, targetOrdinal);
+        [Theory, MemberData(nameof(MoveSubListValidMemberData))]
+        public void MoveSubList_ValidPosition_SubListOrdinalChanges(TodoSubListId subListId, TodoSubListPosition destinationPosition)
+        {
+            var subListToBeMoved = _fixture.Sut.SubLists.Single(sl => sl.TodoSubListId == subListId);
 
-            subListToBeMoved.Ordinal.Should().Be(targetOrdinal);
+            _fixture.Sut.MoveSubList(subListId, destinationPosition);
+
+            subListToBeMoved.Position.Should().Be(destinationPosition);
 
             var resultSubListOrdinals =
-                _fixture.Sut.SubLists.Where(sl => !sl.IsDeleted).OrderBy(sl => sl.Ordinal).ToList();
+                _fixture.Sut.SubLists.Where(sl => !sl.IsDeleted).OrderBy(sl => sl.Position).ToList();
 
             for (int i = 0; i < resultSubListOrdinals.Count; i++)
             {
-                resultSubListOrdinals[i].Ordinal.Should().Be(i + 1);
+                resultSubListOrdinals[i].Position.Should().Be((TodoSubListPosition)(i + 1));
             }
         }
 
         [Fact]
         public void MoveSubList_DeletedSubList_ThrowsTodoListException()
         {
-            var deletedSubListId = 2;
+            var deletedSubListId = (TodoSubListId)2;
 
-            _fixture.Sut.Invoking(l => l.MoveSubList(deletedSubListId, 4)).Should().Throw<TodoListException>()
+            _fixture.Sut.Invoking(l => l.MoveSubList(deletedSubListId, (TodoSubListPosition)4)).Should().Throw<TodoListException>()
                 .WithMessage($"*sublist*{deletedSubListId}*does not exist*");
         }
 
         [Fact]
         public void MoveSubList_OutOfRangeOrdinal_ThrowsTodoListException()
         {
-            var invalidOrdinal = 99;
+            var invalidPosition = (TodoSubListPosition)99;
 
-            _fixture.Sut.Invoking(l => l.MoveSubList(3, invalidOrdinal)).Should().Throw<TodoListException>()
+            _fixture.Sut.Invoking(l => l.MoveSubList((TodoSubListId)3, invalidPosition)).Should().Throw<TodoListException>()
                 .WithMessage("*ordinal*out of range*");
         }
 
         [Fact]
         public void MoveSubList_NonExistentSubListId_ThrowsTodoListException()
         {
-            var nonExistentSubListId = 99;
+            var nonExistentSubListId = (TodoSubListId)99;
 
-            _fixture.Sut.Invoking(l => l.MoveSubList(nonExistentSubListId, 4)).Should()
+            _fixture.Sut.Invoking(l => l.MoveSubList(nonExistentSubListId, (TodoSubListPosition)4)).Should()
                 .Throw<TodoListException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");
         }
     }

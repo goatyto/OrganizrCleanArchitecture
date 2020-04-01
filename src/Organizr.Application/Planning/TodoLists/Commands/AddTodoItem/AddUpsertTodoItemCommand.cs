@@ -52,7 +52,8 @@ namespace Organizr.Application.Planning.TodoLists.Commands.AddTodoItem
 
         public async Task<Unit> Handle(AddTodoItemCommand request, CancellationToken cancellationToken)
         {
-            var todoList = await _todoListRepository.GetAsync(request.TodoListId, cancellationToken: cancellationToken);
+            var todoListId = new TodoListId(request.TodoListId);
+            var todoList = await _todoListRepository.GetAsync(todoListId, cancellationToken: cancellationToken);
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.TodoListId);
@@ -62,7 +63,10 @@ namespace Organizr.Application.Planning.TodoLists.Commands.AddTodoItem
             if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
                 throw new AccessDeniedException<TodoList>(request.TodoListId, currentUserId);
 
-            todoList.AddTodo(request.Title, request.Description, ClientDateUtc.Create(request.DueDateUtc, request.ClientTimeZoneOffsetInMinutes), request.SubListId);
+            var dueDateUtc = ClientDateUtc.Create(request.DueDateUtc, request.ClientTimeZoneOffsetInMinutes);
+            var subListId = TodoSubListId.Create(request.SubListId);
+
+            todoList.AddTodo(request.Title, request.Description, dueDateUtc, subListId);
 
             _todoListRepository.Update(todoList);
 

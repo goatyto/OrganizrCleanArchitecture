@@ -19,9 +19,9 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void EditTodo_ValidData_TodoEdited()
         {
-            var todoId = 1;
+            var todoId = (TodoItemId)1;
 
-            var todoToBeEdited = _fixture.Sut.Items.Single(item => item.Id == todoId);
+            var todoToBeEdited = _fixture.Sut.Items.Single(item => item.TodoItemId == todoId);
             var originalPosition = todoToBeEdited.Position;
             var originalIsCompleted = todoToBeEdited.IsCompleted;
             var originalIsDeleted = todoToBeEdited.IsDeleted;
@@ -32,7 +32,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 
             _fixture.Sut.EditTodo(todoId, newTitle, newDescription, newDueDateUtc);
 
-            todoToBeEdited.Id.Should().Be(todoId);
+            todoToBeEdited.TodoItemId.Should().Be(todoId);
             todoToBeEdited.Title.Should().Be(newTitle);
             todoToBeEdited.Description.Should().Be(newDescription);
             todoToBeEdited.DueDateUtc.Should().Be(newDueDateUtc);
@@ -47,7 +47,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var newTitle = "Todo";
             var newDescription = "Todo Description";
             var newDueDate = _fixture.CreateClientDateUtcWithDaysOffset(5);
-            var nonExistentTodoId = 99;
+            var nonExistentTodoId = (TodoItemId)99;
 
             _fixture.Sut.Invoking(l => l.EditTodo(nonExistentTodoId, newTitle, newDescription, newDueDate)).Should()
                 .Throw<TodoListException>().WithMessage($"*todo item*{nonExistentTodoId}*does not exist*");
@@ -56,7 +56,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void EditTodo_DeletedTodoId_ThrowsTodoItemDeletedException()
         {
-            var deletedTodoId = 3;
+            var deletedTodoId = (TodoItemId)3;
 
             var newTitle = "Todo";
             var newDescription = "Todo Description";
@@ -69,7 +69,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void EditTodo_DeletedSubListTodoId_ThrowsTodoListException()
         {
-            var deletedSubListTodoId = 11;
+            var deletedSubListTodoId = (TodoItemId)11;
             var newTitle = "Todo";
             var newDescription = "Todo Description";
             var newDueDateUtc = _fixture.CreateClientDateUtcWithDaysOffset(5);
@@ -84,7 +84,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [InlineData(" ")]
         public void EditTodo_NullOrWhiteSpaceTitle_ThrowsArgumentException(string newTitle)
         {
-            var todoId = 1;
+            var todoId = (TodoItemId)1;
             var newDescription = "Todo Description";
             var newDueDate = _fixture.CreateClientDateUtcWithDaysOffset(5);
 
@@ -95,7 +95,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void EditTodo_DueDateInThePast_ThrowsTodoListException()
         {
-            var todoId = 1;
+            var todoId = (TodoItemId)1;
             var newTitle = "Todo";
             var newDescription = "Todo Description";
             var newDueDateUtc = _fixture.CreateClientDateUtcWithDaysOffset(-1);

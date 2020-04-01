@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 using Organizr.Domain.SharedKernel;
 
@@ -18,14 +19,15 @@ namespace Organizr.Infrastructure.Persistence.Repositories
             _context = context;
         }
 
-        public Task<UserGroup> GetAsync(Guid id, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<UserGroup> GetAsync(UserGroupId id, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            return await _context.UserGroups.Include(ug => ug.Members)
+                .SingleAsync(ug => ug.UserGroupId == id, cancellationToken);
         }
 
         public void Add(UserGroup userGroup)
         {
-            throw new NotImplementedException();
+            _context.UserGroups.Add(userGroup);
         }
 
         public void Update(UserGroup userGroup)

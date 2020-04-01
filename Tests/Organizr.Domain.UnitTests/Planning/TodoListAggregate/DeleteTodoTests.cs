@@ -18,7 +18,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void DeleteTodo_ValidTodoId_TodoMarkedDeleted()
         {
-            var todoId = 1;
+            var todoId = (TodoItemId)1;
 
             var deletedTodo = _fixture.GetTodoItemById(todoId);
 
@@ -30,7 +30,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void DeleteTodo_NonExistentTodoId_TodoListException()
         {
-            var nonExistentTodoId = 99;
+            var nonExistentTodoId = (TodoItemId)99;
 
             _fixture.Sut.Invoking(l => l.DeleteTodo(nonExistentTodoId)).Should().Throw<TodoListException>()
                 .WithMessage($"*todo item*{nonExistentTodoId}*does not exist*");
@@ -39,7 +39,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void DeleteTodo_DeletedSubListTodoId_ThrowsTodoSubListDeletedException()
         {
-            var deletedSubListTodoId = 11;
+            var deletedSubListTodoId = (TodoItemId)11;
 
             _fixture.Sut.Invoking(l => l.DeleteTodo(deletedSubListTodoId)).Should().Throw<TodoListException>()
                 .WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");

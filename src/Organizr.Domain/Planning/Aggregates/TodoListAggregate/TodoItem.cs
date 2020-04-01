@@ -5,8 +5,10 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 {
-    public class TodoItem : Entity<int>
+    public class TodoItem : Entity<TodoItemId>
     {
+        protected override TodoItemId Identity => TodoItemId;
+        public TodoItemId TodoItemId { get; }
         public string Title { get; private set; }
         public string Description { get; private set; }
         public TodoItemPosition Position { get; private set; }
@@ -19,9 +21,9 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
         }
 
-        internal TodoItem(int id, string title, TodoItemPosition position, string description = null, DateTime? dueDateUtc = null) : this()
+        internal TodoItem(TodoItemId id, string title, TodoItemPosition position, string description = null, DateTime? dueDateUtc = null) : this()
         {
-            Id = id;
+            TodoItemId = id;
             Title = title;
             Position = position;
             Description = description;

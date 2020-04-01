@@ -5,6 +5,6 @@ namespace Organizr.Application.Planning.Common.Interfaces
 {
     public interface IIdGenerator
     {
-        Guid GenerateNext<TEntity>() where TEntity : Entity<Guid>;
+        Guid GenerateNext<TEntity>() where TEntity : IAggregateRoot;
     }
 }

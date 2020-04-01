@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Text;
 using Organizr.Domain.SharedKernel;
 
-namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
+namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 {
-    public class TodoListId : ValueObject
+    public class UserGroupId : ValueObject
     {
         public Guid Id { get; private set; }
 
-        public TodoListId(Guid id)
+        public UserGroupId(Guid id)
         {
             Id = id;
         }
 
-        public static explicit operator TodoListId(Guid id) => new TodoListId(id);
+        public static explicit operator UserGroupId(Guid id) => new UserGroupId(id);
 
         protected override IEnumerable<object> GetAtomicValues()
         {

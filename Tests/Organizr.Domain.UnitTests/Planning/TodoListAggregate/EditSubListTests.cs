@@ -18,19 +18,18 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void EditSubList_NewSubListData_SubListInfoChanges()
         {
-            var subListId = 1;
-            var editedSubList = _fixture.Sut.SubLists.Single(sl => sl.Id == subListId);
-            var originalOrdinal = editedSubList.Ordinal;
+            var subListId = (TodoSubListId)1;
+            var editedSubList = _fixture.Sut.SubLists.Single(sl => sl.TodoSubListId == subListId);
+            var originalPosition = editedSubList.Position;
 
             var newTitle = "Todo Sub List";
             var newDescription = "Todo Sub List Description";
 
             _fixture.Sut.EditSubList(subListId, newTitle, newDescription);
 
-
-            editedSubList.Id.Should().Be(subListId);
+            editedSubList.TodoSubListId.Should().Be(subListId);
             editedSubList.Title.Should().Be(newTitle);
-            editedSubList.Ordinal.Should().Be(originalOrdinal);
+            editedSubList.Position.Should().Be(originalPosition);
             editedSubList.Description.Should().Be(newDescription);
             editedSubList.IsDeleted.Should().Be(false);
         }
@@ -38,7 +37,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void EditSubList_NonExistingSubListId_ThrowsTodoListException()
         {
-            var nonExistingSubListId = 99;
+            var nonExistingSubListId = (TodoSubListId)99;
             var newTitle = "Todo Sub List";
             var newDescription = "Todo Sub List Description";
 
@@ -49,7 +48,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void EditSubList_DeletedSubListId_ThrowsTodoListException()
         {
-            var deletedSubListId = 2;
+            var deletedSubListId = (TodoSubListId)2;
             var newTitle = "Todo Sub List";
             var newDescription = "Todo Sub List Description";
 
@@ -63,7 +62,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [InlineData(" ")]
         public void EditSubList_NullOrWhiteSpaceTitle_ThrowsArgumentException(string newTitle)
         {
-            var subListId = 1;
+            var subListId = (TodoSubListId)1;
             var newDescription = "Todo Sub List Description";
 
             _fixture.Sut.Invoking(l => l.EditSubList(subListId, newTitle, newDescription)).Should().Throw<ArgumentException>()

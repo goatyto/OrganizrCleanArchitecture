@@ -43,9 +43,10 @@ namespace Organizr.Application.Planning.UserGroups.AddMember
 
         public async Task<Unit> Handle(AddMemberCommand request, CancellationToken cancellationToken)
         {
-            var userGroup = await _userGroupRepository.GetAsync(request.UserGroupId, cancellationToken);
+            var userGroupId = new UserGroupId(request.UserGroupId);
+            var userGroup = await _userGroupRepository.GetAsync(userGroupId, cancellationToken);
 
-            if(userGroup == null)
+            if (userGroup == null)
                 throw new ResourceNotFoundException<UserGroup>(request.UserGroupId);
 
             var userExists = await _identityService.UserExistsAsync(request.UserId);
@@ -53,7 +54,8 @@ namespace Organizr.Application.Planning.UserGroups.AddMember
             if(!userExists)
                 throw new InvalidUserIdException(request.UserId);
 
-            userGroup.AddMember(request.UserId);
+            var member = new UserGroupMember(request.UserId);
+            userGroup.AddMember(member);
 
             _userGroupRepository.Update(userGroup);
 

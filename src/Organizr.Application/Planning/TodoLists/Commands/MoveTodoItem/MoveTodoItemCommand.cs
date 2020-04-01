@@ -47,7 +47,8 @@ namespace Organizr.Application.Planning.TodoLists.Commands.MoveTodoItem
 
         public async Task<Unit> Handle(MoveTodoItemCommand request, CancellationToken cancellationToken)
         {
-            var todoList = await _todoListRepository.GetAsync(request.TodoListId, cancellationToken: cancellationToken);
+            var todoListId = new TodoListId(request.TodoListId);
+            var todoList = await _todoListRepository.GetAsync(todoListId, cancellationToken: cancellationToken);
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.TodoListId);
@@ -57,7 +58,11 @@ namespace Organizr.Application.Planning.TodoLists.Commands.MoveTodoItem
             if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
                 throw new AccessDeniedException<TodoList>(request.TodoListId, currentUserId);
 
-            todoList.MoveTodo(request.Id, new TodoItemPosition(request.NewOrdinal), request.NewSubListId);
+            var todoId = new TodoItemId(request.Id);
+            var todoItemPosition = new TodoItemPosition(request.NewOrdinal);
+            var subListId = TodoSubListId.Create(request.NewSubListId);
+          
+            todoList.MoveTodo(todoId, todoItemPosition, subListId);
 
             _todoListRepository.Update(todoList);
 

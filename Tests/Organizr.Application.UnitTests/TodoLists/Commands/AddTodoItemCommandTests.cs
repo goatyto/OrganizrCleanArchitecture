@@ -55,7 +55,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
 
             _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should()
                 .Throw<AccessDeniedException<TodoList>>().Where(exception =>
-                    exception.ResourceId == TodoListId && exception.UserId == noAccessUserId);
+                    exception.ResourceId.Equals(TodoListId) && exception.UserId == noAccessUserId);
         }
     }
 }

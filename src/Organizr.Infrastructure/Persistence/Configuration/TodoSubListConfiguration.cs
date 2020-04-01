@@ -18,10 +18,18 @@ namespace Organizr.Infrastructure.Persistence.Configuration
 
             builder.Ignore(sl => sl.DomainEvents);
 
+            builder.Property(sl => sl.TodoSubListId)
+                .HasConversion(todoSubListId => todoSubListId.Id, id => TodoSubListId.Create(id))
+                .IsRequired();
+
             builder.Property(sl => sl.Title).IsRequired();
             builder.Property(sl => sl.Description);
             builder.Property(sl => sl.IsDeleted).IsRequired();
-            builder.Property(sl => sl.Ordinal).IsRequired();
+            
+            builder.OwnsOne(sl => sl.Position, positionBuilder =>
+                {
+                    positionBuilder.Property(p => p.Ordinal).IsRequired();
+                });
 
             builder.HasMany(sl => sl.Items)
                 .WithOne()
