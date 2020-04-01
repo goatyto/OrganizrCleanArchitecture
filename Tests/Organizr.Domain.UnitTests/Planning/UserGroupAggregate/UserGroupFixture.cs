@@ -1,32 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Organizr.Domain.Planning;
-using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 
 namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
 {
     public class UserGroupFixture
     {
-        public UserGroupId UserGroupId { get; }
-        public CreatorUser UserGroupCreator { get; }
-        public UserGroupMember ExistingUserGroupMember { get; }
-        public TodoListId SharedTodoListId { get; }
-        public UserGroup Sut { get; }
+        public readonly Guid UserGroupId;
+        public readonly string UserGroupCreatorId;
+        public readonly string ExistingUserGroupMemberId;
+        public readonly Guid SharedTodoListId;
+        public readonly UserGroup Sut;
 
         public UserGroupFixture()
         {
-            UserGroupId = new UserGroupId(Guid.NewGuid());
-            UserGroupCreator = new CreatorUser("User1");
-            ExistingUserGroupMember = new UserGroupMember("User2");
-            SharedTodoListId = new TodoListId(Guid.NewGuid());
+            UserGroupId = Guid.NewGuid();
+            UserGroupCreatorId = "User1";
+            ExistingUserGroupMemberId = "User2";
+            SharedTodoListId = Guid.NewGuid();
 
-            Sut = UserGroup.Create(UserGroupId, UserGroupCreator, "UserGroupName", "UserGroupDescription");
+            Sut = UserGroup.Create(UserGroupId, UserGroupCreatorId, "UserGroupName", "UserGroupDescription");
 
-            Sut.AddMember(ExistingUserGroupMember);
+            Sut.AddMember(ExistingUserGroupMemberId);
 
-            Sut.CreateSharedTodoList(SharedTodoListId, UserGroupCreator, "Title", "Description");
+            Sut.CreateSharedTodoList(SharedTodoListId, UserGroupCreatorId, "Title", "Description");
         }
     }
 }

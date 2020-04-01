@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Planning\Aggregates\TodoListAggregate\TodoSubListPosition.cs" />
     <Compile Remove="SharedKernel\Enumeration.cs" />
     <Compile Remove="SharedKernel\IDateTime.cs" />
   </ItemGroup>

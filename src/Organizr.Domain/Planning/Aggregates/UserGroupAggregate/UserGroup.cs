@@ -7,45 +7,43 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 {
-    public class UserGroup : Entity<UserGroupId>, IAggregateRoot
+    public class UserGroup : Entity<Guid>, IAggregateRoot
     {
-        protected override UserGroupId Identity => UserGroupId;
-        public UserGroupId UserGroupId { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public CreatorUser CreatorUser { get; private set; }
+        public string CreatorUserId { get; private set; }
 
-        private readonly List<UserGroupMember> _membership;
-        public IReadOnlyCollection<UserGroupMember> Members => _membership.AsReadOnly();
+        private readonly List<UserGroupMembership> _membership;
+        public IReadOnlyCollection<UserGroupMembership> Membership => _membership.AsReadOnly();
 
         private UserGroup()
         {
-            _membership = new List<UserGroupMember>();
+            _membership = new List<UserGroupMembership>();
         }
 
-        public static UserGroup Create(UserGroupId id, CreatorUser creatorUser, string name, string description = null,
-            IEnumerable<UserGroupMember> groupMembers = null)
+        public static UserGroup Create(Guid id, string creatorUserId, string name, string description = null,
+            IEnumerable<string> groupMemberIds = null)
         {
             Guard.Against.Default(id, nameof(id));
-            Guard.Against.Null(creatorUser, nameof(creatorUser));
+            Guard.Against.NullOrWhiteSpace(creatorUserId, nameof(creatorUserId));
             Guard.Against.NullOrWhiteSpace(name, nameof(name));
 
             var userGroup = new UserGroup();
 
-            userGroup.UserGroupId = id;
-            userGroup.CreatorUser = creatorUser;
+            userGroup.Id = id;
+            userGroup.CreatorUserId = creatorUserId;
             userGroup.Name = name;
             userGroup.Description = description;
 
-            userGroup._membership.Add((UserGroupMember)creatorUser);
+            userGroup._membership.Add(new UserGroupMembership(creatorUserId));
 
-            if (groupMembers != null)
+            if (groupMemberIds != null)
             {
-                foreach (var member in groupMembers.Distinct())
+                foreach (var userId in groupMemberIds.Distinct())
                 {
-                    if (member == (UserGroupMember)creatorUser) continue;
+                    if (userId == creatorUserId) continue;
 
-                    userGroup._membership.Add(member);
+                    userGroup._membership.Add(new UserGroupMembership(userId));
                 }
             }
 
@@ -64,59 +62,43 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
             AddDomainEvent(new UserGroupEdited(this));
         }
 
-        public void AddMember(UserGroupMember member)
+        public void AddMember(string userId)
         {
-            Guard.Against.Null(member, nameof(member));
+            Guard.Against.NullOrWhiteSpace(userId, nameof(userId));
 
-            AssertMemberNotInGroup(member);
+            var newMembership = new UserGroupMembership(userId);
 
-            _membership.Add(member);
+            if (_membership.Any(m => m == newMembership))
+                throw new UserAlreadyMemberException(Id, userId);
 
-            AddDomainEvent(new UserGroupMemberAdded(UserGroupId, member));
+            _membership.Add(newMembership);
+
+            AddDomainEvent(new UserGroupMemberAdded(Id, userId));
         }
 
-        public void RemoveMember(UserGroupMember member)
+        public void RemoveMember(string userId)
         {
-            Guard.Against.Null(member, nameof(member));
+            Guard.Against.NullOrWhiteSpace(userId, nameof(userId));
 
-            AssertMemberExistsInGroup(member);
-            AssertMemberToBeRemovedNotCreator(member);
+            if (userId == CreatorUserId)
+                throw new CreatorCannotBeRemovedException(Id);
 
-            _membership.Remove(member);
+            if (_membership.All(m => m != userId))
+                throw new UserNotAMemberException(Id, userId);
 
-            AddDomainEvent(new UserGroupMemberRemoved(UserGroupId, member));
+            _membership.Remove((UserGroupMembership)userId);
+
+            AddDomainEvent(new UserGroupMemberRemoved(Id, userId));
         }
 
-        public TodoList CreateSharedTodoList(TodoListId id, CreatorUser creatorUser, string title, string description = null)
+        public TodoList CreateSharedTodoList(Guid id, string creatorUserId, string title, string description = null)
         {
-            AssertMemberExistsInGroup((UserGroupMember)creatorUser);
+            if (_membership.All(m => m.UserId != creatorUserId))
+                throw new UserNotAMemberException(Id, creatorUserId);
 
-            var todoList = TodoList.CreateShared(id, creatorUser, Identity, title, description);
+            var todoList = TodoList.CreateShared(id, creatorUserId, Id, title, description);
 
             return todoList;
-        }
-
-        private bool IsCreator(UserGroupMember member)
-        {
-            return true;
-        }
-
-        private void AssertMemberToBeRemovedNotCreator(UserGroupMember memberToBeRemoved)
-        {
-            if(memberToBeRemoved == CreatorUser)
-                throw new UserGroupException("Creator user cannot be removed.");
-        }
-
-        private void AssertMemberExistsInGroup(UserGroupMember member)
-        {
-            if(!Members.Contains(member))
-                throw new UserGroupException($"User \"{member}\" is not a member in group \"{UserGroupId}\".");
-        }
-
-        private void AssertMemberNotInGroup(UserGroupMember member)
-        {
-            if(Members.Contains(member))
-                throw new UserGroupException($"User \"{member}\" is already a member in group \"{UserGroupId}\".");
         }
     }
 }

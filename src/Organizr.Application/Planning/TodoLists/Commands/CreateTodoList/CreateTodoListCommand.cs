@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Planning.Common.Interfaces;
-using Organizr.Domain.Planning;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 
 namespace Organizr.Application.Planning.TodoLists.Commands.CreateTodoList
@@ -39,10 +38,10 @@ namespace Organizr.Application.Planning.TodoLists.Commands.CreateTodoList
 
         public async Task<Unit> Handle(CreateTodoListCommand request, CancellationToken cancellationToken)
         {
-            var todoListId = new TodoListId(_idGenerator.GenerateNext<TodoList>());
-            var creatorUser = new CreatorUser(_identityService.CurrentUserId);
+            var todoListId = _idGenerator.GenerateNext<TodoList>();
+            var currentUserId = _identityService.CurrentUserId;
 
-            var todoList = TodoList.Create(todoListId, creatorUser, request.Title, request.Description);
+            var todoList = TodoList.Create(todoListId, currentUserId, request.Title, request.Description);
 
             _todoListRepository.Add(todoList);
 

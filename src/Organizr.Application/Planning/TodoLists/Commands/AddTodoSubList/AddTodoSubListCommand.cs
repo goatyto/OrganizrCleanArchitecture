@@ -45,8 +45,7 @@ namespace Organizr.Application.Planning.TodoLists.Commands.AddTodoSubList
 
         public async Task<Unit> Handle(AddTodoSubListCommand request, CancellationToken cancellationToken)
         {
-            var todoListId = new TodoListId(request.TodoListId);
-            var todoList = await _todoListRepository.GetAsync(todoListId, cancellationToken: cancellationToken);
+            var todoList = await _todoListRepository.GetAsync(request.TodoListId, cancellationToken: cancellationToken);
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.TodoListId);

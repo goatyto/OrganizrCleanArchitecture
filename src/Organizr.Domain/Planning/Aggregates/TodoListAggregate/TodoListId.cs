@@ -14,11 +14,9 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             Id = id;
         }
 
-        public static explicit operator TodoListId(Guid id) => new TodoListId(id);
-
         protected override IEnumerable<object> GetAtomicValues()
         {
-            yield return Id;
+            throw new NotImplementedException();
         }
     }
 }

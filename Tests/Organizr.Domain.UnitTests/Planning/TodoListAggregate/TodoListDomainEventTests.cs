@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using FluentAssertions;
-using Organizr.Domain.Planning;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Xunit;
 
@@ -13,7 +12,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void TodoListCreatedConstructor_ValidTodoList_ObjectInitialized()
         {
-            var todoList = TodoList.Create(new TodoListId(Guid.NewGuid()), new CreatorUser("User1"), "Title", "Description");
+            var todoList = TodoList.Create(Guid.NewGuid(), "User1", "Title", "Description");
 
             var sut = new TodoListCreated(todoList);
 
@@ -33,7 +32,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void TodoListUpdatedConstructor_ValidTodoList_ObjectInitialized()
         {
-            var todoList = TodoList.Create(new TodoListId(Guid.NewGuid()), new CreatorUser("User1"), "Title", "Description");
+            var todoList = TodoList.Create(Guid.NewGuid(), "User1", "Title", "Description");
 
             var sut = new TodoListUpdated(todoList);
 

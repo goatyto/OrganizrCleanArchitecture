@@ -44,8 +44,7 @@ namespace Organizr.Application.Planning.TodoLists.Commands.EditTodoList
         }
         public async Task<Unit> Handle(EditTodoListCommand request, CancellationToken cancellationToken)
         {
-            var todoListId = new TodoListId(request.Id);
-            var todoList = await _todoListRepository.GetAsync(todoListId, cancellationToken: cancellationToken);
+            var todoList = await _todoListRepository.GetAsync(request.Id, cancellationToken: cancellationToken);
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.Id);

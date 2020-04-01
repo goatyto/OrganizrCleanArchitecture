@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Ardalis.GuardClauses;
-using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 {
-    public class TodoList : Entity<TodoListId>, IAggregateRoot
+    public class TodoList : Entity<Guid>, IAggregateRoot
     {
-        protected override TodoListId Identity => TodoListId;
-        public TodoListId TodoListId { get; private set; }
-        public CreatorUser CreatorUser { get; private set; }
-        public UserGroupId UserGroupId { get; private set; }
+        public string CreatorUserId { get; private set; }
+        public Guid? UserGroupId { get; private set; }
         public string Title { get; private set; }
         public string Description { get; private set; }
 
@@ -29,16 +26,16 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             _subLists = new List<TodoSubList>();
         }
 
-        public static TodoList Create(TodoListId id, CreatorUser creatorUser, string title, string description = null)
+        public static TodoList Create(Guid id, string creatorUserId, string title, string description = null)
         {
             Guard.Against.Default(id, nameof(id));
-            Guard.Against.Null(creatorUser, nameof(creatorUser));
+            Guard.Against.NullOrWhiteSpace(creatorUserId, nameof(creatorUserId));
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
 
             var todoList = new TodoList();
 
-            todoList.TodoListId = id;
-            todoList.CreatorUser = creatorUser;
+            todoList.Id = id;
+            todoList.CreatorUserId = creatorUserId;
             todoList.Title = title;
             todoList.Description = description;
 
@@ -47,12 +44,12 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             return todoList;
         }
 
-        internal static TodoList CreateShared(TodoListId id, CreatorUser creatorUser, UserGroupId userGroupId, string title,
+        internal static TodoList CreateShared(Guid id, string creatorUserId, Guid userGroupId, string title,
             string description = null)
         {
             Guard.Against.Default(userGroupId, nameof(userGroupId));
 
-            var todoList = Create(id, creatorUser, title, description);
+            var todoList = Create(id, creatorUserId, title, description);
 
             todoList.UserGroupId = userGroupId;
 
@@ -75,13 +72,13 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
         {
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
 
-            var subList = new TodoSubList(GetNextSubListId(), title, GetNextSubListPosition(), description);
+            var subList = new TodoSubList(GetNextSubListId(), title, GetNextSubListOrdinal(), description);
             _subLists.Add(subList);
 
             AddDomainEvent(new TodoListUpdated(this));
         }
 
-        public void EditSubList(TodoSubListId subListId, string title, string description = null)
+        public void EditSubList(int subListId, string title, string description = null)
         {
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
 
@@ -92,30 +89,30 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             AddDomainEvent(new TodoListUpdated(this));
         }
 
-        public void MoveSubList(TodoSubListId subListId, TodoSubListPosition destinationPosition)
+        public void MoveSubList(int subListId, int destinationOrdinal)
         {
-            AssertSubListPositionValid(destinationPosition);
+            AssertSubListPositionValid(destinationOrdinal);
 
             var targetSubList = FindSubList(subListId);
 
-            var initialOrdinal = targetSubList.Position;
+            var initialOrdinal = targetSubList.Ordinal;
 
-            if (initialOrdinal == destinationPosition)
+            if (initialOrdinal == destinationOrdinal)
                 return;
 
-            var isMovingUp = destinationPosition > initialOrdinal;
+            var isMovingUp = destinationOrdinal > initialOrdinal;
             var otherListsShiftDirection = isMovingUp ? ShiftDirection.Down : ShiftDirection.Up;
-            var otherListsShiftStartOrdinal = isMovingUp ? initialOrdinal + 1 : destinationPosition;
-            var otherListsShiftEndOrdinal = isMovingUp ? destinationPosition : initialOrdinal - 1;
+            var otherListsShiftStartOrdinal = isMovingUp ? initialOrdinal + 1 : destinationOrdinal;
+            var otherListsShiftEndOrdinal = isMovingUp ? destinationOrdinal : initialOrdinal - 1;
 
             ShiftSubLists(otherListsShiftDirection, otherListsShiftStartOrdinal, otherListsShiftEndOrdinal);
 
-            targetSubList.SetPosition(destinationPosition);
+            targetSubList.SetPosition(destinationOrdinal);
 
             AddDomainEvent(new TodoListUpdated(this));
         }
 
-        public void DeleteSubList(TodoSubListId subListId)
+        public void DeleteSubList(int subListId)
         {
             var subList = FindSubList(subListId);
 
@@ -124,12 +121,12 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
             subList.Delete();
 
-            ShiftSubLists(ShiftDirection.Down, subList.Position + 1);
+            ShiftSubLists(ShiftDirection.Down, subList.Ordinal + 1);
 
             AddDomainEvent(new TodoListUpdated(this));
         }
 
-        public void AddTodo(string title, string description = null, ClientDateUtc dueDateUtc = null, TodoSubListId subListId = null)
+        public void AddTodo(string title, string description = null, ClientDateUtc dueDateUtc = null, int? subListId = null)
         {
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
 
@@ -140,9 +137,9 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
             var todo = new TodoItem(GetNextItemId(), title, GetNextItemPosition(subListId), description, dueDateUtc);
 
-            if (subListId != null)
+            if (subListId.HasValue)
             {
-                var subList = FindSubList(subListId);
+                var subList = FindSubList(subListId.Value);
 
                 subList.AddTodo(todo);
             }
@@ -154,7 +151,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             AddDomainEvent(new TodoListUpdated(this));
         }
 
-        public void EditTodo(TodoItemId todoId, string title, string description = null, ClientDateUtc dueDateUtc = null)
+        public void EditTodo(int todoId, string title, string description = null, ClientDateUtc dueDateUtc = null)
         {
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
 
@@ -170,7 +167,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             AddDomainEvent(new TodoListUpdated(this));
         }
 
-        public void SetCompletedTodo(TodoItemId todoId, bool isCompleted = true)
+        public void SetCompletedTodo(int todoId, bool isCompleted = true)
         {
             var todo = FindTodoItem(todoId, out _);
 
@@ -182,7 +179,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             AddDomainEvent(new TodoListUpdated(this));
         }
 
-        public void MoveTodo(TodoItemId todoId, TodoItemPosition destinationPosition, TodoSubListId destinationSubListId = null)
+        public void MoveTodo(int todoId, TodoItemPosition destinationPosition, int? destinationSubListId = null)
         {
             var todoToBeMoved = FindTodoItem(todoId, out var sourceSubListId);
 
@@ -193,12 +190,12 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
             TodoSubList sourceSubList = null, destinationSubList = null;
 
-            if (sourceSubListId != null)
+            if (sourceSubListId.HasValue)
             {
-                sourceSubList = FindSubList(sourceSubListId);
+                sourceSubList = FindSubList(sourceSubListId.Value);
             }
 
-            if (destinationSubListId != null)
+            if (destinationSubListId.HasValue)
             {
                 if (sourceSubListId == destinationSubListId)
                 {
@@ -206,7 +203,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
                 }
                 else
                 {
-                    destinationSubList = FindSubList(destinationSubListId);
+                    destinationSubList = FindSubList(destinationSubListId.Value);
                 }
             }
 
@@ -219,24 +216,24 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
                 var otherItemsShiftStartOrdinal = isMovingUp ? initialOrdinal + 1 : destinationPosition;
                 var otherItemsShiftEndOrdinal = isMovingUp ? destinationPosition : initialOrdinal - 1;
 
-                var itemsToBeShifted = sourceSubList == null ? Items : sourceSubList.Items;
+                var itemsToBeShifted = !sourceSubListId.HasValue ? Items : sourceSubList.Items;
 
                 ShiftTodoItems(itemsToBeShifted, otherItemsShiftDirection, otherItemsShiftStartOrdinal, otherItemsShiftEndOrdinal);
             }
             else
             {
-                var sourceItemsToBeShifted = sourceSubListId == null ? Items : sourceSubList.Items;
+                var sourceItemsToBeShifted = !sourceSubListId.HasValue ? Items : sourceSubList.Items;
                 ShiftTodoItems(sourceItemsToBeShifted, ShiftDirection.Down, todoToBeMoved.Position + 1);
 
-                var destinationItemsToBeShifted = destinationSubListId == null ? Items : destinationSubList.Items;
+                var destinationItemsToBeShifted = !destinationSubListId.HasValue ? Items : destinationSubList.Items;
                 ShiftTodoItems(destinationItemsToBeShifted, ShiftDirection.Up, destinationPosition);
 
-                if (sourceSubListId == null)
+                if (!sourceSubListId.HasValue)
                     _items.Remove(todoToBeMoved);
                 else
                     sourceSubList.RemoveTodo(todoToBeMoved);
 
-                if (destinationSubListId == null)
+                if (!destinationSubListId.HasValue)
                     _items.Add(todoToBeMoved);
                 else
                     destinationSubList.AddTodo(todoToBeMoved);
@@ -247,7 +244,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             AddDomainEvent(new TodoListUpdated(this));
         }
 
-        public void DeleteTodo(TodoItemId todoId)
+        public void DeleteTodo(int todoId)
         {
             var todo = FindTodoItem(todoId, out var subListId);
 
@@ -256,39 +253,39 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
             TodoSubList subList = null;
 
-            if (subListId != null)
+            if (subListId.HasValue)
             {
-                subList = FindSubList(subListId);
+                subList = FindSubList(subListId.Value);
             }
 
             todo.Delete();
 
-            var todoItemsToBeShifted = subListId == null ? Items : subList.Items;
+            var todoItemsToBeShifted = !subListId.HasValue ? Items : subList.Items;
             ShiftTodoItems(todoItemsToBeShifted, ShiftDirection.Down, todo.Position + 1);
 
             AddDomainEvent(new TodoListUpdated(this));
         }
 
-        private TodoSubListId GetNextSubListId()
+        private int GetNextSubListId()
         {
-            if (!SubLists.Any()) return TodoSubListId.Create(1);
-            return TodoSubListId.Create(SubLists.Max(sl => sl.TodoSubListId).Id + 1);
+            if (!SubLists.Any()) return 1;
+            return SubLists.Max(sl => sl.Id) + 1;
         }
 
-        private TodoSubListPosition GetNextSubListPosition()
+        private int GetNextSubListOrdinal()
         {
-            return new TodoSubListPosition(SubLists.Count(sl => !sl.IsDeleted) + 1);
+            return SubLists.Count(sl => !sl.IsDeleted) + 1;
         }
 
-        private TodoItemId GetNextItemId()
+        private int GetNextItemId()
         {
             var allTodoItemsCount = Items.Union(SubLists.SelectMany(sl => sl.Items)).Count();
-            return new TodoItemId(allTodoItemsCount + 1);
+            return allTodoItemsCount + 1;
         }
 
-        private TodoItemPosition GetNextItemPosition(TodoSubListId subListId = null)
+        private TodoItemPosition GetNextItemPosition(int? subListId = null)
         {
-            var items = subListId == null ? Items : FindSubList(subListId).Items;
+            var items = !subListId.HasValue ? Items : FindSubList(subListId.Value).Items;
 
             return new TodoItemPosition(items.Count(item => !item.IsDeleted) + 1);
         }
@@ -299,29 +296,29 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             Down = 2
         }
 
-        private void ShiftSubLists(ShiftDirection direction, TodoSubListPosition startPosition, TodoSubListPosition endPosition = null)
+        private void ShiftSubLists(ShiftDirection direction, int startOrdinal, int? endOrdinal = null)
         {
             var subListsToBeShifted = SubLists.Where(sl =>
-                    !sl.IsDeleted && sl.Position >= startPosition && (endPosition == null || sl.Position <= endPosition))
-                .OrderBy(sl => sl.Position)
+                    !sl.IsDeleted && sl.Ordinal >= startOrdinal && (!endOrdinal.HasValue || sl.Ordinal <= endOrdinal))
+                .OrderBy(sl => sl.Ordinal)
                 .ToList();
 
             for (int i = 0; i < subListsToBeShifted.Count; i++)
             {
-                TodoSubListPosition newCalculatedPosition;
+                int newCalculatedOrdinal;
 
                 switch (direction)
                 {
                     case ShiftDirection.Down:
-                        newCalculatedPosition = i + startPosition - 1;
+                        newCalculatedOrdinal = subListsToBeShifted[i].Ordinal - 1;
                         break;
                     case ShiftDirection.Up:
                     default:
-                        newCalculatedPosition = i + startPosition + 1;
+                        newCalculatedOrdinal = subListsToBeShifted[i].Ordinal + 1;
                         break;
                 }
 
-                subListsToBeShifted[i].SetPosition(newCalculatedPosition);
+                subListsToBeShifted[i].SetPosition(newCalculatedOrdinal);
             }
         }
 
@@ -334,68 +331,68 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
             for (int i = 0; i < todoItemsToBeShifted.Count; i++)
             {
-                TodoItemPosition newCalculatedPosition;
+                TodoItemPosition newCalculatedOrdinal;
 
                 switch (direction)
                 {
                     case ShiftDirection.Down:
-                        newCalculatedPosition = i + startPosition - 1;
+                        newCalculatedOrdinal = i + startPosition - 1;
                         break;
                     case ShiftDirection.Up:
                     default:
-                        newCalculatedPosition = i + startPosition + 1;
+                        newCalculatedOrdinal = i + startPosition + 1;
                         break;
                 }
 
-                todoItemsToBeShifted[i].SetPosition(newCalculatedPosition);
+                todoItemsToBeShifted[i].SetPosition(newCalculatedOrdinal);
             }
         }
 
-        private TodoSubList FindSubList(TodoSubListId subListId)
+        private TodoSubList FindSubList(int subListId)
         {
-            var subList = SubLists.SingleOrDefault(sl => !sl.IsDeleted && sl.TodoSubListId == subListId);
+            var subList = SubLists.SingleOrDefault(sl => !sl.IsDeleted && sl.Id == subListId);
 
             if (subList == null)
-                throw new TodoListException($"Sublist with id \"{subListId}\" does not exist in list \"{Identity}\".");
+                throw new TodoListException($"Sublist with id \"{subListId}\" does not exist in list \"{Id}\".");
 
             return subList;
         }
 
-        private TodoItem FindTodoItem(TodoItemId todoId, out TodoSubListId subListId)
+        private TodoItem FindTodoItem(int todoId, out int? subListId)
         {
             subListId = null;
 
-            var todo = Items.SingleOrDefault(item => !item.IsDeleted && item.TodoItemId == todoId);
+            var todo = Items.SingleOrDefault(item => !item.IsDeleted && item.Id == todoId);
 
             if (todo == null)
             {
                 foreach (var subList in SubLists.Where(sl => !sl.IsDeleted))
                 {
-                    todo = subList.Items.SingleOrDefault(it => !it.IsDeleted && it.TodoItemId == todoId);
+                    todo = subList.Items.SingleOrDefault(it => !it.IsDeleted && it.Id == todoId);
 
                     if (todo == null) continue;
-
-                    subListId = subList.TodoSubListId;
+                    
+                    subListId = subList.Id;
                     break;
                 }
             }
 
             if (todo == null)
-                throw new TodoListException($"Todo item with id \"{todoId}\" does not exist in list \"{Identity}\".");
+                throw new TodoListException($"Todo item with id \"{todoId}\" does not exist in list \"{Id}\".");
 
             return todo;
         }
 
-        public void AssertSubListPositionValid(TodoSubListPosition position)
+        public void AssertSubListPositionValid(int ordinal)
         {
-            if (position < 1 || position > SubLists.Count)
+            if (ordinal < 1 || ordinal > SubLists.Count)
                 throw new TodoListException("Provided sublist ordinal is out of range.");
         }
 
-        public void AssertTodoItemPositionValid(TodoItemPosition position, TodoSubListId subListId = null)
+        public void AssertTodoItemPositionValid(TodoItemPosition position, int? subListId = null)
         {
             var itemRangeToBeChecked =
-                subListId == null ? Items : FindSubList(subListId).Items;
+                !subListId.HasValue ? Items : FindSubList(subListId.Value).Items;
 
             if (position < 1 || position > itemRangeToBeChecked.Count)
                 throw new TodoListException("Provided todo item position is out of range.");

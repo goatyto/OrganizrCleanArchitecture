@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Organizr.Domain.Planning;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Infrastructure.Persistence;
 using Organizr.Infrastructure.Persistence.Repositories;
@@ -17,7 +16,7 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Repositories
     {
         private readonly OrganizrContextFixture _fixture;
         private readonly ITodoListRepository _sut;
-        private readonly TodoListId _todoListId;
+        private readonly Guid _todoListId;
 
         public TodoListRepositoryTests(OrganizrContextFixture fixture)
         {
@@ -25,9 +24,9 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Repositories
 
             _sut = new TodoListRepository(_fixture.Context);
 
-            _todoListId = new TodoListId(Guid.NewGuid());
+            _todoListId = Guid.NewGuid();
 
-            var todoList = TodoList.Create(_todoListId, new CreatorUser("User1"), "Title", "Description");
+            var todoList = TodoList.Create(_todoListId, "User1", "Title", "Description");
 
             todoList.AddSubList("SubList1");
             todoList.AddSubList("SubList2");
@@ -35,8 +34,8 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Repositories
             todoList.AddTodo("Todo1");
             todoList.AddTodo("Todo2");
 
-            todoList.AddTodo("Todo11", subListId: (TodoSubListId)1);
-            todoList.AddTodo("Todo12", subListId: (TodoSubListId)1);
+            todoList.AddTodo("Todo11", subListId: 1);
+            todoList.AddTodo("Todo12", subListId: 1);
 
             _sut.Add(todoList);
 
@@ -54,9 +53,9 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Repositories
         [Fact]
         public async Task Add_ValidData_EntrySaved()
         {
-            var todoListId = new TodoListId(Guid.NewGuid());
+            var todoListId = Guid.NewGuid();
 
-            var todoList = TodoList.Create(todoListId, new CreatorUser("User1"), "Title", "Description");
+            var todoList = TodoList.Create(todoListId, "User1", "Title", "Description");
 
             _sut.Add(todoList);
 
@@ -72,10 +71,10 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Repositories
         {
             var persistedTodoList = await _sut.GetAsync(_todoListId);
 
-            persistedTodoList.DeleteSubList((TodoSubListId)2);
+            persistedTodoList.DeleteSubList(2);
 
-            persistedTodoList.DeleteTodo((TodoItemId)2);
-            persistedTodoList.DeleteTodo((TodoItemId)4);
+            persistedTodoList.DeleteTodo(2);
+            persistedTodoList.DeleteTodo(4);
 
             _sut.Update(persistedTodoList);
 
@@ -83,12 +82,12 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Repositories
 
             persistedTodoList = await _sut.GetAsync(_todoListId);
 
-            persistedTodoList.SubLists.Single(sl => sl.TodoSubListId == (TodoSubListId)2).IsDeleted.Should().Be(true);
+            persistedTodoList.SubLists.Single(sl => sl.Id == 2).IsDeleted.Should().Be(true);
 
             var allTodoItems = persistedTodoList.Items.Union(persistedTodoList.SubLists.SelectMany(sl => sl.Items)).ToList();
 
-            allTodoItems.Single(it => it.TodoItemId == (TodoItemId)2).IsDeleted.Should().Be(true);
-            allTodoItems.Single(it => it.TodoItemId == (TodoItemId)4).IsDeleted.Should().Be(true);
+            allTodoItems.Single(it => it.Id == 2).IsDeleted.Should().Be(true);
+            allTodoItems.Single(it => it.Id == 4).IsDeleted.Should().Be(true);
         }
     }
 }

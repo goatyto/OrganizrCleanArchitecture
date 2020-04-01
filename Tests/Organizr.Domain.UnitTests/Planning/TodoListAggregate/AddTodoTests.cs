@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
@@ -17,14 +16,10 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             _fixture = new TodoListFixture();
         }
 
-        public static IEnumerable<object[]> AddTodoValidMemberData = new List<object[]>
-        {
-            new object[] {null},
-            new object[] {(TodoSubListId) 1}
-        };
-
-        [Theory, MemberData(nameof(AddTodoValidMemberData))]
-        public void AddTodo_ValidData_TodoItemAdded(TodoSubListId subListId)
+        [Theory]
+        [InlineData(null)]
+        [InlineData(1)]
+        public void AddTodo_ValidData_TodoItemAdded(int? subListId)
         {
             var title = "Todo";
             var description = "Todo Description";
@@ -36,7 +31,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 
             var addedTodo = _fixture.GetTodoItems(subListId).Last();
 
-            addedTodo.TodoItemId.Should().Be((TodoItemId)(initialTodoListCount + 1));
+            addedTodo.Id.Should().Be(initialTodoListCount + 1);
             addedTodo.Title.Should().Be(title);
             addedTodo.Description.Should().Be(description);
             addedTodo.DueDateUtc.Should().Be(dueDateUtc);
@@ -51,7 +46,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var title = "Todo";
             var description = "Todo Description";
             var dueDateUtc = _fixture.CreateClientDateUtcWithDaysOffset(1);
-            var nonExistentSubListId = (TodoSubListId)99;
+            var nonExistentSubListId = 99;
 
             _fixture.Sut.Invoking(l => l.AddTodo(title, description, dueDateUtc, nonExistentSubListId)).Should()
                 .Throw<TodoListException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");
@@ -63,7 +58,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var title = "Todo";
             var description = "Todo Description";
             var dueDate = _fixture.CreateClientDateUtcWithDaysOffset(1);
-            var deletedSubListId = (TodoSubListId)2;
+            var deletedSubListId = 2;
 
             _fixture.Sut.Invoking(l => l.AddTodo(title, description, dueDate, deletedSubListId)).Should()
                 .Throw<TodoListException>().WithMessage($"*sublist*{deletedSubListId}*does not exist*");

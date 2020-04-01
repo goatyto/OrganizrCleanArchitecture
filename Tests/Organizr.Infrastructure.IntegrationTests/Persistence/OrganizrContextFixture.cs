@@ -14,8 +14,8 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence
         public OrganizrContextFixture()
         {
             var options = new DbContextOptionsBuilder<OrganizrContext>()
-                //.UseSqlite("DataSource=:memory:")
-                .UseSqlite("DataSource=TestDb.db")
+                .UseSqlite("DataSource=:memory:")
+                //.UseSqlite("DataSource=TestDb.db")
                 .Options;
 
             Context = new OrganizrContext(options);

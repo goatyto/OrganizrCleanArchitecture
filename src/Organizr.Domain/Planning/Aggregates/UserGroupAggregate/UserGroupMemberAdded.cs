@@ -8,16 +8,16 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 {
     public class UserGroupMemberAdded : IDomainEvent
     {
-        public UserGroupId UserGroupId { get; }
-        public UserGroupMember UserGroupMember { get; }
+        public Guid UserGroupId { get; }
+        public string UserId { get; }
 
-        public UserGroupMemberAdded(UserGroupId userGroupId, UserGroupMember userGroupMember)
+        public UserGroupMemberAdded(Guid userGroupId, string userId)
         {
-            Guard.Against.Null(userGroupId, nameof(userGroupId));
-            Guard.Against.Null(userGroupMember, nameof(userGroupMember));
+            Guard.Against.Default(userGroupId, nameof(userGroupId));
+            Guard.Against.NullOrWhiteSpace(userId, nameof(userId));
             
             UserGroupId = userGroupId;
-            UserGroupMember = userGroupMember;
+            UserId = userId;
         }
     }
 }

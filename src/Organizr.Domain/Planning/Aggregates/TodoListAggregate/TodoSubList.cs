@@ -5,14 +5,12 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 {
-    public class TodoSubList : Entity<TodoSubListId>
+    public class TodoSubList : Entity<int>
     {
-        protected override TodoSubListId Identity => TodoSubListId;
-        public TodoSubListId TodoSubListId { get; }
         public string Title { get; private set; }
         public string Description { get; private set; }
-        public TodoSubListPosition Position { get; private set; }
         public bool IsDeleted { get; private set; }
+        public int Ordinal { get; private set; }
 
         private readonly List<TodoItem> _items;
         public IReadOnlyCollection<TodoItem> Items => _items.AsReadOnly();
@@ -22,11 +20,11 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             _items = new List<TodoItem>();
         }
 
-        internal TodoSubList(TodoSubListId identity, string title, TodoSubListPosition position, string description = null) : this()
+        internal TodoSubList(int id, string title, int ordinal, string description = null) : this()
         {
-            TodoSubListId = identity;
+            Id = id;
             Title = title;
-            Position = position;
+            Ordinal = ordinal;
             Description = description;
         }
 
@@ -36,9 +34,9 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             Description = description;
         }
 
-        internal void SetPosition(TodoSubListPosition position)
+        internal void SetPosition(int ordinal)
         {
-            Position = position;
+            Ordinal = ordinal;
         }
 
         internal void AddTodo(TodoItem todoItem)

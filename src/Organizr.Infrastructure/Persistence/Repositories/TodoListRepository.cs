@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
-using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Infrastructure.Persistence.Repositories
@@ -21,13 +20,13 @@ namespace Organizr.Infrastructure.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<TodoList> GetAsync(TodoListId id, UserGroupId userGroupId = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<TodoList> GetAsync(Guid id, Guid? userGroupId = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             return await _context
                 .TodoLists
                 .Include(tl => tl.SubLists)
                 .Include(tl => tl.Items)
-                .SingleAsync(l => l.TodoListId == id && l.UserGroupId == userGroupId, cancellationToken);
+                .SingleAsync(l => l.Id == id && l.UserGroupId == userGroupId, cancellationToken);
         }
 
         public void Add(TodoList todoList)

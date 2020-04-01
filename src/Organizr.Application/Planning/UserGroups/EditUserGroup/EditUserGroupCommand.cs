@@ -47,8 +47,7 @@ namespace Organizr.Application.Planning.UserGroups.EditUserGroup
 
         public async Task<Unit> Handle(EditUserGroupCommand request, CancellationToken cancellationToken)
         {
-            var userGroupId = new UserGroupId(request.Id);
-            var userGroup = await _userGroupRepository.GetAsync(userGroupId, cancellationToken);
+            var userGroup = await _userGroupRepository.GetAsync(request.Id, cancellationToken);
 
             if(userGroup == null)
                 throw new ResourceNotFoundException<UserGroup>(request.Id);

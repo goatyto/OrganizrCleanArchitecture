@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Planning.Common.Exceptions;
 using Organizr.Application.Planning.Common.Interfaces;
-using Organizr.Domain.Planning;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 
 namespace Organizr.Application.Planning.UserGroups.CreateUserGroup
@@ -46,9 +44,8 @@ namespace Organizr.Application.Planning.UserGroups.CreateUserGroup
 
         public async Task<Unit> Handle(CreateUserGroupCommand request, CancellationToken cancellationToken)
         {
-            var userGroupId = new UserGroupId(_idGenerator.GenerateNext<UserGroup>());;
-            var creatorUser = new CreatorUser(_identityService.CurrentUserId);
-            var groupMembers = new List<UserGroupMember>();
+            var userGroupId = _idGenerator.GenerateNext<UserGroup>();
+            var currentUserId = _identityService.CurrentUserId;
 
             foreach (var userId in request.GroupMemberIds)
             {
@@ -56,11 +53,10 @@ namespace Organizr.Application.Planning.UserGroups.CreateUserGroup
 
                 if(!userExists)
                     throw new InvalidUserIdException(userId);
-
-                groupMembers.Add(new UserGroupMember(userId));
             }
 
-            var userGroup = UserGroup.Create(userGroupId, creatorUser, request.Name, request.Description, groupMembers);
+            var userGroup = UserGroup.Create(userGroupId, currentUserId, request.Name, request.Description,
+                request.GroupMemberIds);
 
             _userGroupRepository.Add(userGroup);
 

@@ -221,7 +221,7 @@ namespace Organizr.Domain.UnitTests.SharedKernel
         {
             public EntityStub(Guid id = default(Guid), IEnumerable<IDomainEvent> domainEvents =  null)
             {
-                Identity = id;
+                Id = id;
 
                 if(domainEvents != null)
                     foreach(var domainEvent in domainEvents) 
@@ -238,7 +238,7 @@ namespace Organizr.Domain.UnitTests.SharedKernel
         {
             public CompareEntityDummy(Guid id = default(Guid))
             {
-                Identity = id;
+                Id = id;
             }
         }
 

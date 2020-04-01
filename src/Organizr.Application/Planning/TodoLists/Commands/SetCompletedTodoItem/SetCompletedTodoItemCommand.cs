@@ -45,8 +45,7 @@ namespace Organizr.Application.Planning.TodoLists.Commands.SetCompletedTodoItem
 
         public async Task<Unit> Handle(SetCompletedTodoItemCommand request, CancellationToken cancellationToken)
         {
-            var todoListId = new TodoListId(request.TodoListId);
-            var todoList = await _todoListRepository.GetAsync(todoListId, cancellationToken: cancellationToken);
+            var todoList = await _todoListRepository.GetAsync(request.TodoListId, cancellationToken: cancellationToken);
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.TodoListId);
@@ -56,8 +55,7 @@ namespace Organizr.Application.Planning.TodoLists.Commands.SetCompletedTodoItem
             if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
                 throw new AccessDeniedException<TodoList>(request.TodoListId, currentUserId);
 
-            var todoId = new TodoItemId(request.Id);
-            todoList.SetCompletedTodo(todoId, request.IsCompleted);
+            todoList.SetCompletedTodo(request.Id, request.IsCompleted);
 
             _todoListRepository.Update(todoList);
 

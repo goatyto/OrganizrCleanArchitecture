@@ -43,8 +43,7 @@ namespace Organizr.Application.Planning.TodoLists.Commands.DeleteTodoItem
 
         public async Task<Unit> Handle(DeleteTodoItemCommand request, CancellationToken cancellationToken)
         {
-            var todoListId = new TodoListId(request.TodoListId);
-            var todoList = await _todoListRepository.GetAsync(todoListId, cancellationToken: cancellationToken);
+            var todoList = await _todoListRepository.GetAsync(request.TodoListId, cancellationToken: cancellationToken);
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.TodoListId);
@@ -54,8 +53,7 @@ namespace Organizr.Application.Planning.TodoLists.Commands.DeleteTodoItem
             if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
                 throw new AccessDeniedException<TodoList>(request.TodoListId, currentUserId);
 
-            var todoId = new TodoItemId(request.Id);
-            todoList.DeleteTodo(todoId);
+            todoList.DeleteTodo(request.Id);
 
             _todoListRepository.Update(todoList);
 

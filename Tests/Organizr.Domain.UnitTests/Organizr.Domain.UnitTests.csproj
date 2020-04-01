@@ -10,8 +10,6 @@
     <Compile Remove="Planning\ClientDateValidatorTests.cs" />
     <Compile Remove="Planning\TodoListAggregate\TodoItemPositionTests.cs" />
     <Compile Remove="Planning\TodoListAggregate\TodoListExceptionsTests.cs" />
-    <Compile Remove="Planning\UserGroupAggregate\UserGroupExceptionsTests.cs" />
-    <Compile Remove="SharedKernel\EntityTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

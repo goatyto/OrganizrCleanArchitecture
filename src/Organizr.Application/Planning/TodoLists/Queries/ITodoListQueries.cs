@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Organizr.Application.Planning.TodoLists.Queries.GetTodoLists;
-using Organizr.Domain.Planning;
-using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 
 namespace Organizr.Application.Planning.TodoLists.Queries
 {

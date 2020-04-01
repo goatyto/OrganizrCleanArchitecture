@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using FluentAssertions;
-using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Xunit;
 
 namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
@@ -27,9 +26,9 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
 
             var insertedSubList = _fixture.Sut.SubLists.Last();
 
-            insertedSubList.TodoSubListId.Should().Be((TodoSubListId)(initialSubListCount + 1));
+            insertedSubList.Id.Should().Be(initialSubListCount + 1);
             insertedSubList.Title.Should().Be(title);
-            insertedSubList.Position.Should().Be((TodoSubListPosition)_fixture.Sut.SubLists.Count(list => !list.IsDeleted));
+            insertedSubList.Ordinal.Should().Be(_fixture.Sut.SubLists.Count(list => !list.IsDeleted));
             insertedSubList.Description.Should().Be(description);
             insertedSubList.IsDeleted.Should().Be(false);
         }

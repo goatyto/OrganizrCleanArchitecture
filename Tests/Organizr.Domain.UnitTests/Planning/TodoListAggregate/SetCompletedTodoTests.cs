@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
@@ -16,16 +15,12 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             _fixture = new TodoListFixture();
         }
 
-        public static IEnumerable<object[]> SetCompletedTodoValidMemberData = new List<object[]>
+        [Theory]
+        [InlineData(1, true)]
+        [InlineData(1, false)]
+        public void SetCompletedTodo_ValidIdAndBool_CompletedStatusChanged(int todoId, bool isCompleted)
         {
-            new object[]{new TodoItemId(1), true },
-            new object[]{new TodoItemId(1), false}
-        };
-
-        [Theory, MemberData(nameof(SetCompletedTodoValidMemberData))]
-        public void SetCompletedTodo_ValidIdAndBool_CompletedStatusChanged(TodoItemId todoId, bool isCompleted)
-        {
-            var editedTodo = _fixture.Sut.Items.Single(item => item.TodoItemId == todoId);
+            var editedTodo = _fixture.Sut.Items.Single(item => item.Id == todoId);
 
             _fixture.Sut.SetCompletedTodo(todoId, isCompleted);
 
@@ -35,7 +30,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void SetCompletedTodo_DeletedTodoId_ThrowsTodoListException()
         {
-            var deletedTodoId = new TodoItemId(3);
+            var deletedTodoId = 3;
             var isCompleted = true;
 
             _fixture.Sut.Invoking(l => l.SetCompletedTodo(deletedTodoId, isCompleted)).Should()
@@ -45,17 +40,17 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void SetCompletedTodo_DeletedSubListTodoId_ThrowsTodoListException()
         {
-            var deletedSubListTodoId = new TodoItemId(11);
+            var deletedSubListTodoId = 11;
             var isCompleted = true;
 
             _fixture.Sut.Invoking(l => l.SetCompletedTodo(deletedSubListTodoId, isCompleted)).Should()
                 .Throw<TodoListException>().WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
         }
-
+        
         [Fact]
         public void SetCompletedTodo_NonExistentTodoId_ThrowsTodoListException()
         {
-            var nonExistentTodoId = new TodoItemId(99);
+            var nonExistentTodoId = 99;
 
             _fixture.Sut.Invoking(l => l.SetCompletedTodo(nonExistentTodoId)).Should()
                 .Throw<TodoListException>().WithMessage($"*todo item*{nonExistentTodoId}*does not exist*");

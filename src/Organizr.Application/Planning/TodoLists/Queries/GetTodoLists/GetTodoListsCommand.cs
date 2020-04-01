@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Planning.Common.Interfaces;
-using Organizr.Domain.Planning;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 
 namespace Organizr.Application.Planning.TodoLists.Queries.GetTodoLists
