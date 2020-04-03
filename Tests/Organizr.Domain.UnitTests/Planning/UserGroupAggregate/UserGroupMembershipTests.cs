@@ -18,7 +18,7 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
             var newMemberId = "User3";
             fixture.Sut.AddMember(newMemberId);
 
-            var addedMemberId = fixture.Sut.Membership.Last();
+            var addedMemberId = fixture.Sut.Members.Last();
 
             addedMemberId.UserId.Should().Be(newMemberId);
         }
@@ -50,11 +50,11 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
         public void RemoveMember_ValidData_MemberRemoved()
         {
             var fixture = new UserGroupFixture();
-            var initialMembershipCount = fixture.Sut.Membership.Count;
+            var initialMembershipCount = fixture.Sut.Members.Count;
 
             fixture.Sut.RemoveMember(fixture.ExistingUserGroupMemberId);
 
-            fixture.Sut.Membership.Should().HaveCount(initialMembershipCount - 1).And
+            fixture.Sut.Members.Should().HaveCount(initialMembershipCount - 1).And
                 .NotContain(membership => membership.UserId == fixture.ExistingUserGroupMemberId);
         }
 

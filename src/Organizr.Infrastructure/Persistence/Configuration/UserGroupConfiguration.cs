@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 
 namespace Organizr.Infrastructure.Persistence.Configuration
@@ -21,7 +22,8 @@ namespace Organizr.Infrastructure.Persistence.Configuration
             builder.Property(ug => ug.Description);
             builder.Property(ug => ug.CreatorUserId).IsRequired();
 
-            builder.HasMany(ug => ug.Membership).WithOne().HasForeignKey("UserGroupId");
+            builder.HasMany(ug => ug.Members).WithOne().HasForeignKey("UserGroupId");
+            builder.HasMany<TodoList>().WithOne();
         }
     }
 }

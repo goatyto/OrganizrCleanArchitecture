@@ -13,20 +13,21 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
         public string Description { get; private set; }
         public string CreatorUserId { get; private set; }
 
-        private readonly List<UserGroupMembership> _membership;
-        public IReadOnlyCollection<UserGroupMembership> Membership => _membership.AsReadOnly();
+        private readonly List<UserGroupMember> _membership;
+        public IReadOnlyCollection<UserGroupMember> Members => _membership.AsReadOnly();
 
         private UserGroup()
         {
-            _membership = new List<UserGroupMembership>();
+            _membership = new List<UserGroupMember>();
         }
 
         public static UserGroup Create(Guid id, string creatorUserId, string name, string description = null,
-            IEnumerable<string> groupMemberIds = null)
+            IEnumerable<string> memberIds = null)
         {
             Guard.Against.Default(id, nameof(id));
             Guard.Against.NullOrWhiteSpace(creatorUserId, nameof(creatorUserId));
             Guard.Against.NullOrWhiteSpace(name, nameof(name));
+            Guard.Against.NullOrEmpty(memberIds, nameof(memberIds));
 
             var userGroup = new UserGroup();
 
@@ -35,15 +36,15 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
             userGroup.Name = name;
             userGroup.Description = description;
 
-            userGroup._membership.Add(new UserGroupMembership(creatorUserId));
+            userGroup._membership.Add(new UserGroupMember(creatorUserId));
 
-            if (groupMemberIds != null)
+            if (memberIds != null)
             {
-                foreach (var userId in groupMemberIds.Distinct())
+                foreach (var userId in memberIds.Distinct())
                 {
                     if (userId == creatorUserId) continue;
 
-                    userGroup._membership.Add(new UserGroupMembership(userId));
+                    userGroup._membership.Add(new UserGroupMember(userId));
                 }
             }
 
@@ -66,7 +67,7 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
         {
             Guard.Against.NullOrWhiteSpace(userId, nameof(userId));
 
-            var newMembership = new UserGroupMembership(userId);
+            var newMembership = new UserGroupMember(userId);
 
             if (_membership.Any(m => m == newMembership))
                 throw new UserAlreadyMemberException(Id, userId);
@@ -86,7 +87,7 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
             if (_membership.All(m => m != userId))
                 throw new UserNotAMemberException(Id, userId);
 
-            _membership.Remove((UserGroupMembership)userId);
+            _membership.Remove((UserGroupMember)userId);
 
             AddDomainEvent(new UserGroupMemberRemoved(Id, userId));
         }

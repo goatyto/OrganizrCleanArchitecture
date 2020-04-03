@@ -35,7 +35,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             addedTodo.Title.Should().Be(title);
             addedTodo.Description.Should().Be(description);
             addedTodo.DueDateUtc.Should().Be(dueDateUtc);
-            addedTodo.Position.Should().Be((TodoItemPosition)_fixture.GetTodoItems(subListId).Count(item => !item.IsDeleted));
+            addedTodo.Ordinal.Should().Be(_fixture.GetTodoItems(subListId).Count(item => !item.IsDeleted));
             addedTodo.IsCompleted.Should().Be(false);
             addedTodo.IsDeleted.Should().Be(false);
         }

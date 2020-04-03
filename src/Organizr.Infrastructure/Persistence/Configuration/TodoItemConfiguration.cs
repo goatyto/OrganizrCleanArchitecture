@@ -20,9 +20,7 @@ namespace Organizr.Infrastructure.Persistence.Configuration
 
             builder.Property(ti => ti.Title).IsRequired();
             builder.Property(ti => ti.Description);
-
-            builder.OwnsOne(ti => ti.Position);
-
+            builder.Property(ti => ti.Ordinal).IsRequired();
             builder.Property(ti => ti.IsCompleted).IsRequired();
             builder.Property(ti => ti.IsDeleted).IsRequired();
             builder.Property(ti => ti.DueDateUtc);

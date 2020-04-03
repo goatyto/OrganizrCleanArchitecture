@@ -12,7 +12,7 @@ namespace Organizr.Infrastructure.Persistence
     {
         public const string USERS_SCHEMA = "Users";
         public DbSet<UserGroup> UserGroups { get; set; }
-        public DbSet<UserGroupMembership> UserGroupMemberships { get; set; }
+        public DbSet<UserGroupMember> UserGroupMemberships { get; set; }
 
         public const string LISTS_SCHEMA = "Lists";
         public DbSet<TodoList> TodoLists { get; set; }
@@ -27,7 +27,7 @@ namespace Organizr.Infrastructure.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UserGroupConfiguration());
-            modelBuilder.ApplyConfiguration(new UserGroupMembershipConfiguration());
+            modelBuilder.ApplyConfiguration(new UserGroupMemberConfiguration());
 
             modelBuilder.ApplyConfiguration(new TodoListConfiguration());
             modelBuilder.ApplyConfiguration(new TodoSubListConfiguration());

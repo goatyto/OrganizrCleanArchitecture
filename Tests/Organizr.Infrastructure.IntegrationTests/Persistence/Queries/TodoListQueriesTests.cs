@@ -10,23 +10,24 @@ using Organizr.Application.Planning.Common.Interfaces;
 using Organizr.Application.Planning.TodoLists.Queries;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
+using Organizr.Infrastructure.Persistence;
 using Organizr.Infrastructure.Persistence.Queries;
 using Organizr.Infrastructure.Persistence.Repositories;
 using Xunit;
 
 namespace Organizr.Infrastructure.IntegrationTests.Persistence.Queries
 {
-    public class TodoListQueriesTests : IClassFixture<OrganizrContextFixture>
+    public class TodoListQueriesTests: IDisposable
     {
-        private readonly OrganizrContextFixture _fixture;
+        private readonly OrganizrContext _context;
         private readonly ITodoListQueries _sut;
         private readonly Guid UserGroupId;
 
-        public TodoListQueriesTests(OrganizrContextFixture fixture)
+        public TodoListQueriesTests()
         {
-            _fixture = fixture;
+            _context = OrganizrContextFactory.Create();
 
-            var todoListRepository = new TodoListRepository(_fixture.Context);
+            var todoListRepository = new TodoListRepository(_context);
 
             var todoList1 = TodoList.Create(Guid.NewGuid(), "User1", "Title1", "Description1");
             todoList1.AddSubList("TodoSubList11");
@@ -48,10 +49,12 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Queries
 
             todoListRepository.UnitOfWork.SaveChangesAsync().Wait();
 
-            var userGroupRepository = new UserGroupRepository(_fixture.Context);
+            var userGroupRepository = new UserGroupRepository(_context);
 
             UserGroupId = Guid.NewGuid();
             var userGroup = UserGroup.Create(UserGroupId, "User1", "Group1");
+
+            userGroupRepository.Add(userGroup);
 
             var sharedTodoList1 = userGroup.CreateSharedTodoList(Guid.NewGuid(), "User1", "SharedTitle1", "SharedDescription1");
             sharedTodoList1.AddSubList("SharedTodoSubList11");
@@ -73,7 +76,7 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Queries
 
             userGroupRepository.UnitOfWork.SaveChangesAsync().Wait();
 
-            var contextDbConnection = _fixture.Context.Database.GetDbConnection();
+            var contextDbConnection = _context.Database.GetDbConnection();
 
             var dbConnectionFactoryMock = new Mock<IDbConnectionFactory>();
             dbConnectionFactoryMock.Setup(m => m.Create(contextDbConnection.ConnectionString))
@@ -85,7 +88,7 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Queries
         }
 
         [Fact]
-        public async Task GetTodoListsForUserAsync_ValidUserId_RetursTodoLists()
+        public async Task GetTodoListsForUserAsync_ValidUserId_ReturnsTodoLists()
         {
             var todoLists = await _sut.GetTodoListsForUserAsync("User1");
 
@@ -93,11 +96,16 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Queries
         }
 
         [Fact]
-        public async Task GetSharedTodoListsForGroupAsync_ValidUserGroupId_RetursTodoLists()
+        public async Task GetSharedTodoListsForGroupAsync_ValidUserGroupId_ReturnsTodoLists()
         {
             var todoLists = await _sut.GetSharedTodoListsForGroupAsync(UserGroupId);
 
             todoLists.Should().HaveCount(3);
+        }
+
+        public void Dispose()
+        {
+            _context?.Dispose();
         }
     }
 }

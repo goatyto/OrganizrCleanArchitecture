@@ -22,7 +22,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var todoId = 1;
 
             var todoToBeEdited = _fixture.Sut.Items.Single(item => item.Id == todoId);
-            var originalPosition = todoToBeEdited.Position;
+            var originalOrdinal = todoToBeEdited.Ordinal;
             var originalIsCompleted = todoToBeEdited.IsCompleted;
             var originalIsDeleted = todoToBeEdited.IsDeleted;
 
@@ -36,7 +36,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             todoToBeEdited.Title.Should().Be(newTitle);
             todoToBeEdited.Description.Should().Be(newDescription);
             todoToBeEdited.DueDateUtc.Should().Be(newDueDateUtc);
-            todoToBeEdited.Position.Should().Be(originalPosition);
+            todoToBeEdited.Ordinal.Should().Be(originalOrdinal);
             todoToBeEdited.IsCompleted.Should().Be(originalIsCompleted);
             todoToBeEdited.IsDeleted.Should().Be(originalIsDeleted);
         }

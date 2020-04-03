@@ -43,7 +43,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
             ResourceAuthorizationServiceMock.Setup(m => m.CanDelete(creatorUserId, todoList)).Returns(true);
 
             TodoListRepositoryMock = new Mock<ITodoListRepository>();
-            TodoListRepositoryMock.Setup(m => m.GetAsync(TodoListId, null, It.IsAny<CancellationToken>()))
+            TodoListRepositoryMock.Setup(m => m.GetOwnAsync(TodoListId, null, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => todoList);
             TodoListRepositoryMock.Setup(m => m.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);

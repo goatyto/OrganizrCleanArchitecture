@@ -21,7 +21,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [InlineData(5, 2)]
         [InlineData(3, 1)]
         [InlineData(4, 3)]
-        public void MoveSubList_ValidPosition_SubListOrdinalChanges(int subListId, int targetOrdinal)
+        public void MoveSubList_ValidOrdinal_SubListOrdinalChanges(int subListId, int targetOrdinal)
         {
             var subListToBeMoved = _fixture.Sut.SubLists.Single(sl => sl.Id == subListId);
 

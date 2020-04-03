@@ -5,16 +5,16 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 {
-    public class UserGroupMembership : ValueObject
+    public class UserGroupMember : ValueObject
     {
         public string UserId { get; }
 
-        private UserGroupMembership()
+        private UserGroupMember()
         {
             
         }
 
-        public UserGroupMembership(string userId)
+        public UserGroupMember(string userId)
         {
             Guard.Against.NullOrWhiteSpace(userId, nameof(userId));
 
@@ -26,7 +26,7 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
             yield return UserId;
         }
 
-        public static implicit operator string(UserGroupMembership membership) => membership.UserId;
-        public static explicit operator UserGroupMembership(string userId) => new UserGroupMembership(userId);
+        public static implicit operator string(UserGroupMember member) => member.UserId;
+        public static explicit operator UserGroupMember(string userId) => new UserGroupMember(userId);
     }
 }

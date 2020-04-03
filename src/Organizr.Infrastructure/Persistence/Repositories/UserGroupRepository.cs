@@ -25,12 +25,12 @@ namespace Organizr.Infrastructure.Persistence.Repositories
 
         public void Add(UserGroup userGroup)
         {
-            throw new NotImplementedException();
+            _context.UserGroups.Add(userGroup);
         }
 
         public void Update(UserGroup userGroup)
         {
-            throw new NotImplementedException();
+            _context.UserGroups.Update(userGroup);
         }
     }
 }

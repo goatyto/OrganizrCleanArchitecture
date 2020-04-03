@@ -34,7 +34,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             Description = description;
         }
 
-        internal void SetPosition(int ordinal)
+        internal void SetOrdinal(int ordinal)
         {
             Ordinal = ordinal;
         }
