@@ -10,14 +10,14 @@ namespace Organizr.Application.UnitTests.Common
 {
     public static class RequestValidatorFactory
     {
-        public static IEnumerable<IValidator<TRequest>> Create<TRequest, TResponse>([CanBeNull] params object[] args) where TRequest : IRequest<TResponse>
+        public static IEnumerable<IValidator<TRequest>> Create<TRequest, TResponse>(params object[] args) where TRequest : IRequest<TResponse>
         {
             return Assembly.GetAssembly(typeof(TRequest)).GetTypes()
                 .Where(type => type.IsClass && typeof(IValidator<TRequest>).IsAssignableFrom(type))
-                .Select(type => (IValidator<TRequest>) Activator.CreateInstance(type, args));
+                .Select(type => (IValidator<TRequest>)Activator.CreateInstance(type, args));
         }
 
-        public static IEnumerable<IValidator<TRequest>> Create<TRequest>([CanBeNull] params object[] args)
+        public static IEnumerable<IValidator<TRequest>> Create<TRequest>(params object[] args)
             where TRequest : IRequest
         {
             return Create<TRequest, Unit>(args);

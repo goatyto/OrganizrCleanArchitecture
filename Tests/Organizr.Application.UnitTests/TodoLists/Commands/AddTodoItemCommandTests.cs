@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using FluentAssertions;
-using MediatR;
-using Moq;
 using Organizr.Application.Planning.Common.Exceptions;
 using Organizr.Application.Planning.TodoLists.Commands.AddTodoItem;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;

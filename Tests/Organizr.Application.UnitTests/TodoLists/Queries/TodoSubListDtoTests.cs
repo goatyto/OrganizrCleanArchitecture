@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using FluentAssertions;
 using Organizr.Application.Planning.TodoLists.Queries.GetTodoLists;
 using Xunit;

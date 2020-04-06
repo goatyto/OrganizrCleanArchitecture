@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
-using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Infrastructure.Persistence.Configuration
 {

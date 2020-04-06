@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using FluentAssertions;
-using Moq;
 using Organizr.Application.Planning.TodoLists.Queries.GetTodoLists;
 using Xunit;
 

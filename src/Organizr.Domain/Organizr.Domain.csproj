@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Compile Remove="Planning\Aggregates\TodoListAggregate\TodoItemPosition.cs" />
+    <Compile Remove="Planning\Aggregates\TodoListAggregate\TodoListId.cs" />
     <Compile Remove="Planning\Aggregates\TodoListAggregate\TodoSubListPosition.cs" />
     <Compile Remove="SharedKernel\Enumeration.cs" />
     <Compile Remove="SharedKernel\IDateTime.cs" />
@@ -25,10 +26,6 @@
 
   <ItemGroup>
     <Folder Include="Calendar\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Ardalis.GuardClauses" Version="1.4.1" />
   </ItemGroup>
 
 </Project>

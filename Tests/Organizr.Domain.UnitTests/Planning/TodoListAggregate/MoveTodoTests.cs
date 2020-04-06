@@ -89,10 +89,10 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         };
 
         [Theory, MemberData(nameof(MoveTodoInvalidOrdinalTestData))]
-        public void MoveTodo_InvalidOrdinal_ThrowsTodoListException(int todoId, int invalidOrdinal, int? subListId)
+        public void MoveTodo_InvalidOrdinal_ThrowsInvalidOperationException(int todoId, int invalidOrdinal, int? subListId)
         {
             _fixture.Sut.Invoking(l => l.MoveTodo(todoId, invalidOrdinal, subListId)).Should()
-                .Throw<TodoListException>().WithMessage("*ordinal*out of range*");
+                .Throw<InvalidOperationException>().WithMessage("*ordinal*out of range*");
         }
 
         public static IEnumerable<object[]> MoveTodoDeletedTodoTestData = new[]
@@ -104,54 +104,54 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         };
 
         [Theory, MemberData(nameof(MoveTodoDeletedTodoTestData))]
-        public void MoveTodo_DeletedTodoId_ThrowsTodoListException(int deletedTodoId, int ordinal, int? subListId)
+        public void MoveTodo_DeletedTodoId_ThrowsInvalidOperationException(int deletedTodoId, int ordinal, int? subListId)
         {
             _fixture.Sut.Invoking(l => l.MoveTodo(deletedTodoId, ordinal, subListId)).Should()
-                .Throw<TodoListException>().WithMessage($"*todo item*{deletedTodoId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*todo item*{deletedTodoId}*does not exist*");
         }
 
         [Fact]
-        public void MoveTodo_DeletedSourceSubList_ThrowsTodoListException()
+        public void MoveTodo_DeletedSourceSubList_ThrowsInvalidOperationException()
         {
             var deletedSubListTodoId = 11;
             var newOrdinal = 1;
             int? newSubListId = null;
 
             _fixture.Sut.Invoking(l => l.MoveTodo(deletedSubListTodoId, newOrdinal, newSubListId)).Should()
-                .Throw<TodoListException>().WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
         }
 
         [Fact]
-        public void MoveTodo_DeletedDestinationSubList_ThrowsTodoListException()
+        public void MoveTodo_DeletedDestinationSubList_ThrowsInvalidOperationException()
         {
             var todoId = 1;
             var todoItemOrdinal = 1;
             var deletedSubListId = 2;
 
             _fixture.Sut.Invoking(l => l.MoveTodo(todoId, todoItemOrdinal, deletedSubListId)).Should()
-                .Throw<TodoListException>().WithMessage($"*sublist*{deletedSubListId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*sublist*{deletedSubListId}*does not exist*");
         }
 
         [Fact]
-        public void MoveTodo_NonExistentDestinationSubListId_ThrowsTodoListException()
+        public void MoveTodo_NonExistentDestinationSubListId_ThrowsInvalidOperationException()
         {
             var todoId = 1;
             var newOrdinal = 1;
             var nonExistentSubListId = 99;
 
             _fixture.Sut.Invoking(l => l.MoveTodo(todoId, newOrdinal, nonExistentSubListId)).Should()
-                .Throw<TodoListException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");
         }
 
         [Fact]
-        public void MoveTodo_NonExistentTodoId_ThrowsTodoListException()
+        public void MoveTodo_NonExistentTodoId_ThrowsInvalidOperationException()
         {
             var nonExistentTodoId = 99;
             var newOrdinal = 1;
             var newSubListId = 1;
 
             _fixture.Sut.Invoking(l => l.MoveTodo(nonExistentTodoId, newOrdinal, newSubListId)).Should()
-                .Throw<TodoListException>().WithMessage($"todo item*{nonExistentTodoId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"todo item*{nonExistentTodoId}*does not exist*");
         }
     }
 }

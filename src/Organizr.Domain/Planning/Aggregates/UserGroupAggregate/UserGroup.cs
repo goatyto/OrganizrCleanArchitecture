@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Ardalis.GuardClauses;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Domain.SharedKernel;
 
@@ -21,13 +20,16 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
             _membership = new List<UserGroupMember>();
         }
 
-        public static UserGroup Create(Guid id, string creatorUserId, string name, string description = null,
-            IEnumerable<string> memberIds = null)
+        public static UserGroup Create(Guid id, string creatorUserId, string name,
+            IEnumerable<string> memberIds, string description = null)
         {
-            Guard.Against.Default(id, nameof(id));
-            Guard.Against.NullOrWhiteSpace(creatorUserId, nameof(creatorUserId));
-            Guard.Against.NullOrWhiteSpace(name, nameof(name));
-            Guard.Against.NullOrEmpty(memberIds, nameof(memberIds));
+            Assert.Argument.NotDefault(id, nameof(id), "User group Id cannot be default value.");
+            Assert.Argument.NotEmpty(creatorUserId, nameof(creatorUserId), "Creator user Id cannot be empty.");
+
+            AssertNameNotEmpty(name);
+
+            Assert.Argument.NotEmpty(memberIds, nameof(memberIds), "Group member collection cannot be empty.");
+            Assert.Argument.DoesNotHaveEmptyElements(memberIds, nameof(memberIds), "Group member collection cannot have empty user Ids.");
 
             var userGroup = new UserGroup();
 
@@ -55,7 +57,7 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 
         public void Edit(string name, string description = null)
         {
-            Guard.Against.NullOrWhiteSpace(name, nameof(name));
+            AssertNameNotEmpty(name);
 
             Name = name;
             Description = description;
@@ -65,12 +67,11 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 
         public void AddMember(string userId)
         {
-            Guard.Against.NullOrWhiteSpace(userId, nameof(userId));
+            Assert.Argument.NotEmpty(userId, nameof(userId), "Member user Id cannot be empty.");
 
             var newMembership = new UserGroupMember(userId);
 
-            if (_membership.Any(m => m == newMembership))
-                throw new UserAlreadyMemberException(Id, userId);
+            AssertGroupMemberDoesNotExist(userId);
 
             _membership.Add(newMembership);
 
@@ -79,13 +80,10 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 
         public void RemoveMember(string userId)
         {
-            Guard.Against.NullOrWhiteSpace(userId, nameof(userId));
+            Assert.Argument.NotEmpty(userId, nameof(userId), "Member user Id cannot be empty.");
 
-            if (userId == CreatorUserId)
-                throw new CreatorCannotBeRemovedException(Id);
-
-            if (_membership.All(m => m != userId))
-                throw new UserNotAMemberException(Id, userId);
+            AssertGroupMemberExists(userId);
+            AssertRemovedGroupMemberNotCreator(userId);
 
             _membership.Remove((UserGroupMember)userId);
 
@@ -94,12 +92,35 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 
         public TodoList CreateSharedTodoList(Guid id, string creatorUserId, string title, string description = null)
         {
-            if (_membership.All(m => m.UserId != creatorUserId))
-                throw new UserNotAMemberException(Id, creatorUserId);
+            AssertGroupMemberExists(creatorUserId);
 
             var todoList = TodoList.CreateShared(id, creatorUserId, Id, title, description);
 
             return todoList;
+        }
+
+        private static void AssertNameNotEmpty(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new UserGroupException("User group name cannot be empty.");
+        }
+
+        private void AssertGroupMemberDoesNotExist(string userId)
+        {
+            if(Members.Any(m=>m == userId))
+                throw new InvalidOperationException($"User with Id \"{userId}\" is already a member in group \"{Id}\".");
+        }
+
+        private void AssertGroupMemberExists(string userId)
+        {
+            if (Members.All(m => m != userId))
+                throw new InvalidOperationException($"User with Id \"{userId}\" is not a member in group \"{Id}\".");
+        }
+
+        private void AssertRemovedGroupMemberNotCreator(string removedMemberId)
+        {
+            if(removedMemberId == CreatorUserId)
+                throw new UserGroupException("Creator user cannot be removed from group.");
         }
     }
 }

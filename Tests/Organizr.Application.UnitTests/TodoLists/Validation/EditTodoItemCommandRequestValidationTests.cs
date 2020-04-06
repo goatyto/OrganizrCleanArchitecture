@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using FluentAssertions;
 using FluentValidation;
-using MediatR;
-using Moq;
 using Organizr.Application.Planning.TodoLists.Commands.EditTodoItem;
 using Organizr.Application.UnitTests.Common;
-using Organizr.Domain.SharedKernel;
 using Xunit;
 
 namespace Organizr.Application.UnitTests.TodoLists.Validation

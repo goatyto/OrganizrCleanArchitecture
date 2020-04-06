@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Ardalis.GuardClauses;
+﻿using System.Collections.Generic;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
@@ -16,7 +14,7 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 
         public UserGroupMember(string userId)
         {
-            Guard.Against.NullOrWhiteSpace(userId, nameof(userId));
+            Assert.Argument.NotEmpty(userId, nameof(userId));
 
             UserId = userId;
         }

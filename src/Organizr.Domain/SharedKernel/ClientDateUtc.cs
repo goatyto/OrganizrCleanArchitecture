@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Ardalis.GuardClauses;
 
 namespace Organizr.Domain.SharedKernel
 {
@@ -39,7 +37,8 @@ namespace Organizr.Domain.SharedKernel
             if (!date.HasValue)
                 return null;
 
-            Guard.Against.Null(clientTimeZoneOffsetInMinutes, nameof(clientTimeZoneOffsetInMinutes));
+            Assert.Argument.NotNull(clientTimeZoneOffsetInMinutes, nameof(clientTimeZoneOffsetInMinutes),
+                $"Parameter \"{nameof(clientTimeZoneOffsetInMinutes)}\" cannot be null when \"{nameof(date)}\" has value.");
 
             return new ClientDateUtc(date.Value, clientTimeZoneOffsetInMinutes.Value);
         }

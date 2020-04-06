@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Ardalis.GuardClauses;
-using Organizr.Domain.SharedKernel;
+﻿using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 {
@@ -12,7 +8,7 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
 
         public UserGroupCreated(UserGroup userGroup)
         {
-            Guard.Against.Null(userGroup, nameof(userGroup));
+            Assert.Argument.NotNull(userGroup, nameof(userGroup));
 
             UserGroup = userGroup;
         }

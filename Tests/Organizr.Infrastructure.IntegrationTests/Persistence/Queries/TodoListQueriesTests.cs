@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using FluentAssertions;
@@ -52,7 +50,7 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Queries
             var userGroupRepository = new UserGroupRepository(_context);
 
             UserGroupId = Guid.NewGuid();
-            var userGroup = UserGroup.Create(UserGroupId, "User1", "Group1");
+            var userGroup = UserGroup.Create(UserGroupId, "User1", "Group1", null);
 
             userGroupRepository.Add(userGroup);
 

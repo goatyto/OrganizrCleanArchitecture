@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using FluentAssertions;
 using FluentValidation;
-using MediatR;
-using Moq;
 using Organizr.Application.Planning.TodoLists.Commands.EditTodoList;
 using Organizr.Application.UnitTests.Common;
 using Xunit;

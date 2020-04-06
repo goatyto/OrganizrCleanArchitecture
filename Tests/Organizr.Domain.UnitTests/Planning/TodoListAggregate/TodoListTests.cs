@@ -25,31 +25,29 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             sut.SubLists.Should().NotBeNull();
         }
 
-        [Fact]
-        public void Create_DefaultId_ThrowsArgumentException()
-        {
-            var defaultId = Guid.Empty;
-
-            Func<TodoList> sut = () => TodoList.Create(defaultId, "User1", "TodoListTitle", "TodoListDescription");
-
-            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("id");
-        }
-
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void Create_NullOrWhiteSpaceTitle_ThrowsArgumentException(string title)
+        public void Create_NullOrWhiteSpaceTitle_ThrowsTodoListException(string title)
         {
-            Func<TodoList> sut = () => TodoList.Create(Guid.NewGuid(), "User1", title);
+            var todoListId = Guid.NewGuid();
+            var creatorUserId = "User1";
 
-            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("title");
+            Func<TodoList> sut = () => TodoList.Create(todoListId, creatorUserId, title);
+
+            sut.Should().Throw<TodoListException>().WithMessage("*title*cannot be empty*");
         }
 
         [Fact]
         public void Edit_ValidData_StateChanges()
         {
-            var sut = TodoList.Create(Guid.NewGuid(), "User1", "Todo List 1 Title", "Todo List 1 Description");
+            var todoListId = Guid.NewGuid();
+            var creatorUserId = "User1";
+            var todoListTitle = "Todo List 1 Title";
+            var todoListDescription = "Todo List 1 Description";
+
+            var sut = TodoList.Create(todoListId, creatorUserId, todoListTitle, todoListDescription);
 
             var newTitle = "New Todo List 1";
             var newDescription = "New Todo List 1 Description";
@@ -64,14 +62,19 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void Edit_NullOrWhiteSpaceTitle_ThrowsArgumentException(string title)
+        public void Edit_NullOrWhiteSpaceTitle_ThrowsTodoListException(string title)
         {
-            var sut = TodoList.Create(Guid.NewGuid(), "User1", "Todo List 1 Title", "Todo List 1 Description");
+            var todoListId = Guid.NewGuid();
+            var creatorUserId = "User1";
+            var todoListTitle = "Todo List 1 Title";
+            var todoListDescription = "Todo List 1 Description";
+
+            var sut = TodoList.Create(todoListId, creatorUserId, todoListTitle, todoListDescription);
 
             var newDescription = "New Todo List 1 Description";
 
-            sut.Invoking(l => l.Edit(title, newDescription)).Should().Throw<ArgumentException>().And.ParamName.Should()
-                .Be("title");
+            sut.Invoking(l => l.Edit(title, newDescription)).Should().Throw<TodoListException>()
+                .WithMessage("*title*cannot be empty*");
         }
     }
 }

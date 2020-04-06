@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using FluentAssertions;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Xunit;
@@ -12,7 +10,12 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void TodoListCreatedConstructor_ValidTodoList_ObjectInitialized()
         {
-            var todoList = TodoList.Create(Guid.NewGuid(), "User1", "Title", "Description");
+            var todoListId = Guid.NewGuid();
+            var creatorUserId = "User1";
+            var title = "Title";
+            var description = "Description";
+
+            var todoList = TodoList.Create(todoListId, creatorUserId, title, description);
 
             var sut = new TodoListCreated(todoList);
 
@@ -32,7 +35,12 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [Fact]
         public void TodoListUpdatedConstructor_ValidTodoList_ObjectInitialized()
         {
-            var todoList = TodoList.Create(Guid.NewGuid(), "User1", "Title", "Description");
+            var todoListId = Guid.NewGuid();
+            var creatorUserId = "User1";
+            var title = "Title";
+            var description = "Description";
+
+            var todoList = TodoList.Create(todoListId, creatorUserId, title, description);
 
             var sut = new TodoListUpdated(todoList);
 

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Ardalis.GuardClauses;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
@@ -28,9 +26,10 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
         public static TodoList Create(Guid id, string creatorUserId, string title, string description = null)
         {
-            Guard.Against.Default(id, nameof(id));
-            Guard.Against.NullOrWhiteSpace(creatorUserId, nameof(creatorUserId));
-            Guard.Against.NullOrWhiteSpace(title, nameof(title));
+            Assert.Argument.NotDefault(id, nameof(id), "Todo list Id cannot be default value.");
+            Assert.Argument.NotEmpty(creatorUserId, nameof(creatorUserId), "Creator user Id cannot be empty.");
+
+            AssertTitleNotEmpty(title);
 
             var todoList = new TodoList();
 
@@ -47,7 +46,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
         internal static TodoList CreateShared(Guid id, string creatorUserId, Guid userGroupId, string title,
             string description = null)
         {
-            Guard.Against.Default(userGroupId, nameof(userGroupId));
+            Assert.Argument.NotDefault(userGroupId, nameof(userGroupId), "User group Id cannot be default value.");
 
             var todoList = Create(id, creatorUserId, title, description);
 
@@ -60,7 +59,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
         public void Edit(string title, string description = null)
         {
-            Guard.Against.NullOrWhiteSpace(title, nameof(title));
+            AssertTitleNotEmpty(title);
 
             Title = title;
             Description = description;
@@ -70,7 +69,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
         public void AddSubList(string title, string description = null)
         {
-            Guard.Against.NullOrWhiteSpace(title, nameof(title));
+            AssertTitleNotEmpty(title);
 
             var subList = new TodoSubList(GetNextSubListId(), title, GetNextSubListOrdinal(), description);
             _subLists.Add(subList);
@@ -80,7 +79,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
         public void EditSubList(int subListId, string title, string description = null)
         {
-            Guard.Against.NullOrWhiteSpace(title, nameof(title));
+            AssertTitleNotEmpty(title);
 
             var subList = FindSubList(subListId);
 
@@ -128,7 +127,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
         public void AddTodo(string title, string description = null, ClientDateUtc dueDateUtc = null, int? subListId = null)
         {
-            Guard.Against.NullOrWhiteSpace(title, nameof(title));
+            AssertTitleNotEmpty(title);
 
             if (dueDateUtc != null)
             {
@@ -153,7 +152,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
 
         public void EditTodo(int todoId, string title, string description = null, ClientDateUtc dueDateUtc = null)
         {
-            Guard.Against.NullOrWhiteSpace(title, nameof(title));
+            AssertTitleNotEmpty(title);
 
             var todo = FindTodoItem(todoId, out _);
 
@@ -353,7 +352,7 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
             var subList = SubLists.SingleOrDefault(sl => !sl.IsDeleted && sl.Id == subListId);
 
             if (subList == null)
-                throw new TodoListException($"Sublist with id \"{subListId}\" does not exist in list \"{Id}\".");
+                throw new InvalidOperationException($"Sublist with id \"{subListId}\" does not exist in list \"{Id}\".");
 
             return subList;
         }
@@ -371,37 +370,43 @@ namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate
                     todo = subList.Items.SingleOrDefault(it => !it.IsDeleted && it.Id == todoId);
 
                     if (todo == null) continue;
-                    
+
                     subListId = subList.Id;
                     break;
                 }
             }
 
             if (todo == null)
-                throw new TodoListException($"Todo item with id \"{todoId}\" does not exist in list \"{Id}\".");
+                throw new InvalidOperationException($"Todo item with id \"{todoId}\" does not exist in list \"{Id}\".");
 
             return todo;
         }
 
-        public void AssertSubListOrdinalValid(int ordinal)
+        private static void AssertTitleNotEmpty(string title)
         {
-            if (ordinal < 1 || ordinal > SubLists.Count)
-                throw new TodoListException("Provided sublist ordinal is out of range.");
+            if(string.IsNullOrWhiteSpace(title))
+                throw new TodoListException("Title cannot be empty.");
         }
 
-        public void AssertTodoItemOrdinalValid(int ordinal, int? subListId = null)
+        private void AssertSubListOrdinalValid(int ordinal)
+        {
+            if (ordinal < 1 || ordinal > SubLists.Count(sl => !sl.IsDeleted))
+                throw new InvalidOperationException("Provided sublist ordinal is out of range.");
+        }
+
+        private void AssertTodoItemOrdinalValid(int ordinal, int? subListId = null)
         {
             var itemRangeToBeChecked =
                 !subListId.HasValue ? Items : FindSubList(subListId.Value).Items;
 
-            if (ordinal < 1 || ordinal > itemRangeToBeChecked.Count)
-                throw new TodoListException("Provided todo item ordinal is out of range.");
+            if (ordinal < 1 || ordinal > itemRangeToBeChecked.Count(ti => !ti.IsDeleted))
+                throw new InvalidOperationException("Provided todo item ordinal is out of range.");
         }
 
-        public void AssertDueDateUtcValid(ClientDateUtc clientDateUtc)
+        private void AssertDueDateUtcValid(ClientDateUtc clientDateUtc)
         {
             if (clientDateUtc.IsBeforeClientToday)
-                throw new TodoListException($"Due date cannot be before client today.");
+                throw new TodoListException("Due date cannot be before client today.");
         }
     }
 }

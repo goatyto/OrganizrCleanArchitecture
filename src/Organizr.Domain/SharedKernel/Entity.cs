@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Ardalis.GuardClauses;
 
 namespace Organizr.Domain.SharedKernel
 {
@@ -20,14 +19,14 @@ namespace Organizr.Domain.SharedKernel
 
         public void AddDomainEvent(IDomainEvent domainEvent)
         {
-            Guard.Against.Null(domainEvent, nameof(domainEvent));
+            Assert.Argument.NotNull(domainEvent, nameof(domainEvent));
 
             _domainEvents.Add(domainEvent);
         }
 
         public void RemoveDomainEvent(IDomainEvent domainEvent)
         {
-            Guard.Against.Null(domainEvent, nameof(domainEvent));
+            Assert.Argument.NotNull(domainEvent, nameof(domainEvent));
 
             _domainEvents.Remove(domainEvent);
         }

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 using Organizr.Infrastructure.Persistence;
@@ -50,8 +48,8 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Repositories
 
             _memberUserId = "User2";
 
-            var userGroup = UserGroup.Create(Guid.NewGuid(), _creatorUserId, "UserGroup", "Description",
-                new List<string> { _memberUserId });
+            var userGroup = UserGroup.Create(Guid.NewGuid(), _creatorUserId, "UserGroup",
+                new List<string> { _memberUserId }, "Description");
 
             userGroupRepository.Add(userGroup);
 

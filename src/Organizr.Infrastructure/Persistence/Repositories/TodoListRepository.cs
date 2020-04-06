@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
-using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Infrastructure.Persistence.Repositories

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using FluentAssertions;
+using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Xunit;
 
 namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
@@ -37,12 +38,12 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void AddSubList_NullOrWhiteSpaceTitle_ThrowsArgumentException(string title)
+        public void AddSubList_NullOrWhiteSpaceTitle_ThrowsTodoListException(string title)
         {
             var description = "Todo Sub List Description";
 
-            _fixture.Sut.Invoking(l => l.AddSubList(title, description)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be("title");
+            _fixture.Sut.Invoking(l => l.AddSubList(title, description)).Should().Throw<TodoListException>()
+                .WithMessage("*title*cannot be empty*");
         }
     }
 }

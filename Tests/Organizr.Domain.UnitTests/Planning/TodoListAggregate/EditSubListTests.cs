@@ -36,38 +36,38 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         }
 
         [Fact]
-        public void EditSubList_NonExistingSubListId_ThrowsTodoListException()
+        public void EditSubList_NonExistingSubListId_ThrowsInvalidOperationException()
         {
             var nonExistingSubListId = 99;
             var newTitle = "Todo Sub List";
             var newDescription = "Todo Sub List Description";
 
             _fixture.Sut.Invoking(l => l.EditSubList(nonExistingSubListId, newTitle, newDescription)).Should()
-                .Throw<TodoListException>().WithMessage($"*sublist*{nonExistingSubListId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*sublist*{nonExistingSubListId}*does not exist*");
         }
 
         [Fact]
-        public void EditSubList_DeletedSubListId_ThrowsTodoListException()
+        public void EditSubList_DeletedSubListId_ThrowsInvalidOperationException()
         {
             var deletedSubListId = 2;
             var newTitle = "Todo Sub List";
             var newDescription = "Todo Sub List Description";
 
             _fixture.Sut.Invoking(l => l.EditSubList(deletedSubListId, newTitle, newDescription)).Should()
-                .Throw<TodoListException>().WithMessage($"*sublist*{deletedSubListId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*sublist*{deletedSubListId}*does not exist*");
         }
 
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void EditSubList_NullOrWhiteSpaceTitle_ThrowsArgumentException(string newTitle)
+        public void EditSubList_NullOrWhiteSpaceTitle_ThrowsTodoListException(string newTitle)
         {
             var subListId = 1;
             var newDescription = "Todo Sub List Description";
 
-            _fixture.Sut.Invoking(l => l.EditSubList(subListId, newTitle, newDescription)).Should().Throw<ArgumentException>()
-                .And.ParamName.Should().Be("title");
+            _fixture.Sut.Invoking(l => l.EditSubList(subListId, newTitle, newDescription)).Should()
+                .Throw<TodoListException>().WithMessage("*title*cannot be empty*");
         }
     }
 }

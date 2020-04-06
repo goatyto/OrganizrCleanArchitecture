@@ -1,9 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Planning.Common.Interfaces;
-using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
+using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.Planning.TodoLists.Queries.GetTodoLists
 {
@@ -19,8 +18,8 @@ namespace Organizr.Application.Planning.TodoLists.Queries.GetTodoLists
 
         public GetTodoListsCommandHandler(IIdentityService currentUserService, ITodoListQueries todoListQueries)
         {
-            Guard.Against.Null(currentUserService, nameof(currentUserService));
-            Guard.Against.Null(todoListQueries, nameof(todoListQueries));
+            Assert.Argument.NotNull(currentUserService, nameof(currentUserService));
+            Assert.Argument.NotNull(todoListQueries, nameof(todoListQueries));
 
             _currentUserService = currentUserService;
             _todoListQueries = todoListQueries;

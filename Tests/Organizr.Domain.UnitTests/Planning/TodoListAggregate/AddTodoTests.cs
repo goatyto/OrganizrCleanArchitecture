@@ -2,7 +2,6 @@
 using System.Linq;
 using FluentAssertions;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
-using Organizr.Domain.SharedKernel;
 using Xunit;
 
 namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
@@ -41,7 +40,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         }
 
         [Fact]
-        public void AddTodo_NonExistentSubListId_ThrowsTodoListException()
+        public void AddTodo_NonExistentSubListId_ThrowsInvalidOperationException()
         {
             var title = "Todo";
             var description = "Todo Description";
@@ -49,11 +48,11 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var nonExistentSubListId = 99;
 
             _fixture.Sut.Invoking(l => l.AddTodo(title, description, dueDateUtc, nonExistentSubListId)).Should()
-                .Throw<TodoListException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");
         }
 
         [Fact]
-        public void AddTodo_DeletedSubListId_ThrowsTodoListException()
+        public void AddTodo_DeletedSubListId_ThrowsInvalidOperationException()
         {
             var title = "Todo";
             var description = "Todo Description";
@@ -61,20 +60,20 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var deletedSubListId = 2;
 
             _fixture.Sut.Invoking(l => l.AddTodo(title, description, dueDate, deletedSubListId)).Should()
-                .Throw<TodoListException>().WithMessage($"*sublist*{deletedSubListId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*sublist*{deletedSubListId}*does not exist*");
         }
 
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void AddTodo_NullOrWhiteSpaceTitle_ThrowsArgumentException(string title)
+        public void AddTodo_NullOrWhiteSpaceTitle_ThrowsTodoListException(string title)
         {
             var description = "Todo Description";
             var dueDate = _fixture.CreateClientDateUtcWithDaysOffset(1);
 
             _fixture.Sut.Invoking(l => l.AddTodo(title, description, dueDate)).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be("title");
+                .Throw<TodoListException>().WithMessage("*title*cannot be empty*");
         }
 
         [Fact]

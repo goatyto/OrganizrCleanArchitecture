@@ -39,30 +39,33 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         }
 
         [Fact]
-        public void MoveSubList_DeletedSubList_ThrowsTodoListException()
+        public void MoveSubList_DeletedSubList_ThrowsInvalidOperationException()
         {
             var deletedSubListId = 2;
+            var destinationOrdinal = 4;
 
-            _fixture.Sut.Invoking(l => l.MoveSubList(deletedSubListId, 4)).Should().Throw<TodoListException>()
+            _fixture.Sut.Invoking(l => l.MoveSubList(deletedSubListId, destinationOrdinal)).Should().Throw<InvalidOperationException>()
                 .WithMessage($"*sublist*{deletedSubListId}*does not exist*");
         }
 
         [Fact]
-        public void MoveSubList_OutOfRangeOrdinal_ThrowsTodoListException()
+        public void MoveSubList_OutOfRangeOrdinal_ThrowsInvalidOperationException()
         {
+            var subListId = 3;
             var invalidOrdinal = 99;
 
-            _fixture.Sut.Invoking(l => l.MoveSubList(3, invalidOrdinal)).Should().Throw<TodoListException>()
+            _fixture.Sut.Invoking(l => l.MoveSubList(subListId, invalidOrdinal)).Should().Throw<InvalidOperationException>()
                 .WithMessage("*ordinal*out of range*");
         }
 
         [Fact]
-        public void MoveSubList_NonExistentSubListId_ThrowsTodoListException()
+        public void MoveSubList_NonExistentSubListId_ThrowsInvalidOperationException()
         {
             var nonExistentSubListId = 99;
+            var destinationOrdinal = 4;
 
-            _fixture.Sut.Invoking(l => l.MoveSubList(nonExistentSubListId, 4)).Should()
-                .Throw<TodoListException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");
+            _fixture.Sut.Invoking(l => l.MoveSubList(nonExistentSubListId, destinationOrdinal)).Should()
+                .Throw<InvalidOperationException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");
         }
     }
 }

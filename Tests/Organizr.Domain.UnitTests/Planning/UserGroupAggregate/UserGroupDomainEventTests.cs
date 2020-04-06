@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using FluentAssertions;
-using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 using Xunit;
 
@@ -13,7 +11,13 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
         [Fact]
         public void UserGroupCreatedConstructor_ValidData_ObjectInitialized()
         {
-            var userGroup = UserGroup.Create(Guid.NewGuid(), "User1", "Name", "Description");
+            var userGroupId = Guid.NewGuid();
+            var creatorUserId = "User1";
+            var userGroupName = "Name";
+            var memberIds = new List<string> { "User2" };
+            var userGroupDescription = "Description";
+
+            var userGroup = UserGroup.Create(userGroupId, creatorUserId, userGroupName, memberIds, userGroupDescription);
 
             var sut = new UserGroupCreated(userGroup);
 
@@ -23,7 +27,7 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
         [Fact]
         public void UserGroupCreatedConstructor_NullUserGroup_ThrowsArgumentException()
         {
-            UserGroup nullUserGroup =  null;
+            UserGroup nullUserGroup = null;
 
             Func<UserGroupCreated> sut = () => new UserGroupCreated(nullUserGroup);
 
@@ -33,7 +37,13 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
         [Fact]
         public void UserGroupEditedConstructor_ValidData_ObjectInitialized()
         {
-            var userGroup = UserGroup.Create(Guid.NewGuid(), "User1", "Name", "Description");
+            var userGroupId = Guid.NewGuid();
+            var creatorUserId = "User1";
+            var userGroupName = "Name";
+            var memberIds = new List<string> { "User2" };
+            var userGroupDescription = "Description";
+
+            var userGroup = UserGroup.Create(userGroupId, creatorUserId, userGroupName, memberIds, userGroupDescription);
 
             var sut = new UserGroupEdited(userGroup);
 
@@ -62,23 +72,15 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
             sut.UserId.Should().Be(userId);
         }
 
-        [Fact]
-        public void UserGroupMemberAddedConstructor_DefaultUserGroupId_ThrowsArgumentException()
-        {
-            var defaultUserGroupId = Guid.Empty;
-
-            Func<UserGroupMemberAdded> sut = () => new UserGroupMemberAdded(defaultUserGroupId, "User1");
-
-            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("userGroupId");
-        }
-
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
         public void UserGroupMemberAddedConstructor_NullOrWhiteSpaceUserId_ThrowsArgumentException(string nullOrWhiteSpaceUserId)
         {
-            Func<UserGroupMemberAdded> sut = () => new UserGroupMemberAdded(Guid.NewGuid(), nullOrWhiteSpaceUserId);
+            var userGroupId = Guid.NewGuid();
+            
+            Func<UserGroupMemberAdded> sut = () => new UserGroupMemberAdded(userGroupId, nullOrWhiteSpaceUserId);
 
             sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("userId");
         }
@@ -95,23 +97,15 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
             sut.UserId.Should().Be(userId);
         }
 
-        [Fact]
-        public void UserGroupMemberRemovedConstructor_DefaultUserGroupId_ThrowsArgumentException()
-        {
-            var defaultUserGroupId = Guid.Empty;
-
-            Func<UserGroupMemberRemoved> sut = () => new UserGroupMemberRemoved(defaultUserGroupId, "User1");
-
-            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("userGroupId");
-        }
-
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
         public void UserGroupMemberRemovedConstructor_NullOrWhiteSpaceUserId_ThrowsArgumentException(string nullOrWhiteSpaceUserId)
         {
-            Func<UserGroupMemberRemoved> sut = () => new UserGroupMemberRemoved(Guid.NewGuid(), nullOrWhiteSpaceUserId);
+            var userGroupId = Guid.NewGuid();
+
+            Func<UserGroupMemberRemoved> sut = () => new UserGroupMemberRemoved(userGroupId, nullOrWhiteSpaceUserId);
 
             sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("userId");
         }

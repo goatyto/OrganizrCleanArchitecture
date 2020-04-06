@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FluentAssertions;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 using Xunit;
@@ -17,9 +16,9 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
             var name = "GroupName";
             var creatorUserId = "User1";
             var description = "GroupDescription";
-            var memberUserIds = new List<string> {"User1", "User2", "User3"};
+            var memberUserIds = new List<string> { "User1", "User2", "User3" };
 
-            var sut = UserGroup.Create(id, creatorUserId, name, description, memberUserIds);
+            var sut = UserGroup.Create(id, creatorUserId, name, memberUserIds, description);
 
             sut.Id.Should().Be(id);
             sut.Name.Should().Be(name);
@@ -29,25 +28,17 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
                 .Contain(memberUserIds.Select(uid => new UserGroupMember(uid)));
         }
 
-        [Fact]
-        public void Create_DefaultId_ThrowsArgumentException()
-        {
-            var defaultId = Guid.Empty;
-
-            Func<UserGroup> sut = () => UserGroup.Create(defaultId, "User1", "GroupName", "GroupDescription");
-
-            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("id");
-        }
-
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void Create_NullOrWhiteSpaceCreatorUserId_ThrowsArgumentException(
-            string nullOrWhiteSpaceCreatorUserId)
+        public void Create_NullOrWhiteSpaceCreatorUserId_ThrowsArgumentException(string nullOrWhiteSpaceCreatorUserId)
         {
-            Func<UserGroup> sut = () =>
-                UserGroup.Create(Guid.NewGuid(), nullOrWhiteSpaceCreatorUserId, "GroupName", "GroupDescription");
+            var userGroupId = Guid.NewGuid();
+            var userGroupName = "GroupName";
+            var userGroupDescription = "GroupDescription";
+
+            Func<UserGroup> sut = () => UserGroup.Create(userGroupId, nullOrWhiteSpaceCreatorUserId, userGroupName, null, userGroupDescription);
 
             sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("creatorUserId");
         }
@@ -56,21 +47,31 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void Create_NullOrWhiteSpaceName_ThrowsArgumentException(string nullOrWhiteSpaceName)
+        public void Create_NullOrWhiteSpaceName_ThrowsUserGroupException(string nullOrWhiteSpaceName)
         {
-            Func<UserGroup> sut = () =>
-                UserGroup.Create(Guid.NewGuid(), "User1", nullOrWhiteSpaceName, "GroupDescription");
+            var userGroupId = Guid.NewGuid();
+            var creatorUserId = "User1";
+            var memberIds = new List<string> { "User2" };
+            var userGroupDescription = "GroupDescription";
 
-            sut.Should().Throw<ArgumentException>().And.ParamName.Should().Be("name");
+            Func<UserGroup> sut = () => UserGroup.Create(userGroupId, creatorUserId, nullOrWhiteSpaceName, memberIds, userGroupDescription);
+
+            sut.Should().Throw<UserGroupException>().WithMessage("*name*cannot be empty*");
         }
 
         [Fact]
         public void Edit_ValidData_StateChanges()
         {
+            var userGroupId = Guid.NewGuid();
+            var creatorUserId = "User1";
+            var userGroupName = "GroupName";
+            var memberIds = new List<string> { "User2" };
+            var userGroupDescription = "GroupDescription";
+
+            var sut = UserGroup.Create(userGroupId, creatorUserId, userGroupName, memberIds, userGroupDescription);
+
             var newName = "NewName";
             var newDescription = "NewDescription";
-
-            var sut = UserGroup.Create(Guid.NewGuid(), "User1", "GroupName", "GroupDescription");
 
             sut.Edit(newName, newDescription);
 
@@ -82,14 +83,20 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void Edit_NullOrWhiteSpaceName_ThrowsArgumentException(string nullOrWhiteSpaceName)
+        public void Edit_NullOrWhiteSpaceName_ThrowsUserGroupException(string nullOrWhiteSpaceName)
         {
+            var userGroupId = Guid.NewGuid();
+            var creatorUserId = "User1";
+            var userGroupName = "GroupName";
+            var memberIds = new List<string> { "User2" };
+            var userGroupDescription = "GroupDescription";
+
+            var sut = UserGroup.Create(userGroupId, creatorUserId, userGroupName, memberIds, userGroupDescription);
+            
             var newDescription = "NewDescription";
 
-            var sut = UserGroup.Create(Guid.NewGuid(), "User1", "GroupName", "GroupDescription");
-
-            sut.Invoking(s => s.Edit(nullOrWhiteSpaceName, newDescription)).Should().Throw<ArgumentException>().And
-                .ParamName.Should().Be("name");
+            sut.Invoking(s => s.Edit(nullOrWhiteSpaceName, newDescription)).Should().Throw<UserGroupException>()
+                .WithMessage("*name*cannot be empty*");
         }
     }
 }

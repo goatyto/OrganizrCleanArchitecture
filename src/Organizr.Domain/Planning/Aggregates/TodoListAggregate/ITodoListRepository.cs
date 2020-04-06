@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate

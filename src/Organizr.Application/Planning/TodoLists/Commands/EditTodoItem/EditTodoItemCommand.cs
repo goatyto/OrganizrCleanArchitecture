@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Planning.Common.Exceptions;
 using Organizr.Application.Planning.Common.Interfaces;
@@ -41,9 +40,9 @@ namespace Organizr.Application.Planning.TodoLists.Commands.EditTodoItem
             IResourceAuthorizationService<TodoList> resourceAuthorizationService,
             ITodoListRepository todoListRepository)
         {
-            Guard.Against.Null(identityService, nameof(identityService));
-            Guard.Against.Null(resourceAuthorizationService, nameof(resourceAuthorizationService));
-            Guard.Against.Null(todoListRepository, nameof(todoListRepository));
+            Assert.Argument.NotNull(identityService, nameof(identityService));
+            Assert.Argument.NotNull(resourceAuthorizationService, nameof(resourceAuthorizationService));
+            Assert.Argument.NotNull(todoListRepository, nameof(todoListRepository));
 
             _identityService = identityService;
             _resourceAuthorizationService = resourceAuthorizationService;

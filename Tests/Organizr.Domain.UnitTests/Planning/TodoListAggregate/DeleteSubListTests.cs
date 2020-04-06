@@ -28,12 +28,12 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         }
 
         [Fact]
-        public void DeleteSubList_NonExistentSubListId_ThrowsTodoListException()
+        public void DeleteSubList_NonExistentSubListId_ThrowsInvalidOperationException()
         {
             var nonExistentSubListId = 99;
 
             _fixture.Sut.Invoking(l => l.DeleteSubList(nonExistentSubListId)).Should()
-                .Throw<TodoListException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*sublist*{nonExistentSubListId}*does not exist*");
         }
     }
 }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FluentAssertions;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
@@ -11,61 +8,57 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
 {
     public class CreateSharedTodoListTests
     {
+        private readonly UserGroupFixture _fixture;
+
+        public CreateSharedTodoListTests()
+        {
+            _fixture = new UserGroupFixture();
+        }
+
         [Fact]
         public void CreateSharedTodoList_ValidData_SharedTodoListCreated()
         {
-            var fixture = new UserGroupFixture();
-
             var todoListId = Guid.NewGuid();
             var todoListCreatorUserId = "User1";
             var todoListTitle = "TodoListTitle";
             var todoListDescription = "TodoListDescription";
 
-            var todoList = fixture.Sut.CreateSharedTodoList(todoListId, todoListCreatorUserId, todoListTitle, todoListDescription);
+            var todoList = _fixture.Sut.CreateSharedTodoList(todoListId, todoListCreatorUserId, todoListTitle, todoListDescription);
 
             todoList.Id.Should().Be(todoListId);
             todoList.CreatorUserId.Should().Be(todoListCreatorUserId);
-            todoList.UserGroupId.Should().Be(fixture.UserGroupId);
+            todoList.UserGroupId.Should().Be(_fixture.UserGroupId);
             todoList.Title.Should().Be(todoListTitle);
             todoList.Description.Should().Be(todoListDescription);
-        }
-
-        [Fact]
-        public void CreateSharedTodoList_DefaultTodoListId_ThrowsArgumentException()
-        {
-            var fixture = new UserGroupFixture();
-
-            var defaultTodoListId = Guid.Empty;
-
-            fixture.Sut.Invoking(s =>
-                    s.CreateSharedTodoList(defaultTodoListId, "User1", "TodoListTitle", "TodoListDescription")).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be("id");
         }
 
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void CreateSharedTodoList_NullOrWhiteSpaceTodoListTitle_ThrowsArgumentException(string nullOrWhiteSpaceTodoListTitle)
+        public void CreateSharedTodoList_NullOrWhiteSpaceTodoListTitle_ThrowsTodoListException(string nullOrWhiteSpaceTodoListTitle)
         {
-            var fixture = new UserGroupFixture();
+            var todoListId = Guid.NewGuid();
+            var creatorUserId = "User1";
+            var todoListDescription = "TodoListDescription";
 
-            fixture.Sut.Invoking(s =>
-                    s.CreateSharedTodoList(Guid.NewGuid(), "User1", nullOrWhiteSpaceTodoListTitle, "TodoListDescription")).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be("title");
+            _fixture.Sut.Invoking(s => s.CreateSharedTodoList(todoListId, creatorUserId, nullOrWhiteSpaceTodoListTitle,
+                    todoListDescription)).Should()
+                .Throw<TodoListException>().WithMessage("*title*cannot be empty*");
         }
 
         [Fact]
-        public void CreateSharedTodoList_NonMemberTodoListCreatorUserId_ThrowsUserNotAMemberException()
+        public void CreateSharedTodoList_NonMemberTodoListCreatorUserId_ThrowsInvalidOperationException()
         {
-            var fixture = new UserGroupFixture();
-
+            var todoListId = Guid.NewGuid();
+            var todoListTitle = "TodoListTitle";
+            var todoListDescription = "TodoListDescription";
             var invalidTodoListCreatorUserId = "User99";
 
-            fixture.Sut
-                .Invoking(s => s.CreateSharedTodoList(Guid.NewGuid(), invalidTodoListCreatorUserId, "TodoListTitle",
-                    "TodoListDescription")).Should().Throw<UserNotAMemberException>().Where(exception =>
-                    exception.UserGroupId == fixture.UserGroupId && exception.UserId == invalidTodoListCreatorUserId);
+            _fixture.Sut
+                .Invoking(s => s.CreateSharedTodoList(todoListId, invalidTodoListCreatorUserId,
+                    todoListTitle, todoListDescription)).Should().Throw<InvalidOperationException>()
+                .WithMessage($"*user*{invalidTodoListCreatorUserId}*not a member*");
         }
     }
 }

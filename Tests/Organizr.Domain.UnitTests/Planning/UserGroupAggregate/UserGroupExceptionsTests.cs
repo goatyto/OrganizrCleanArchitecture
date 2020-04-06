@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using FluentAssertions;
-using Moq;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 using Organizr.Domain.SharedKernel;
 using Xunit;

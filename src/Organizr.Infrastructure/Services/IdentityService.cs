@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Http;
 using Organizr.Application.Planning.Common.Interfaces;
+using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Infrastructure.Services
 {
@@ -16,7 +14,7 @@ namespace Organizr.Infrastructure.Services
 
         public IdentityService(IHttpContextAccessor httpContextAccessor)
         {
-            Guard.Against.Null(httpContextAccessor, nameof(httpContextAccessor));
+            Assert.Argument.NotNull(httpContextAccessor, nameof(httpContextAccessor));
 
             _httpContextAccessor = httpContextAccessor;
         }

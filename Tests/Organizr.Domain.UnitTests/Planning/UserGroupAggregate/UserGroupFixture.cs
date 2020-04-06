@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
 
 namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
 {
     public class UserGroupFixture
     {
-        public readonly Guid UserGroupId;
-        public readonly string UserGroupCreatorId;
-        public readonly string ExistingUserGroupMemberId;
-        public readonly Guid SharedTodoListId;
-        public readonly UserGroup Sut;
+        public Guid UserGroupId { get; }
+        public string UserGroupCreatorId { get; }
+        public string ExistingUserGroupMemberId { get; }
+        public Guid SharedTodoListId { get; }
+        public UserGroup Sut { get; }
 
         public UserGroupFixture()
         {
@@ -20,9 +19,8 @@ namespace Organizr.Domain.UnitTests.Planning.UserGroupAggregate
             ExistingUserGroupMemberId = "User2";
             SharedTodoListId = Guid.NewGuid();
 
-            Sut = UserGroup.Create(UserGroupId, UserGroupCreatorId, "UserGroupName", "UserGroupDescription");
-
-            Sut.AddMember(ExistingUserGroupMemberId);
+            Sut = UserGroup.Create(UserGroupId, UserGroupCreatorId, "UserGroupName",
+                new List<string> {ExistingUserGroupMemberId}, "UserGroupDescription");
 
             Sut.CreateSharedTodoList(SharedTodoListId, UserGroupCreatorId, "Title", "Description");
         }

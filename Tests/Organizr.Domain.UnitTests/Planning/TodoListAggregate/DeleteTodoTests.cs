@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using FluentAssertions;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
 using Xunit;
@@ -28,20 +27,20 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         }
 
         [Fact]
-        public void DeleteTodo_NonExistentTodoId_TodoListException()
+        public void DeleteTodo_NonExistentTodoId_ThrowsInvalidOperationException()
         {
             var nonExistentTodoId = 99;
 
-            _fixture.Sut.Invoking(l => l.DeleteTodo(nonExistentTodoId)).Should().Throw<TodoListException>()
+            _fixture.Sut.Invoking(l => l.DeleteTodo(nonExistentTodoId)).Should().Throw<InvalidOperationException>()
                 .WithMessage($"*todo item*{nonExistentTodoId}*does not exist*");
         }
 
         [Fact]
-        public void DeleteTodo_DeletedSubListTodoId_ThrowsTodoSubListDeletedException()
+        public void DeleteTodo_DeletedSubListTodoId_ThrowsInvalidOperationException()
         {
             var deletedSubListTodoId = 11;
 
-            _fixture.Sut.Invoking(l => l.DeleteTodo(deletedSubListTodoId)).Should().Throw<TodoListException>()
+            _fixture.Sut.Invoking(l => l.DeleteTodo(deletedSubListTodoId)).Should().Throw<InvalidOperationException>()
                 .WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
         }
     }

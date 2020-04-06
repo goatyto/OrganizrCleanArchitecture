@@ -2,7 +2,6 @@
 using System.Linq;
 using FluentAssertions;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
-using Organizr.Domain.SharedKernel;
 using Xunit;
 
 namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
@@ -42,7 +41,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         }
 
         [Fact]
-        public void EditTodo_NonExistingTodoId_ThrowsTodoListException()
+        public void EditTodo_NonExistingTodoId_ThrowsInvalidOperationException()
         {
             var newTitle = "Todo";
             var newDescription = "Todo Description";
@@ -50,11 +49,11 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var nonExistentTodoId = 99;
 
             _fixture.Sut.Invoking(l => l.EditTodo(nonExistentTodoId, newTitle, newDescription, newDueDate)).Should()
-                .Throw<TodoListException>().WithMessage($"*todo item*{nonExistentTodoId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*todo item*{nonExistentTodoId}*does not exist*");
         }
 
         [Fact]
-        public void EditTodo_DeletedTodoId_ThrowsTodoItemDeletedException()
+        public void EditTodo_DeletedTodoId_ThrowsInvalidOperationException()
         {
             var deletedTodoId = 3;
 
@@ -63,11 +62,11 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var newDueDateUtc = _fixture.CreateClientDateUtcWithDaysOffset(5);
 
             _fixture.Sut.Invoking(l => l.EditTodo(deletedTodoId, newTitle, newDescription, newDueDateUtc)).Should()
-                .Throw<TodoListException>().WithMessage($"*todo item*{deletedTodoId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*todo item*{deletedTodoId}*does not exist*");
         }
 
         [Fact]
-        public void EditTodo_DeletedSubListTodoId_ThrowsTodoListException()
+        public void EditTodo_DeletedSubListTodoId_ThrowsInvalidOperationException()
         {
             var deletedSubListTodoId = 11;
             var newTitle = "Todo";
@@ -75,21 +74,21 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var newDueDateUtc = _fixture.CreateClientDateUtcWithDaysOffset(5);
 
             _fixture.Sut.Invoking(l => l.EditTodo(deletedSubListTodoId, newTitle, newDescription, newDueDateUtc)).Should()
-                .Throw<TodoListException>().WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
         }
 
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void EditTodo_NullOrWhiteSpaceTitle_ThrowsArgumentException(string newTitle)
+        public void EditTodo_NullOrWhiteSpaceTitle_ThrowsTodoListException(string newTitle)
         {
             var todoId = 1;
             var newDescription = "Todo Description";
             var newDueDate = _fixture.CreateClientDateUtcWithDaysOffset(5);
 
             _fixture.Sut.Invoking(l => l.EditTodo(todoId, newTitle, newDescription, newDueDate)).Should()
-                .Throw<ArgumentException>().And.ParamName.Should().Be("title");
+                .Throw<TodoListException>().WithMessage("*title*cannot be empty*");
         }
 
         [Fact]

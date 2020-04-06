@@ -28,32 +28,32 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         }
 
         [Fact]
-        public void SetCompletedTodo_DeletedTodoId_ThrowsTodoListException()
+        public void SetCompletedTodo_DeletedTodoId_ThrowsInvalidOperationException()
         {
             var deletedTodoId = 3;
             var isCompleted = true;
 
             _fixture.Sut.Invoking(l => l.SetCompletedTodo(deletedTodoId, isCompleted)).Should()
-                .Throw<TodoListException>().WithMessage($"*todo item*{deletedTodoId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*todo item*{deletedTodoId}*does not exist*");
         }
 
         [Fact]
-        public void SetCompletedTodo_DeletedSubListTodoId_ThrowsTodoListException()
+        public void SetCompletedTodo_DeletedSubListTodoId_ThrowsInvalidOperationException()
         {
             var deletedSubListTodoId = 11;
             var isCompleted = true;
 
             _fixture.Sut.Invoking(l => l.SetCompletedTodo(deletedSubListTodoId, isCompleted)).Should()
-                .Throw<TodoListException>().WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*todo item*{deletedSubListTodoId}*does not exist*");
         }
         
         [Fact]
-        public void SetCompletedTodo_NonExistentTodoId_ThrowsTodoListException()
+        public void SetCompletedTodo_NonExistentTodoId_ThrowsInvalidOperationException()
         {
             var nonExistentTodoId = 99;
 
             _fixture.Sut.Invoking(l => l.SetCompletedTodo(nonExistentTodoId)).Should()
-                .Throw<TodoListException>().WithMessage($"*todo item*{nonExistentTodoId}*does not exist*");
+                .Throw<InvalidOperationException>().WithMessage($"*todo item*{nonExistentTodoId}*does not exist*");
         }
     }
 }

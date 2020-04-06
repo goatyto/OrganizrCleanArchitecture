@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using FluentAssertions;
 using FluentValidation;
-using Moq;
 using Organizr.Application.Planning.TodoLists.Commands.AddTodoSubList;
 using Organizr.Application.UnitTests.Common;
 using Xunit;

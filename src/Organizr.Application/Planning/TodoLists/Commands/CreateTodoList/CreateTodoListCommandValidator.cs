@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using System.Collections.Generic;
 
 namespace Organizr.Application.Planning.TodoLists.Commands.CreateTodoList
 {

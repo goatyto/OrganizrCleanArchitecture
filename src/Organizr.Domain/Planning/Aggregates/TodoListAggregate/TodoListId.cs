@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Domain.Planning.Aggregates.TodoListAggregate

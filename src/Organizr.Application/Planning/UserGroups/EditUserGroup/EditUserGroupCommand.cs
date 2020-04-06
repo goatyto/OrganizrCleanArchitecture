@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Planning.Common.Exceptions;
 using Organizr.Application.Planning.Common.Interfaces;
@@ -36,9 +33,9 @@ namespace Organizr.Application.Planning.UserGroups.EditUserGroup
             IResourceAuthorizationService<UserGroup> resourceAuthorizationService,
             IUserGroupRepository userGroupRepository)
         {
-            Guard.Against.Null(identityService, nameof(identityService));
-            Guard.Against.Null(resourceAuthorizationService, nameof(resourceAuthorizationService));
-            Guard.Against.Null(userGroupRepository, nameof(userGroupRepository));
+            Assert.Argument.NotNull(identityService, nameof(identityService));
+            Assert.Argument.NotNull(resourceAuthorizationService, nameof(resourceAuthorizationService));
+            Assert.Argument.NotNull(userGroupRepository, nameof(userGroupRepository));
 
             _identityService = identityService;
             _resourceAuthorizationService = resourceAuthorizationService;

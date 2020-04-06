@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Planning.Common.Interfaces;
 using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
+using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.Planning.TodoLists.Commands.CreateTodoList
 {
@@ -27,9 +27,9 @@ namespace Organizr.Application.Planning.TodoLists.Commands.CreateTodoList
 
         public CreateTodoListCommandHandler(IIdGenerator idGenerator, IIdentityService identityService, ITodoListRepository todoListRepository)
         {
-            Guard.Against.Null(idGenerator, nameof(idGenerator));
-            Guard.Against.Null(identityService, nameof(identityService));
-            Guard.Against.Null(todoListRepository, nameof(todoListRepository));
+            Assert.Argument.NotNull(idGenerator, nameof(idGenerator));
+            Assert.Argument.NotNull(identityService, nameof(identityService));
+            Assert.Argument.NotNull(todoListRepository, nameof(todoListRepository));
 
             _idGenerator = idGenerator;
             _identityService = identityService;

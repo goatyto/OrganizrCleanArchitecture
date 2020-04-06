@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using MediatR;
 using Organizr.Application.Planning.Common.Exceptions;
 using Organizr.Application.Planning.Common.Interfaces;
 using Organizr.Domain.Planning.Aggregates.UserGroupAggregate;
+using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.Planning.UserGroups.CreateUserGroup
 {
@@ -33,9 +31,9 @@ namespace Organizr.Application.Planning.UserGroups.CreateUserGroup
 
         public CreateUserGroupCommandHandler(IIdGenerator idGenerator, IIdentityService identityService, IUserGroupRepository userGroupRepository)
         {
-            Guard.Against.Null(idGenerator, nameof(idGenerator));
-            Guard.Against.Null(identityService, nameof(identityService));
-            Guard.Against.Null(userGroupRepository, nameof(userGroupRepository));
+            Assert.Argument.NotNull(idGenerator, nameof(idGenerator));
+            Assert.Argument.NotNull(identityService, nameof(identityService));
+            Assert.Argument.NotNull(userGroupRepository, nameof(userGroupRepository));
 
             _idGenerator = idGenerator;
             _identityService = identityService;
@@ -55,8 +53,8 @@ namespace Organizr.Application.Planning.UserGroups.CreateUserGroup
                     throw new InvalidUserIdException(userId);
             }
 
-            var userGroup = UserGroup.Create(userGroupId, currentUserId, request.Name, request.Description,
-                request.GroupMemberIds);
+            var userGroup = UserGroup.Create(userGroupId, currentUserId, request.Name,
+                request.GroupMemberIds, request.Description);
 
             _userGroupRepository.Add(userGroup);
 

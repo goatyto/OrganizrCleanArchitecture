@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Dapper;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Organizr.Application.Planning.Common.Interfaces;
 using Organizr.Application.Planning.TodoLists.Queries;
 using Organizr.Application.Planning.TodoLists.Queries.GetTodoLists;
-using Organizr.Domain.Planning.Aggregates.TodoListAggregate;
+using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Infrastructure.Persistence.Queries
 {
@@ -23,8 +18,8 @@ namespace Organizr.Infrastructure.Persistence.Queries
 
         public TodoListQueries(IDbConnectionFactory dbConnectionFactory, string connectionString)
         {
-            Guard.Against.Null(dbConnectionFactory, nameof(dbConnectionFactory));
-            Guard.Against.NullOrWhiteSpace(connectionString, nameof(connectionString));
+            Assert.Argument.NotNull(dbConnectionFactory, nameof(dbConnectionFactory));
+            Assert.Argument.NotEmpty(connectionString, nameof(connectionString));
 
             _dbConnectionFactory = dbConnectionFactory;
             _connectionString = connectionString;

@@ -1,8 +1,6 @@
-﻿using System;
-using MediatR;
+﻿using MediatR;
 using Moq;
 using Organizr.Application.Planning.Common.Behaviors;
-using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.UnitTests.Common
 {
