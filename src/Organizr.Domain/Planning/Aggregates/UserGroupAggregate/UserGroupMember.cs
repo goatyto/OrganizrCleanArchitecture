@@ -12,7 +12,7 @@ namespace Organizr.Domain.Planning.Aggregates.UserGroupAggregate
             
         }
 
-        public UserGroupMember(string userId)
+        internal UserGroupMember(string userId)
         {
             Assert.Argument.NotEmpty(userId, nameof(userId));
 

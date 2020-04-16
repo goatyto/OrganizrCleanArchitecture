@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DependencyInjectionTests.cs" />
+    <Compile Remove="TodoLists\Queries\TodoItemDtoTests.cs" />
+    <Compile Remove="TodoLists\Queries\TodoListDtoTests.cs" />
+    <Compile Remove="TodoLists\Queries\TodoListsVmTests.cs" />
+    <Compile Remove="TodoLists\Queries\TodoSubListDtoTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.2" />
     <PackageReference Include="MediatR" Version="8.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />

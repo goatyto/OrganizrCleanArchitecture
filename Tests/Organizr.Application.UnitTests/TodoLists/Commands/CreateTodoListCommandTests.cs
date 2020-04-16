@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Organizr.Application.UnitTests.TodoLists.Commands
 {
-    public class CreateTodoListCommandTests : TodoListCommandsTestBase
+    public class CreateTodoListCommandTests : TodoListCommandTestsBase
     {
         private readonly Mock<IIdGenerator> _idGeneratorMock;
         private readonly CreateTodoListCommandHandler _sut;
@@ -21,7 +21,7 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
             _idGeneratorMock = new Mock<IIdGenerator>();
             _idGeneratorMock.Setup(m => m.GenerateNext<TodoList>()).Returns(todoListId);
 
-            _sut = new CreateTodoListCommandHandler(_idGeneratorMock.Object, CurrentUserServiceMock.Object,
+            _sut = new CreateTodoListCommandHandler(_idGeneratorMock.Object, IdentityServiceMock.Object,
                 TodoListRepositoryMock.Object);
         }
 

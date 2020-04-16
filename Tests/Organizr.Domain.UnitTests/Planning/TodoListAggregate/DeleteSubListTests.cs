@@ -16,7 +16,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         }
 
         [Fact]
-        public void DeleteSubList_SubListId_MarksSubListAsDeleted()
+        public void DeleteSubList_ValidSubListId_MarksSubListAsDeleted()
         {
             var subListId = 1;
 

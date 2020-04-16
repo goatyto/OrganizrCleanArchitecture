@@ -88,12 +88,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
         {
             return ClientDateUtc.Create(_clientDateTimeToday.Date.AddDays(daysOffset), _clientTimeZoneOffsetInMinutes);
         }
-
-        public ClientDateUtc CreateClientDateUtcWithTicksOffset(int ticksOffset)
-        {
-            return ClientDateUtc.Create(_clientDateTimeToday.Date.AddTicks(ticksOffset), _clientTimeZoneOffsetInMinutes);
-        }
-
+        
         public void Dispose()
         {
             

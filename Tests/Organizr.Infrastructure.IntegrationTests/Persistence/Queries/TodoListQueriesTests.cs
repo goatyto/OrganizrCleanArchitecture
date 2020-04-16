@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
 using FluentAssertions;
@@ -15,7 +16,7 @@ using Xunit;
 
 namespace Organizr.Infrastructure.IntegrationTests.Persistence.Queries
 {
-    public class TodoListQueriesTests: IDisposable
+    public class TodoListQueriesTests : IDisposable
     {
         private readonly OrganizrContext _context;
         private readonly ITodoListQueries _sut;
@@ -50,7 +51,7 @@ namespace Organizr.Infrastructure.IntegrationTests.Persistence.Queries
             var userGroupRepository = new UserGroupRepository(_context);
 
             UserGroupId = Guid.NewGuid();
-            var userGroup = UserGroup.Create(UserGroupId, "User1", "Group1", null);
+            var userGroup = UserGroup.Create(UserGroupId, "User1", "Group1", new List<string> { "User2" });
 
             userGroupRepository.Add(userGroup);
 

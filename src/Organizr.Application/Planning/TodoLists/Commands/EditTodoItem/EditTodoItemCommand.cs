@@ -9,43 +9,34 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.Planning.TodoLists.Commands.EditTodoItem
 {
-    public class EditTodoItemCommand : IRequest
+    public class EditTodoItemCommand : DueDateUtcCommandBase, IRequest
     {
         public Guid TodoListId { get; }
         public int Id { get; }
         public string Title { get; }
         public string Description { get; }
-        public DateTime? DueDateUtc { get; }
-        public int? ClientTimeZoneOffsetInMinutes { get; }
 
         public EditTodoItemCommand(Guid todoListId, int id, string title, string description = null,
-            DateTime? dueDateUtc = null, int? clientTimeZoneOffsetInMinutes = null)
+            DateTime? dueDateUtc = null, int? clientTimeZoneOffsetInMinutes = null) : base(dueDateUtc, clientTimeZoneOffsetInMinutes)
         {
             TodoListId = todoListId;
             Id = id;
             Title = title;
             Description = description;
-            DueDateUtc = dueDateUtc;
-            ClientTimeZoneOffsetInMinutes = clientTimeZoneOffsetInMinutes;
         }
     }
 
     public class EditTodoItemCommandHandler : IRequestHandler<EditTodoItemCommand>
     {
         private readonly IIdentityService _identityService;
-        private readonly IResourceAuthorizationService<TodoList> _resourceAuthorizationService;
         private readonly ITodoListRepository _todoListRepository;
 
-        public EditTodoItemCommandHandler(IIdentityService identityService,
-            IResourceAuthorizationService<TodoList> resourceAuthorizationService,
-            ITodoListRepository todoListRepository)
+        public EditTodoItemCommandHandler(IIdentityService identityService, ITodoListRepository todoListRepository)
         {
             Assert.Argument.NotNull(identityService, nameof(identityService));
-            Assert.Argument.NotNull(resourceAuthorizationService, nameof(resourceAuthorizationService));
             Assert.Argument.NotNull(todoListRepository, nameof(todoListRepository));
 
             _identityService = identityService;
-            _resourceAuthorizationService = resourceAuthorizationService;
             _todoListRepository = todoListRepository;
         }
 
@@ -57,9 +48,6 @@ namespace Organizr.Application.Planning.TodoLists.Commands.EditTodoItem
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.TodoListId);
-
-            if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
-                throw new AccessDeniedException<TodoList>(request.TodoListId, currentUserId);
 
             todoList.EditTodo(request.Id, request.Title, request.Description,
                 ClientDateUtc.Create(request.DueDateUtc, request.ClientTimeZoneOffsetInMinutes));

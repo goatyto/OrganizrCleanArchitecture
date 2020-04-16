@@ -12,47 +12,44 @@ namespace Organizr.Application.Planning.UserGroups.AddMember
     public class AddMemberCommand : IConcurrentRequest
     {
         public Guid UserGroupId { get; }
-        public string UserId { get; }
+        public string MemberUserId { get; }
 
-        public AddMemberCommand(Guid userGroupId, string userId)
+        public AddMemberCommand(Guid userGroupId, string memberUserId)
         {
             UserGroupId = userGroupId;
-            UserId = userId;
+            MemberUserId = memberUserId;
         }
     }
 
     public class AddMemberCommandHandler : IRequestHandler<AddMemberCommand>
     {
         private readonly IIdentityService _identityService;
-        private readonly IResourceAuthorizationService<UserGroup> _resourceAuthorizationService;
         private readonly IUserGroupRepository _userGroupRepository;
 
-        public AddMemberCommandHandler(IIdentityService identityService,
-            IResourceAuthorizationService<UserGroup> resourceAuthorizationService,
-            IUserGroupRepository userGroupRepository)
+        public AddMemberCommandHandler(IIdentityService identityService, IUserGroupRepository userGroupRepository)
         {
             Assert.Argument.NotNull(identityService, nameof(identityService));
-            Assert.Argument.NotNull(resourceAuthorizationService, nameof(resourceAuthorizationService));
             Assert.Argument.NotNull(userGroupRepository, nameof(userGroupRepository));
 
             _identityService = identityService;
-            _resourceAuthorizationService = resourceAuthorizationService;
             _userGroupRepository = userGroupRepository;
         }
 
         public async Task<Unit> Handle(AddMemberCommand request, CancellationToken cancellationToken)
         {
-            var userGroup = await _userGroupRepository.GetAsync(request.UserGroupId, cancellationToken);
+            var currentUserId = _identityService.CurrentUserId;
+            
+            var userGroup = await _userGroupRepository.GetAsync(request.UserGroupId, currentUserId, cancellationToken);
 
             if(userGroup == null)
                 throw new ResourceNotFoundException<UserGroup>(request.UserGroupId);
 
-            var userExists = await _identityService.UserExistsAsync(request.UserId);
+            var userExists = await _identityService.UserExistsAsync(request.MemberUserId);
 
             if(!userExists)
-                throw new InvalidUserIdException(request.UserId);
+                throw new InvalidUserIdException(request.MemberUserId);
 
-            userGroup.AddMember(request.UserId);
+            userGroup.AddMember(request.MemberUserId);
 
             _userGroupRepository.Update(userGroup);
 

@@ -7,7 +7,7 @@ namespace Organizr.Application.Planning.UserGroups.AddMember
         public AddMemberCommandValidator()
         {
             RuleFor(c => c.UserGroupId).NotEmpty();
-            RuleFor(c => c.UserId).NotEmpty();
+            RuleFor(c => c.MemberUserId).NotEmpty();
         }
     }
 }

@@ -9,24 +9,27 @@ namespace Organizr.Domain.SharedKernel
         public int ClientTimeZoneOffsetInMinutes { get; }
 
         public bool IsBeforeClientToday => Date.AddMinutes(-ClientTimeZoneOffsetInMinutes) <
-                                             DateTime.UtcNow.AddMinutes(-ClientTimeZoneOffsetInMinutes).Date;
+                                           DateTime.UtcNow.AddMinutes(-ClientTimeZoneOffsetInMinutes).Date;
+
+        private const int TimeZoneOffsetLowerBound = -12 * 60;
+        private const int TimeZoneOffsetUpperBound = 14 * 60;
 
         private ClientDateUtc(DateTime date, int clientTimeZoneOffsetInMinutes)
         {
             if (date.Kind != DateTimeKind.Utc)
                 throw new ArgumentException("Date must be of kind Utc.", nameof(date));
 
-            if(date > date.Date)
+            var normalizedClientDate = date.AddMinutes(-clientTimeZoneOffsetInMinutes);
+            if(normalizedClientDate != normalizedClientDate.Date)
                 throw new ArgumentException("Date must not have time component.", nameof(date));
 
-            if (clientTimeZoneOffsetInMinutes % 60 != 0 && 
+            if (clientTimeZoneOffsetInMinutes < TimeZoneOffsetLowerBound ||
+                clientTimeZoneOffsetInMinutes > TimeZoneOffsetUpperBound ||
+                clientTimeZoneOffsetInMinutes % 60 != 0 && 
                 clientTimeZoneOffsetInMinutes % 45 != 0 &&
                 clientTimeZoneOffsetInMinutes % 30 != 0)
                 throw new ArgumentException($"Invalid client timezone offset value: {clientTimeZoneOffsetInMinutes}.",
                     nameof(clientTimeZoneOffsetInMinutes));
-
-            if(Math.Abs(clientTimeZoneOffsetInMinutes) > 60 * 24)
-                throw new ArgumentException("Client timezone offset is out of range.", nameof(clientTimeZoneOffsetInMinutes));
 
             Date = date;
             ClientTimeZoneOffsetInMinutes = clientTimeZoneOffsetInMinutes;

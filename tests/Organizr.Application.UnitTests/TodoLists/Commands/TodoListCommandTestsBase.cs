@@ -8,16 +8,15 @@ using Organizr.Domain.SharedKernel;
 
 namespace Organizr.Application.UnitTests.TodoLists.Commands
 {
-    public abstract class TodoListCommandsTestBase
+    public abstract class TodoListCommandTestsBase
     {
-        protected readonly Guid TodoListId;
-        protected readonly Mock<IIdentityService> CurrentUserServiceMock;
-        protected readonly Mock<IResourceAuthorizationService<TodoList>> ResourceAuthorizationServiceMock;
-        protected readonly Mock<ITodoListRepository> TodoListRepositoryMock;
-        protected readonly DateTime ClientDateToday;
-        protected readonly int ClientTimeZoneOffsetInMinutes;
+        protected Guid TodoListId { get; }
+        protected Mock<IIdentityService> IdentityServiceMock { get; }
+        protected Mock<ITodoListRepository> TodoListRepositoryMock { get; }
+        protected DateTime ClientDateToday { get; }
+        protected int ClientTimeZoneOffsetInMinutes { get; }
 
-        public TodoListCommandsTestBase()
+        public TodoListCommandTestsBase()
         {
             TodoListId = Guid.NewGuid();
             var creatorUserId = "User1";
@@ -33,16 +32,11 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
             todoList.AddTodo("TodoItem Title", "TodoItem Description", ClientDateUtc.Create(ClientDateToday.AddDays(1), ClientTimeZoneOffsetInMinutes));
             todoList.AddTodo("TodoItem Title", "TodoItem Description", ClientDateUtc.Create(ClientDateToday.AddDays(2), ClientTimeZoneOffsetInMinutes));
 
-            CurrentUserServiceMock = new Mock<IIdentityService>();
-            CurrentUserServiceMock.Setup(m => m.CurrentUserId).Returns(creatorUserId);
-
-            ResourceAuthorizationServiceMock = new Mock<IResourceAuthorizationService<TodoList>>();
-            ResourceAuthorizationServiceMock.Setup(m => m.CanRead(creatorUserId, todoList)).Returns(true);
-            ResourceAuthorizationServiceMock.Setup(m => m.CanModify(creatorUserId, todoList)).Returns(true);
-            ResourceAuthorizationServiceMock.Setup(m => m.CanDelete(creatorUserId, todoList)).Returns(true);
+            IdentityServiceMock = new Mock<IIdentityService>();
+            IdentityServiceMock.Setup(m => m.CurrentUserId).Returns(creatorUserId);
 
             TodoListRepositoryMock = new Mock<ITodoListRepository>();
-            TodoListRepositoryMock.Setup(m => m.GetOwnAsync(TodoListId, null, It.IsAny<CancellationToken>()))
+            TodoListRepositoryMock.Setup(m => m.GetOwnAsync(TodoListId, creatorUserId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => todoList);
             TodoListRepositoryMock.Setup(m => m.UnitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);

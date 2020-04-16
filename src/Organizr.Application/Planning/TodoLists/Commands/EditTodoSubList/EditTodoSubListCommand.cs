@@ -28,19 +28,14 @@ namespace Organizr.Application.Planning.TodoLists.Commands.EditTodoSubList
     public class EditTodoSubListCommandHandler : IRequestHandler<EditTodoSubListCommand>
     {
         private readonly IIdentityService _identityService;
-        private readonly IResourceAuthorizationService<TodoList> _resourceAuthorizationService;
         private readonly ITodoListRepository _todoListRepository;
 
-        public EditTodoSubListCommandHandler(IIdentityService identityService,
-            IResourceAuthorizationService<TodoList> resourceAuthorizationService,
-            ITodoListRepository todoListRepository)
+        public EditTodoSubListCommandHandler(IIdentityService identityService, ITodoListRepository todoListRepository)
         {
             Assert.Argument.NotNull(identityService, nameof(identityService));
-            Assert.Argument.NotNull(resourceAuthorizationService, nameof(resourceAuthorizationService));
             Assert.Argument.NotNull(todoListRepository, nameof(todoListRepository));
 
             _identityService = identityService;
-            _resourceAuthorizationService = resourceAuthorizationService;
             _todoListRepository = todoListRepository;
         }
 
@@ -52,9 +47,6 @@ namespace Organizr.Application.Planning.TodoLists.Commands.EditTodoSubList
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.TodoListId);
-
-            if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
-                throw new AccessDeniedException<TodoList>(request.TodoListId, currentUserId);
 
             todoList.EditSubList(request.Id, request.Title, request.Description);
 

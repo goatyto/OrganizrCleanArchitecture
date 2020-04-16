@@ -13,16 +13,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Organizr.Web", "src\Organiz
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Organizr.Infrastructure", "src\Organizr.Infrastructure\Organizr.Infrastructure.csproj", "{6A9D767E-DB2B-4B35-AD11-3537BC2439B7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BE6A4CDD-4A0C-46EB-8847-756BF45A175B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BE6A4CDD-4A0C-46EB-8847-756BF45A175B}"
 	ProjectSection(SolutionItems) = preProject
 		CodeCoverage.runsettings = CodeCoverage.runsettings
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Organizr.Domain.UnitTests", "Tests\Organizr.Domain.UnitTests\Organizr.Domain.UnitTests.csproj", "{A723E1D5-7B4C-41A6-A099-FA42F2248E59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Organizr.Domain.UnitTests", "tests\Organizr.Domain.UnitTests\Organizr.Domain.UnitTests.csproj", "{A723E1D5-7B4C-41A6-A099-FA42F2248E59}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Organizr.Application.UnitTests", "Tests\Organizr.Application.UnitTests\Organizr.Application.UnitTests.csproj", "{0B13A2E5-6D1C-46DB-A9CF-E8A66DBF272C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Organizr.Application.UnitTests", "tests\Organizr.Application.UnitTests\Organizr.Application.UnitTests.csproj", "{0B13A2E5-6D1C-46DB-A9CF-E8A66DBF272C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Organizr.Infrastructure.IntegrationTests", "Tests\Organizr.Infrastructure.IntegrationTests\Organizr.Infrastructure.IntegrationTests.csproj", "{C6BD3D04-65E5-40CC-9DA2-D56207B6EAC0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Organizr.Infrastructure.IntegrationTests", "tests\Organizr.Infrastructure.IntegrationTests\Organizr.Infrastructure.IntegrationTests.csproj", "{C6BD3D04-65E5-40CC-9DA2-D56207B6EAC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

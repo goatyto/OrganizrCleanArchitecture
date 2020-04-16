@@ -21,6 +21,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             var subListId = 1;
             var editedSubList = _fixture.Sut.SubLists.Single(sl => sl.Id == subListId);
             var originalOrdinal = editedSubList.Ordinal;
+            var originalIsDeleted = editedSubList.IsDeleted;
 
             var newTitle = "Todo Sub List";
             var newDescription = "Todo Sub List Description";
@@ -32,7 +33,7 @@ namespace Organizr.Domain.UnitTests.Planning.TodoListAggregate
             editedSubList.Title.Should().Be(newTitle);
             editedSubList.Ordinal.Should().Be(originalOrdinal);
             editedSubList.Description.Should().Be(newDescription);
-            editedSubList.IsDeleted.Should().Be(false);
+            editedSubList.IsDeleted.Should().Be(originalIsDeleted);
         }
 
         [Fact]

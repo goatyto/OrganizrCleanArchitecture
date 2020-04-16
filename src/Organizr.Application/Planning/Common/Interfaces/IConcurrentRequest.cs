@@ -7,7 +7,7 @@ namespace Organizr.Application.Planning.Common.Interfaces
         
     }
 
-    public interface IConcurrentRequest : IConcurrentRequest<Unit>
+    public interface IConcurrentRequest : IConcurrentRequest<Unit>, IRequest
     {
 
     }

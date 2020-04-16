@@ -26,33 +26,25 @@ namespace Organizr.Application.Planning.UserGroups.EditUserGroup
     public class EditUserGroupCommandHandler : IRequestHandler<EditUserGroupCommand>
     {
         private readonly IIdentityService _identityService;
-        private readonly IResourceAuthorizationService<UserGroup> _resourceAuthorizationService;
         private readonly IUserGroupRepository _userGroupRepository;
 
-        public EditUserGroupCommandHandler(IIdentityService identityService,
-            IResourceAuthorizationService<UserGroup> resourceAuthorizationService,
-            IUserGroupRepository userGroupRepository)
+        public EditUserGroupCommandHandler(IIdentityService identityService, IUserGroupRepository userGroupRepository)
         {
             Assert.Argument.NotNull(identityService, nameof(identityService));
-            Assert.Argument.NotNull(resourceAuthorizationService, nameof(resourceAuthorizationService));
             Assert.Argument.NotNull(userGroupRepository, nameof(userGroupRepository));
 
             _identityService = identityService;
-            _resourceAuthorizationService = resourceAuthorizationService;
             _userGroupRepository = userGroupRepository;
         }
 
         public async Task<Unit> Handle(EditUserGroupCommand request, CancellationToken cancellationToken)
         {
-            var userGroup = await _userGroupRepository.GetAsync(request.Id, cancellationToken);
+            var currentUserId = _identityService.CurrentUserId;
+            
+            var userGroup = await _userGroupRepository.GetAsync(request.Id, currentUserId, cancellationToken);
 
             if(userGroup == null)
                 throw new ResourceNotFoundException<UserGroup>(request.Id);
-
-            var currentUserId = _identityService.CurrentUserId;
-
-            if(!_resourceAuthorizationService.CanModify(currentUserId, userGroup))
-                throw new AccessDeniedException<UserGroup>(request.Id, currentUserId);
 
             userGroup.Edit(request.Name, request.Description);
 

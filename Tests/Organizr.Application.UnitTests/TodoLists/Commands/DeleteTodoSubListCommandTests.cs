@@ -9,14 +9,13 @@ using Xunit;
 
 namespace Organizr.Application.UnitTests.TodoLists.Commands
 {
-    public class DeleteTodoSubListCommandTests : TodoListCommandsTestBase
+    public class DeleteTodoSubListCommandTests : TodoListCommandTestsBase
     {
         private readonly DeleteTodoSubListCommandHandler _sut;
 
         public DeleteTodoSubListCommandTests()
         {
-            _sut = new DeleteTodoSubListCommandHandler(CurrentUserServiceMock.Object,
-                ResourceAuthorizationServiceMock.Object, TodoListRepositoryMock.Object);
+            _sut = new DeleteTodoSubListCommandHandler(IdentityServiceMock.Object, TodoListRepositoryMock.Object);
         }
 
         [Fact]
@@ -39,16 +38,15 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
         }
 
         [Fact]
-        public void Handle_CurrentUserHasNoAccess_ThrowsAccessDeniedException()
+        public void Handle_NonUserMemberId_ThrowsResourceNotFoundException()
         {
             var noAccessUserId = "User2";
-            CurrentUserServiceMock.Setup(m => m.CurrentUserId).Returns(noAccessUserId);
+            IdentityServiceMock.Setup(m => m.CurrentUserId).Returns(noAccessUserId);
 
             var request = new DeleteTodoSubListCommand(TodoListId, 1);
 
             _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should()
-                .Throw<AccessDeniedException<TodoList>>().Where(exception =>
-                    exception.ResourceId == TodoListId && exception.UserId == noAccessUserId);
+                .Throw<ResourceNotFoundException<TodoList>>().Where(exception => exception.ResourceId == TodoListId);
         }
     }
 }

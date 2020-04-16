@@ -9,14 +9,13 @@ using Xunit;
 
 namespace Organizr.Application.UnitTests.TodoLists.Commands
 {
-    public class AddTodoItemCommandTests : TodoListCommandsTestBase
+    public class AddTodoItemCommandTests : TodoListCommandTestsBase
     {
         private readonly AddTodoItemCommandHandler _sut;
 
         public AddTodoItemCommandTests()
         {
-            _sut = new AddTodoItemCommandHandler(CurrentUserServiceMock.Object, ResourceAuthorizationServiceMock.Object,
-                TodoListRepositoryMock.Object);
+            _sut = new AddTodoItemCommandHandler(IdentityServiceMock.Object, TodoListRepositoryMock.Object);
         }
 
         [Fact]
@@ -41,17 +40,16 @@ namespace Organizr.Application.UnitTests.TodoLists.Commands
         }
 
         [Fact]
-        public void Handle_CurrentUserHasNoAccess_ThrowsAccessDeniedException()
+        public void Handle_NonMemberUserId_ThrowsResourceNotFoundException()
         {
             var noAccessUserId = "User2";
-            CurrentUserServiceMock.Setup(m => m.CurrentUserId).Returns(noAccessUserId);
+            IdentityServiceMock.Setup(m => m.CurrentUserId).Returns(noAccessUserId);
 
             var request = new AddTodoItemCommand(TodoListId, "Title", "Description", ClientDateToday.AddDays(1),
                 ClientTimeZoneOffsetInMinutes);
 
             _sut.Invoking(s => s.Handle(request, CancellationToken.None)).Should()
-                .Throw<AccessDeniedException<TodoList>>().Where(exception =>
-                    exception.ResourceId == TodoListId && exception.UserId == noAccessUserId);
+                .Throw<ResourceNotFoundException<TodoList>>().Where(exception => exception.ResourceId == TodoListId);
         }
     }
 }

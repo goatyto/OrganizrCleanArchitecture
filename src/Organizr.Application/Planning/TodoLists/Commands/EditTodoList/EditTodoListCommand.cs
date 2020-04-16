@@ -26,19 +26,14 @@ namespace Organizr.Application.Planning.TodoLists.Commands.EditTodoList
     public class EditTodoListCommandHandler : IRequestHandler<EditTodoListCommand>
     {
         private readonly IIdentityService _identityService;
-        private readonly IResourceAuthorizationService<TodoList> _resourceAuthorizationService;
         private readonly ITodoListRepository _todoListRepository;
 
-        public EditTodoListCommandHandler(IIdentityService identityService,
-            IResourceAuthorizationService<TodoList> resourceAuthorizationService,
-            ITodoListRepository todoListRepository)
+        public EditTodoListCommandHandler(IIdentityService identityService, ITodoListRepository todoListRepository)
         {
             Assert.Argument.NotNull(identityService, nameof(identityService));
-            Assert.Argument.NotNull(resourceAuthorizationService, nameof(resourceAuthorizationService));
             Assert.Argument.NotNull(todoListRepository, nameof(todoListRepository));
 
             _identityService = identityService;
-            _resourceAuthorizationService = resourceAuthorizationService;
             _todoListRepository = todoListRepository;
         }
         public async Task<Unit> Handle(EditTodoListCommand request, CancellationToken cancellationToken)
@@ -49,9 +44,6 @@ namespace Organizr.Application.Planning.TodoLists.Commands.EditTodoList
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.Id);
-
-            if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
-                throw new AccessDeniedException<TodoList>(request.Id, currentUserId);
 
             todoList.Edit(request.Title, request.Description);
 

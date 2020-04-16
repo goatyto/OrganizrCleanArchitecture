@@ -24,19 +24,14 @@ namespace Organizr.Application.Planning.TodoLists.Commands.DeleteTodoItem
     public class DeleteTodoItemCommandHandler : IRequestHandler<DeleteTodoItemCommand>
     {
         private readonly IIdentityService _identityService;
-        private readonly IResourceAuthorizationService<TodoList> _resourceAuthorizationService;
         private readonly ITodoListRepository _todoListRepository;
 
-        public DeleteTodoItemCommandHandler(IIdentityService identityService,
-            IResourceAuthorizationService<TodoList> resourceAuthorizationService,
-            ITodoListRepository todoListRepository)
+        public DeleteTodoItemCommandHandler(IIdentityService identityService, ITodoListRepository todoListRepository)
         {
             Assert.Argument.NotNull(identityService, nameof(identityService));
-            Assert.Argument.NotNull(resourceAuthorizationService, nameof(resourceAuthorizationService));
             Assert.Argument.NotNull(todoListRepository, nameof(todoListRepository));
 
             _identityService = identityService;
-            _resourceAuthorizationService = resourceAuthorizationService;
             _todoListRepository = todoListRepository;
         }
 
@@ -48,9 +43,6 @@ namespace Organizr.Application.Planning.TodoLists.Commands.DeleteTodoItem
 
             if (todoList == null)
                 throw new ResourceNotFoundException<TodoList>(request.TodoListId);
-
-            if (!_resourceAuthorizationService.CanModify(currentUserId, todoList))
-                throw new AccessDeniedException<TodoList>(request.TodoListId, currentUserId);
 
             todoList.DeleteTodo(request.Id);
 
